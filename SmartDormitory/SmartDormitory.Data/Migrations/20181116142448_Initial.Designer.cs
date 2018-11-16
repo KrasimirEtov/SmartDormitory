@@ -10,7 +10,7 @@ using SmartDormitory.App.Data;
 namespace SmartDormitory.Data.Migrations
 {
     [DbContext(typeof(SmartDormitoryContext))]
-    [Migration("20181116110617_Initial")]
+    [Migration("20181116142448_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -131,6 +131,100 @@ namespace SmartDormitory.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("SmartDormitory.Data.Models.ApiSensor", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ApiFetchUrl");
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<DateTime?>("DeletedOn");
+
+                    b.Property<string>("Description");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<string>("LatestResultId");
+
+                    b.Property<int>("MaxRangeValue");
+
+                    b.Property<string>("MeasureType");
+
+                    b.Property<int>("MinPollingInterval");
+
+                    b.Property<int>("MinRangeValue");
+
+                    b.Property<DateTime?>("ModifiedOn");
+
+                    b.Property<string>("Tag");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApiSensors");
+                });
+
+            modelBuilder.Entity("SmartDormitory.Data.Models.LatestApiSensorResult", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ApiSensorId");
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<DateTime?>("DeletedOn");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<DateTime?>("ModifiedOn");
+
+                    b.Property<DateTime>("TimeStamp");
+
+                    b.Property<double>("Value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApiSensorId")
+                        .IsUnique()
+                        .HasFilter("[ApiSensorId] IS NOT NULL");
+
+                    b.ToTable("LatestApiSensorResults");
+                });
+
+            modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("AlarmOn");
+
+                    b.Property<string>("ApiSensorId");
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<DateTime?>("DeletedOn");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<bool>("IsPublic");
+
+                    b.Property<DateTime?>("ModifiedOn");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("OwnerId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApiSensorId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Sensors");
+                });
+
             modelBuilder.Entity("SmartDormitory.Data.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -141,14 +235,26 @@ namespace SmartDormitory.Data.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<DateTime?>("DeletedOn");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
 
+                    b.Property<string>("FirstName");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<string>("LastName");
+
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<DateTime?>("ModifiedOn");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256);
@@ -225,6 +331,24 @@ namespace SmartDormitory.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SmartDormitory.Data.Models.LatestApiSensorResult", b =>
+                {
+                    b.HasOne("SmartDormitory.Data.Models.ApiSensor", "ApiSensor")
+                        .WithOne("LatestResult")
+                        .HasForeignKey("SmartDormitory.Data.Models.LatestApiSensorResult", "ApiSensorId");
+                });
+
+            modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>
+                {
+                    b.HasOne("SmartDormitory.Data.Models.ApiSensor", "ApiSensor")
+                        .WithMany("Sensors")
+                        .HasForeignKey("ApiSensorId");
+
+                    b.HasOne("SmartDormitory.Data.Models.User", "Owner")
+                        .WithMany("Sensors")
+                        .HasForeignKey("OwnerId");
                 });
 #pragma warning restore 612, 618
         }

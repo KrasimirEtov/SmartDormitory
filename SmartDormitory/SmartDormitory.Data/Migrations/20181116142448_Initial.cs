@@ -9,6 +9,29 @@ namespace SmartDormitory.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "ApiSensors",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    DeletedOn = table.Column<DateTime>(nullable: true),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    ModifiedOn = table.Column<DateTime>(nullable: true),
+                    MinRangeValue = table.Column<int>(nullable: false),
+                    MaxRangeValue = table.Column<int>(nullable: false),
+                    Tag = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    MinPollingInterval = table.Column<int>(nullable: false),
+                    MeasureType = table.Column<string>(nullable: true),
+                    LatestResultId = table.Column<string>(nullable: true),
+                    ApiFetchUrl = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApiSensors", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -40,11 +63,41 @@ namespace SmartDormitory.Data.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    DeletedOn = table.Column<DateTime>(nullable: true),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    ModifiedOn = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LatestApiSensorResults",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    DeletedOn = table.Column<DateTime>(nullable: true),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    ModifiedOn = table.Column<DateTime>(nullable: true),
+                    TimeStamp = table.Column<DateTime>(nullable: false),
+                    Value = table.Column<double>(nullable: false),
+                    ApiSensorId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LatestApiSensorResults", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LatestApiSensorResults_ApiSensors_ApiSensorId",
+                        column: x => x.ApiSensorId,
+                        principalTable: "ApiSensors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -153,6 +206,38 @@ namespace SmartDormitory.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Sensors",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    DeletedOn = table.Column<DateTime>(nullable: true),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    ModifiedOn = table.Column<DateTime>(nullable: true),
+                    OwnerId = table.Column<string>(nullable: true),
+                    ApiSensorId = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    AlarmOn = table.Column<bool>(nullable: false),
+                    IsPublic = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sensors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sensors_ApiSensors_ApiSensorId",
+                        column: x => x.ApiSensorId,
+                        principalTable: "ApiSensors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Sensors_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -191,6 +276,23 @@ namespace SmartDormitory.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LatestApiSensorResults_ApiSensorId",
+                table: "LatestApiSensorResults",
+                column: "ApiSensorId",
+                unique: true,
+                filter: "[ApiSensorId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sensors_ApiSensorId",
+                table: "Sensors",
+                column: "ApiSensorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sensors_OwnerId",
+                table: "Sensors",
+                column: "OwnerId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -211,7 +313,16 @@ namespace SmartDormitory.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "LatestApiSensorResults");
+
+            migrationBuilder.DropTable(
+                name: "Sensors");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "ApiSensors");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

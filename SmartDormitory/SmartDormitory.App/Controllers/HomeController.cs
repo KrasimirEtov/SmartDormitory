@@ -27,20 +27,21 @@ namespace SmartDormitory.App.Controllers
         {
             ViewData["Message"] = "Your application description page.";
 
-            var apiSensor = new ApiSensor
-            {
-                Id = "f1796a28-642e-401f-8129-fd7465417061",
-                MinRangeValue = 15,
-                MaxRangeValue = 28,
-                MinPollingInterval = 40,
-                Tag = "TemperatureSensor1",
-                Description = "This sensor will return values between 15 and 28",
-                MeasureType = "°C",
-                ApiFetchUrl = "http://telerikacademy.icb.bg/api/sensor/f1796a28-642e-401f-8129-fd7465417061"
-            };
+            // Testing
+            //var apiSensor = new ApiSensor
+            //{
+            //    Id = "f1796a28-642e-401f-8129-fd7465417061",
+            //    MinRangeValue = 15,
+            //    MaxRangeValue = 28,
+            //    MinPollingInterval = 40,
+            //    Tag = "TemperatureSensor1",
+            //    Description = "This sensor will return values between 15 and 28",
+            //    MeasureType = "°C",
+            //    ApiFetchUrl = "http://telerikacademy.icb.bg/api/sensor/f1796a28-642e-401f-8129-fd7465417061"
+            //};
 
-            this.context.Add(apiSensor);
-            this.context.SaveChanges();
+            //this.context.Add(apiSensor);
+            //this.context.SaveChanges();
 
             return View();
         }

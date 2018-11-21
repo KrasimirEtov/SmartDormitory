@@ -8,89 +8,103 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
 using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.Data.Models;
+using SmartDormitory.Services;
+using SmartDormitory.Services.Contracts;
 using System;
+using System.Threading.Tasks;
 
 namespace SmartDormitory.App
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
-        {
-            this.Configuration = configuration;
-            this.Environment = env;
-        }
+	public class Startup
+	{
+		public Startup(IConfiguration configuration, IHostingEnvironment env)
+		{
+			this.Configuration = configuration;
+			this.Environment = env;
+		}
 
-        public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+		public IConfiguration Configuration { get; }
+		public IHostingEnvironment Environment { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            //services.Configure<CookiePolicyOptions>(options =>
-            //{
-            //    options.CheckConsentNeeded = context => true;
-            //    options.MinimumSameSitePolicy = SameSiteMode.None;
-            //});
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public void ConfigureServices(IServiceCollection services)
+		{
+			//services.Configure<CookiePolicyOptions>(options =>
+			//{
+			//    options.CheckConsentNeeded = context => true;
+			//    options.MinimumSameSitePolicy = SameSiteMode.None;
+			//});
 
-            services.AddDbContext<SmartDormitoryContext>(options =>
-            {
-                var connectionString = System.Environment.GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
-                options.UseSqlServer(connectionString);
-            });
+			services.AddDbContext<SmartDormitoryContext>(options =>
+			{
+				var connectionString = System.Environment.GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
+				options.UseSqlServer(connectionString);
+			});
 
-            services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<SmartDormitoryContext>()
-                .AddDefaultTokenProviders();
+			services.AddIdentity<User, IdentityRole>()
+				.AddEntityFrameworkStores<SmartDormitoryContext>()
+				.AddDefaultTokenProviders();
 
-            if (this.Environment.IsDevelopment())
-            {
-                services.Configure<IdentityOptions>(options =>
-                {
-                    // Password settings
-                    options.Password.RequireDigit = false;
-                    options.Password.RequiredLength = 3;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequiredUniqueChars = 0;
+			// Dependency Injection
+			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<UserManager<User>>();
+			services.AddScoped<RoleManager<IdentityRole>>();
 
-                    // Lockout settings
-                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(1);
-                    options.Lockout.MaxFailedAccessAttempts = 999;
-                });
-            }
+			if (this.Environment.IsDevelopment())
+			{
+				services.Configure<IdentityOptions>(options =>
+				{
+					// Password settings
+					options.Password.RequireDigit = false;
+					options.Password.RequiredLength = 3;
+					options.Password.RequireNonAlphanumeric = false;
+					options.Password.RequireUppercase = false;
+					options.Password.RequireLowercase = false;
+					options.Password.RequiredUniqueChars = 0;
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-        }
+					// Lockout settings
+					options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(1);
+					options.Lockout.MaxFailedAccessAttempts = 999;
+				});
+			}
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-           // app.UseDatabaseMigration();
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+		}
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+		{
+			// app.UseDatabaseMigration();
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+				app.UseDatabaseErrorPage();
+			}
+			else
+			{
+				app.UseExceptionHandler("/Home/Error");
+				app.UseHsts();
+			}
 
-            app.UseAuthentication();
+			app.UseHttpsRedirection();
+			app.UseStaticFiles();
+			app.UseCookiePolicy();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
-        }
-    }
+			app.UseAuthentication();
+
+			//app.SeedAdminAccount();
+
+			app.UseMvc(routes =>
+			{
+				routes.MapRoute(
+					name: "Administration",
+					template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+				routes.MapRoute(
+					name: "default",
+					template: "{controller=Home}/{action=Index}/{id?}");
+			});
+		}
+	}
 }

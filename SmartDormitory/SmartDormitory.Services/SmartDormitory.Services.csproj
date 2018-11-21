@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmartDormitory.Data.Models\SmartDormitory.Data.Models.csproj" />
+    <ProjectReference Include="..\SmartDormitory.Data\SmartDormitory.Data.csproj" />
+  </ItemGroup>
+
+</Project>

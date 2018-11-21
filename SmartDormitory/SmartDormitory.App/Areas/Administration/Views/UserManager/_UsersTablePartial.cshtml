@@ -1,0 +1,81 @@
+﻿@model UserViewModelList
+
+@{
+    string adminBtnStyle = "btn-outline-danger";
+    string nonAdminBtnStyle = "btn-outline-dark-green";
+
+
+    //string buttonTitle = user.IsAdmin ? "Remove admin" : "Make admin";
+}
+
+<div id="users-table">
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th class="th-lg" scope="col" style="text-align:center">UserName</th>
+                    <th class="th-lg" scope="col" style="text-align:center">Sensors Count</th>
+                    <th class="th-lg" scope="col" style="text-align:center">Role</th>
+                    <th class="th-lg" scope="col" style="text-align:center">Action</th>
+                    <th class="th-lg" scope="col" style="text-align:center">State</th>
+                </tr>
+            </thead>
+            <tbody id="user-section">
+                @foreach (var user in Model.UserViewModels)
+                {
+                    <tr style="text-align:center">
+                        <td>@user.UserName</td>
+                        <td>@user.SensorsCount</td>
+                        <td>
+                            @if (user.UserName == User.Identity.Name)
+                            {
+                                <button class="btn btn-dark-green" disabled>Admin</button>
+                            }
+                            else
+                            {
+                                string buttonClass = user.IsAdmin ? adminBtnStyle : nonAdminBtnStyle;
+
+                                <form id="removeAdmin-form" asp-area="Administration" asp-controller="UserManager"
+                                      asp-action="ToggleRole" asp-route-userId ="@user.Id" method="post">
+                                    <button class="adminButton btn waves-effect @buttonClass" type="submit">test</button>
+                                </form>
+                            }
+                        </td>
+                        <td>
+                            <a asp-area="Identity" asp-route-userId="@user.Id"
+                               asp-page="/Account/Manage/Index" class="btn btn-outline-brown waves-effect">Profile</a>
+                        </td>
+                        <td>
+                            @if (user.IsDeleted)
+                            {
+                                <a asp-area="Administration" asp-controller="UserManager"
+                                   asp-action="Delete" asp-route-userId="@user.Id"
+                                   class="btn btn-dark-green waves-effect">Enable</a>
+                            }
+                            else
+                            {
+                                <button type="button" data-id="@user.Id" class="btn btn-outline-danger waves-effect"
+                                        data-toggle="modal" data-target="#deleteModal">
+                                    Disable
+                                </button>
+
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $('.adminButton').click(function () {
+        if ($(this).hasClass("adminBtnStyle")) {
+            $(this).removeClass('adminBtnStyle').addClass('nonAdminBtnStyle');
+        }
+        else if ($(this).hasClass("nonAdminBtnStyle")) {
+            $(this).removeClass('nonAdminBtnStyle').addClass('adminBtnStyle');
+
+        }
+    })
+</script>

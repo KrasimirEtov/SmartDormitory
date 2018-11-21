@@ -46,7 +46,7 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account.Manage
             public string PhoneNumber { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string userId)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -66,7 +66,7 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account.Manage
                 PhoneNumber = phoneNumber
             };
 
-            IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+            //IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
 
             return Page();
         }

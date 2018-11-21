@@ -28,7 +28,8 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="#"><strong>Smart Dormitory</strong></a>
+        <a asp-area="" asp-controller="Home" asp-action="Index"
+           class="navbar-brand"><strong>Smart Dormitory</strong></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -47,6 +48,10 @@
                     <a asp-area="" asp-controller="Home" asp-action="Contact"
                        class="nav-link waves-effect">Contact</a>
                 </li>
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
+                {
+                    <partial name="_AdminPartial" /> @* TODO: Дали Html.PartialAsync*@
+                }
             </ul>
             @await Html.PartialAsync("_LoginPartial")
         </div>

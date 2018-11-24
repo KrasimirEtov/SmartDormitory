@@ -129,66 +129,41 @@ namespace SmartDormitory.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("SmartDormitory.Data.Models.ApiSensor", b =>
+            modelBuilder.Entity("SmartDormitory.Data.Models.IcbSensor", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ApiFetchUrl");
-
                     b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<float>("CurrentValue");
 
                     b.Property<DateTime?>("DeletedOn");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired();
 
                     b.Property<bool>("IsDeleted");
 
-                    b.Property<string>("LatestResultId");
+                    b.Property<DateTime>("LastUpdateOn");
 
-                    b.Property<int>("MaxRangeValue");
+                    b.Property<float>("MaxRangeValue");
 
-                    b.Property<string>("MeasureType");
+                    b.Property<string>("MeasureUnit")
+                        .IsRequired();
 
-                    b.Property<int>("MinPollingInterval");
-
-                    b.Property<int>("MinRangeValue");
-
-                    b.Property<DateTime?>("ModifiedOn");
-
-                    b.Property<string>("Tag");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ApiSensors");
-                });
-
-            modelBuilder.Entity("SmartDormitory.Data.Models.LatestApiSensorResult", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ApiSensorId");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<DateTime?>("DeletedOn");
-
-                    b.Property<bool>("IsDeleted");
+                    b.Property<float>("MinRangeValue");
 
                     b.Property<DateTime?>("ModifiedOn");
 
-                    b.Property<DateTime>("TimeStamp");
+                    b.Property<int>("PollingInterval");
 
-                    b.Property<double>("Value");
+                    b.Property<string>("Tag")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApiSensorId")
-                        .IsUnique()
-                        .HasFilter("[ApiSensorId] IS NOT NULL");
-
-                    b.ToTable("LatestApiSensorResults");
+                    b.ToTable("IcbSensors");
                 });
 
             modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>
@@ -196,13 +171,20 @@ namespace SmartDormitory.Data.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("AlarmOn");
+                    b.Property<float>("AlarmMaxRangeValue");
 
-                    b.Property<string>("ApiSensorId");
+                    b.Property<float>("AlarmMinRangeValue");
+
+                    b.Property<bool>("AlarmOn");
 
                     b.Property<DateTime?>("CreatedOn");
 
                     b.Property<DateTime?>("DeletedOn");
+
+                    b.Property<string>("Description")
+                        .IsRequired();
+
+                    b.Property<string>("IcbSensorId");
 
                     b.Property<bool>("IsDeleted");
 
@@ -210,13 +192,16 @@ namespace SmartDormitory.Data.Migrations
 
                     b.Property<DateTime?>("ModifiedOn");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<string>("OwnerId");
 
+                    b.Property<int>("UserPollingInterval");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ApiSensorId");
+                    b.HasIndex("IcbSensorId");
 
                     b.HasIndex("OwnerId");
 
@@ -331,22 +316,31 @@ namespace SmartDormitory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("SmartDormitory.Data.Models.LatestApiSensorResult", b =>
-                {
-                    b.HasOne("SmartDormitory.Data.Models.ApiSensor", "ApiSensor")
-                        .WithOne("LatestResult")
-                        .HasForeignKey("SmartDormitory.Data.Models.LatestApiSensorResult", "ApiSensorId");
-                });
-
             modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>
                 {
-                    b.HasOne("SmartDormitory.Data.Models.ApiSensor", "ApiSensor")
+                    b.HasOne("SmartDormitory.Data.Models.IcbSensor", "IcbSensor")
                         .WithMany("Sensors")
-                        .HasForeignKey("ApiSensorId");
+                        .HasForeignKey("IcbSensorId");
 
                     b.HasOne("SmartDormitory.Data.Models.User", "Owner")
                         .WithMany("Sensors")
                         .HasForeignKey("OwnerId");
+
+                    b.OwnsOne("SmartDormitory.Data.Models.Coordinates", "Coordinates", b1 =>
+                        {
+                            b1.Property<string>("SensorId");
+
+                            b1.Property<double>("Latitude");
+
+                            b1.Property<double>("Longitude");
+
+                            b1.ToTable("Sensors");
+
+                            b1.HasOne("SmartDormitory.Data.Models.Sensor")
+                                .WithOne("Coordinates")
+                                .HasForeignKey("SmartDormitory.Data.Models.Coordinates", "SensorId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
                 });
 #pragma warning restore 612, 618
         }

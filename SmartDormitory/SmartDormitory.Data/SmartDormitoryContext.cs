@@ -20,9 +20,7 @@ namespace SmartDormitory.App.Data
 
         public DbSet<Sensor> Sensors { get; set; }
 
-        public DbSet<ApiSensor> ApiSensors { get; set; }
-
-        public DbSet<LatestApiSensorResult> LatestApiSensorResults { get; set; }
+        public DbSet<IcbSensor> IcbSensors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -31,15 +29,10 @@ namespace SmartDormitory.App.Data
                 .WithOne(s => s.Owner)
                 .HasForeignKey(u => u.OwnerId);
 
-            builder.Entity<ApiSensor>()
+            builder.Entity<IcbSensor>()
                 .HasMany(x => x.Sensors)
-                .WithOne(s => s.ApiSensor)
-                .HasForeignKey(s => s.ApiSensorId);
-
-            builder.Entity<ApiSensor>()
-                .HasOne(s => s.LatestResult)
-                .WithOne(lr => lr.ApiSensor)
-                .HasForeignKey<LatestApiSensorResult>(lr => lr.ApiSensorId);
+                .WithOne(s => s.IcbSensor)
+                .HasForeignKey(s => s.IcbSensorId);
 
             base.OnModelCreating(builder);
         }

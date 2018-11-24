@@ -7,8 +7,8 @@ namespace SmartDormitory.Data.Models.Abstract
 {
     public class BaseEntity : IAuditable, IDeletable
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
         public bool IsDeleted { get; set; }

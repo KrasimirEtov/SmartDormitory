@@ -10,7 +10,7 @@ using SmartDormitory.App.Data;
 namespace SmartDormitory.Data.Migrations
 {
     [DbContext(typeof(SmartDormitoryContext))]
-    [Migration("20181124155955_Initial")]
+    [Migration("20181125215101_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,8 +151,7 @@ namespace SmartDormitory.Data.Migrations
 
                     b.Property<float>("MaxRangeValue");
 
-                    b.Property<string>("MeasureUnit")
-                        .IsRequired();
+                    b.Property<string>("MeasureTypeId");
 
                     b.Property<float>("MinRangeValue");
 
@@ -165,7 +164,39 @@ namespace SmartDormitory.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MeasureTypeId");
+
                     b.ToTable("IcbSensors");
+                });
+
+            modelBuilder.Entity("SmartDormitory.Data.Models.MeasureType", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<DateTime?>("DeletedOn");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<string>("MeasureUnit");
+
+                    b.Property<DateTime?>("ModifiedOn");
+
+                    b.Property<string>("SuitableSensorType");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MeasureTypes");
+
+                    b.HasData(
+                        new { Id = "d27a77b3-1d45-4f40-8871-bc6aa4054686", CreatedOn = new DateTime(2018, 11, 25, 23, 51, 1, 659, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "°C", SuitableSensorType = "Temperature" },
+                        new { Id = "7df3c119-a73f-4cd8-b044-86d0b261e65a", CreatedOn = new DateTime(2018, 11, 25, 23, 51, 1, 661, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "%", SuitableSensorType = "Humidity" },
+                        new { Id = "2524f6f3-5291-404b-b5e4-b24db2c0254a", CreatedOn = new DateTime(2018, 11, 25, 23, 51, 1, 661, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "W", SuitableSensorType = "Electric power consumtion" },
+                        new { Id = "29d56a9e-ce59-4055-926c-f354621e7086", CreatedOn = new DateTime(2018, 11, 25, 23, 51, 1, 661, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "(true/false)", SuitableSensorType = "Boolean switch (door/occupancy/etc)" },
+                        new { Id = "697d3892-43be-4ab3-9ad9-57a3b2b168ea", CreatedOn = new DateTime(2018, 11, 25, 23, 51, 1, 661, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "dB", SuitableSensorType = "Noise" }
+                    );
                 });
 
             modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>
@@ -318,6 +349,13 @@ namespace SmartDormitory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("SmartDormitory.Data.Models.IcbSensor", b =>
+                {
+                    b.HasOne("SmartDormitory.Data.Models.MeasureType", "MeasureType")
+                        .WithMany("IcbSensors")
+                        .HasForeignKey("MeasureTypeId");
+                });
+
             modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>
                 {
                     b.HasOne("SmartDormitory.Data.Models.IcbSensor", "IcbSensor")
@@ -332,9 +370,11 @@ namespace SmartDormitory.Data.Migrations
                         {
                             b1.Property<string>("SensorId");
 
-                            b1.Property<double>("Latitude");
+                            b1.Property<double>("Latitude")
+                                .HasColumnName("Latitude");
 
-                            b1.Property<double>("Longitude");
+                            b1.Property<double>("Longitude")
+                                .HasColumnName("Longitude");
 
                             b1.ToTable("Sensors");
 

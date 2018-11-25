@@ -22,7 +22,17 @@ namespace SmartDormitory.App.Data
 
         public DbSet<IcbSensor> IcbSensors { get; set; }
 
+        public DbSet<MeasureType> MeasureTypes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
+        {
+            this.SetupEntitiesRelations(builder);
+            this.SeedMeasureTypes(builder);
+
+            base.OnModelCreating(builder);
+        }
+
+        private void SetupEntitiesRelations(ModelBuilder builder)
         {
             builder.Entity<User>()
                 .HasMany(u => u.Sensors)
@@ -34,7 +44,59 @@ namespace SmartDormitory.App.Data
                 .WithOne(s => s.IcbSensor)
                 .HasForeignKey(s => s.IcbSensorId);
 
-            base.OnModelCreating(builder);
+            builder.Entity<MeasureType>()
+                .HasMany(mt => mt.IcbSensors)
+                .WithOne(s => s.MeasureType)
+                .HasForeignKey(s => s.MeasureTypeId);
+
+            builder.Entity<Sensor>()
+                   .OwnsOne(s => s.Coordinates,
+                            c =>
+                            {
+                                c.Property(p => p.Latitude).HasColumnName("Latitude");
+                                c.Property(p => p.Longitude).HasColumnName("Longitude");
+                            });
+        }
+
+        private void SeedMeasureTypes(ModelBuilder builder)
+        {
+            builder.Entity<MeasureType>()
+                   .HasData(
+                            new MeasureType
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                MeasureUnit = "°C",
+                                SuitableSensorType = "Temperature",
+                                CreatedOn = DateTime.Now
+                            },
+                           new MeasureType
+                           {
+                               Id = Guid.NewGuid().ToString(),
+                               MeasureUnit = "%",
+                               SuitableSensorType = "Humidity",
+                               CreatedOn = DateTime.Now
+                           },
+                           new MeasureType
+                           {
+                               Id = Guid.NewGuid().ToString(),
+                               MeasureUnit = "W",
+                               SuitableSensorType = "Electric power consumtion",
+                               CreatedOn = DateTime.Now
+                           },
+                           new MeasureType
+                           {
+                               Id = Guid.NewGuid().ToString(),
+                               MeasureUnit = "(true/false)",
+                               SuitableSensorType = "Boolean switch (door/occupancy/etc)",
+                               CreatedOn = DateTime.Now
+                           },
+                           new MeasureType
+                           {
+                               Id = Guid.NewGuid().ToString(),
+                               MeasureUnit = "dB",
+                               SuitableSensorType = "Noise",
+                               CreatedOn = DateTime.Now
+                           });
         }
 
         public override int SaveChanges()

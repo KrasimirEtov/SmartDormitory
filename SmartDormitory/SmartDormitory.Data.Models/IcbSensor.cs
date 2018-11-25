@@ -24,8 +24,8 @@ namespace SmartDormitory.Data.Models
         [Range(0, int.MaxValue, ErrorMessage = UserPollingIntervalErrorMessage)]
         public int PollingInterval { get; set; }
 
-        [Required]
-        public string MeasureUnit { get; set; }
+        public MeasureType MeasureType { get; set; }
+        public string MeasureTypeId { get; set; }
 
         public ICollection<Sensor> Sensors { get; set; } = new HashSet<Sensor>();
 

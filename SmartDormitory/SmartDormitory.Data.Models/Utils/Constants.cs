@@ -1,4 +1,4 @@
-﻿namespace SmartDormitory.Data.Models.Common
+﻿namespace SmartDormitory.Data.Models.Utils
 {
     public static partial class Constants
     {

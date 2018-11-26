@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartDormitory.Data.Models.Abstract;
 using System.ComponentModel.DataAnnotations;
-using static SmartDormitory.Data.Models.Common.Constants.DomainConstants;
+using static SmartDormitory.Data.Models.Utils.Constants.DomainConstants;
 
 namespace SmartDormitory.Data.Models
 {

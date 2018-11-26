@@ -5,8 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SmartDormitory.Data.Models\SmartDormitory.Data.Models.csproj" />
     <ProjectReference Include="..\SmartDormitory.Data\SmartDormitory.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

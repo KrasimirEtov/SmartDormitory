@@ -34,7 +34,7 @@
                         <td>@user.UserName</td>
                         <td>@user.SensorsCount</td>
                         <td>
-                            @if (user.UserName == User.Identity.Name || user.Id == "08ab4a4d-cdbe-488d-b8d7-07edc1a53ede")
+                            @if (user.UserName == User.Identity.Name || user.UserName == "admin")
                             {
                                 <button class="btn btn-dark-green" disabled>Admin</button>
                             }
@@ -45,7 +45,10 @@
 
                                 <form asp-area="Administration" asp-controller="UserManager"
                                       asp-action="ToggleRole" data-user-id="@user.Id" method="post" class="roleForm">
-                                    <button class="roleButton btn @buttonClass" data-user-id="@user.Id" type="submit">@buttonTitle</button>
+                                    <button class="roleButton btn @buttonClass"
+                                            data-user-id="@user.Id" type="submit">
+                                        @buttonTitle
+                                    </button>
                                 </form>
                             }
                         </td>

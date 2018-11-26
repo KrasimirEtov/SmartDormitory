@@ -21,7 +21,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Users()
 		{
-			// TODO: Delete user account
+			// TODO: Return a partial view for pagination
 			var users = await userService.GetAllUsers();
 			var userViewModels = users.Select(u => new UserViewModel(u)).ToList();
 
@@ -32,54 +32,53 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 					user.IsAdmin = true;
 				}
 			}
-			var userViewModelList = new UserViewModelList(userViewModels);
 
-			return View(userViewModelList);
+			return View(userViewModels);
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> ToggleRole(string userId)
+		public async Task<IActionResult> ToggleRole([FromForm]string userId)
 		{
+			
 			var user = await this.userService.GetUser(userId);
 			if (user == null)
 			{
 				this.TempData["Error-Message"] = $"User does not exist!";
-				return NoContent();
+				return this.NotFound();
 			}
 
 			if (await userService.IsInRole(userId, "Administrator"))
-			{
-				this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
-
+			{		
+				// try catch ? 
 				await this.userService.RemoveRole(user.Id, "Administrator");
+				this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
 			}
 			else
 			{
-				this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
-
 				await this.userService.SetRole(user.Id, "Administrator");
+				this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
 			}
 
-			return NoContent();
+			return this.Ok();
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Delete(string userId)
+		public async Task<IActionResult> Delete([FromForm]string userId)
 		{
 			var user = await this.userService.GetUser(userId);
 			if (user == null)
 			{
 				this.TempData["Error-Message"] = $"User does not exist!";
-				return NoContent();
+				return this.NotFound();
 			}
 
 			await this.userService.DeleteUser(userId);
 
 			this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
 
-			return NoContent(); 
+			return this.Ok();
 		}
 	}
 }

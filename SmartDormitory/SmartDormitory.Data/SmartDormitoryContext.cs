@@ -20,28 +20,83 @@ namespace SmartDormitory.App.Data
 
         public DbSet<Sensor> Sensors { get; set; }
 
-        public DbSet<ApiSensor> ApiSensors { get; set; }
+        public DbSet<IcbSensor> IcbSensors { get; set; }
 
-        public DbSet<LatestApiSensorResult> LatestApiSensorResults { get; set; }
+        public DbSet<MeasureType> MeasureTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
+        {
+            this.SetupEntitiesRelations(builder);
+            this.SeedMeasureTypes(builder);
+
+            base.OnModelCreating(builder);
+        }
+
+        private void SetupEntitiesRelations(ModelBuilder builder)
         {
             builder.Entity<User>()
                 .HasMany(u => u.Sensors)
                 .WithOne(s => s.Owner)
                 .HasForeignKey(u => u.OwnerId);
 
-            builder.Entity<ApiSensor>()
+            builder.Entity<IcbSensor>()
                 .HasMany(x => x.Sensors)
-                .WithOne(s => s.ApiSensor)
-                .HasForeignKey(s => s.ApiSensorId);
+                .WithOne(s => s.IcbSensor)
+                .HasForeignKey(s => s.IcbSensorId);
 
-            builder.Entity<ApiSensor>()
-                .HasOne(s => s.LatestResult)
-                .WithOne(lr => lr.ApiSensor)
-                .HasForeignKey<LatestApiSensorResult>(lr => lr.ApiSensorId);
+            builder.Entity<MeasureType>()
+                .HasMany(mt => mt.IcbSensors)
+                .WithOne(s => s.MeasureType)
+                .HasForeignKey(s => s.MeasureTypeId);
 
-            base.OnModelCreating(builder);
+            builder.Entity<Sensor>()
+                   .OwnsOne(s => s.Coordinates,
+                            c =>
+                            {
+                                c.Property(p => p.Latitude).HasColumnName("Latitude");
+                                c.Property(p => p.Longitude).HasColumnName("Longitude");
+                            });
+        }
+
+        private void SeedMeasureTypes(ModelBuilder builder)
+        {
+            builder.Entity<MeasureType>()
+                   .HasData(
+                            new MeasureType
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                MeasureUnit = "°C",
+                                SuitableSensorType = "Temperature",
+                                CreatedOn = DateTime.Now
+                            },
+                           new MeasureType
+                           {
+                               Id = Guid.NewGuid().ToString(),
+                               MeasureUnit = "%",
+                               SuitableSensorType = "Humidity",
+                               CreatedOn = DateTime.Now
+                           },
+                           new MeasureType
+                           {
+                               Id = Guid.NewGuid().ToString(),
+                               MeasureUnit = "W",
+                               SuitableSensorType = "Electric power consumtion",
+                               CreatedOn = DateTime.Now
+                           },
+                           new MeasureType
+                           {
+                               Id = Guid.NewGuid().ToString(),
+                               MeasureUnit = "(true/false)",
+                               SuitableSensorType = "Boolean switch (door/occupancy/etc)",
+                               CreatedOn = DateTime.Now
+                           },
+                           new MeasureType
+                           {
+                               Id = Guid.NewGuid().ToString(),
+                               MeasureUnit = "dB",
+                               SuitableSensorType = "Noise",
+                               CreatedOn = DateTime.Now
+                           });
         }
 
         public override int SaveChanges()

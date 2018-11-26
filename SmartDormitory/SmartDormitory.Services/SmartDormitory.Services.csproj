@@ -13,8 +13,4 @@
     <ProjectReference Include="..\SmartDormitory.Data\SmartDormitory.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
 </Project>

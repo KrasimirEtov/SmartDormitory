@@ -1,11 +1,13 @@
-﻿@model IEnumerable<UserViewModel>
+﻿@model UsersPagingViewModel
 @{
     ViewData["Title"] = "Users";
 }
 <h2 style="text-align:center">All users</h2>
 <hr />
 
-<partial name="_UsersTablePartial" model="@Model" />
+<div id="usersTable">
+    <partial name="_UsersTablePartial" model="@Model" />
+</div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -31,6 +33,5 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/roleManager.js"></script>
     <script src="~/js/deleteUserModal.js"></script>
 }

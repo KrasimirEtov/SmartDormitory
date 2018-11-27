@@ -1,11 +1,11 @@
 ﻿$(function () {
 
     $('button.roleButton').click(function () {
-
-        const isAdminBtn = $('#adminBtnStyle').val();
-        const isNotAdminBtn = $('#nonAdminBtnStyle').val();
-        const isAdminText = $('#isAdminText').val();
-        const isNotAdminText = $('#isNotAdminText').val();
+            
+        const isAdminBtn = 'btn-danger';
+        const isNotAdminBtn = 'btn-dark-green';
+        const isAdminText = 'Remove Admin';
+        const isNotAdminText = 'Make Admin';
 
         if ($(this).hasClass(isAdminBtn)) {
             $(this).removeClass(isAdminBtn).addClass(isNotAdminBtn);
@@ -29,3 +29,5 @@
         });
     });
 });
+
+

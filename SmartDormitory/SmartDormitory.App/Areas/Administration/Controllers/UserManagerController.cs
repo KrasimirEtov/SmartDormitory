@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartDormitory.App.Areas.Administration.Models;
 using SmartDormitory.Services.Contracts;
+using SmartDormitory.Services.Exceptions;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,14 +25,22 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 			// TODO: Delete user account
 			var users = await userService.GetAllUsers();
 			var userViewModels = users.Select(u => new UserViewModel(u)).ToList();
-
-			foreach (var user in userViewModels)
+			try
 			{
-				if (await userService.IsInRole(user.Id, "Administrator"))
+				foreach (var user in userViewModels)
 				{
-					user.IsAdmin = true;
+					if (await userService.IsInRole(user.Id, "Administrator"))
+					{
+						user.IsAdmin = true;
+					}
 				}
 			}
+			catch (EntityDoesntExistException e)
+			{
+				// TODO: Talk about exception handling
+				return this.NotFound();
+			}
+
 			var userViewModelList = new UserViewModelList(userViewModels);
 
 			return View(userViewModelList);
@@ -47,18 +56,25 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 				this.TempData["Error-Message"] = $"User does not exist!";
 				return NoContent();
 			}
-
-			if (await userService.IsInRole(userId, "Administrator"))
+			try
 			{
-				this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
+				if (await userService.IsInRole(userId, "Administrator"))
+				{
+					this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
 
-				await this.userService.RemoveRole(user.Id, "Administrator");
+					await this.userService.RemoveRole(user.Id, "Administrator");
+				}
+				else
+				{
+					this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
+
+					await this.userService.SetRole(user.Id, "Administrator");
+				}
 			}
-			else
+			catch (EntityDoesntExistException e)
 			{
-				this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
-
-				await this.userService.SetRole(user.Id, "Administrator");
+				// TODO: Talk about exception handling
+				return this.NotFound();
 			}
 
 			return NoContent();
@@ -68,18 +84,19 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Delete(string userId)
 		{
-			var user = await this.userService.GetUser(userId);
-			if (user == null)
+			try
 			{
-				this.TempData["Error-Message"] = $"User does not exist!";
-				return NoContent();
+				await this.userService.DeleteUser(userId);
 			}
+			catch (EntityDoesntExistException e)
+			{
+				this.TempData["Error-Message"] = e.Message;
+				// TODO: Talk about exception handling
+				return this.NotFound();
+			}
+			this.TempData["Success-Message"] = $"User was successfully deleted!";
 
-			await this.userService.DeleteUser(userId);
-
-			this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
-
-			return NoContent(); 
+			return this.Ok();
 		}
 	}
 }

@@ -51,7 +51,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
 
                 BackgroundJob.Schedule(() => SetupSensorUpdateReccuringJob(id, pollingInterval),
                                              TimeSpan.FromSeconds(pollingInterval));
-            }
+            } 
         }
     }
 }

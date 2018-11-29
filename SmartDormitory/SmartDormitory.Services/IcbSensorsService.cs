@@ -52,7 +52,8 @@ namespace SmartDormitory.Services
                             MeasureTypeId = measureType.Id,
                             PollingInterval = icbSensor.MinPollingIntervalInSeconds,
                             MinRangeValue = MinRange,
-                            MaxRangeValue = MaxRange
+                            MaxRangeValue = MaxRange,
+                            CreatedOn = DateTime.Now
                         };
 
                         await this.Context.IcbSensors.AddAsync(icbSensorToAdd);
@@ -72,11 +73,12 @@ namespace SmartDormitory.Services
                                       .IcbSensors
                                       .Include(s => s.MeasureType)
                                       .FirstOrDefaultAsync(s => s.Id == id);
-
+            
             if (icbSensor != null)
             {
                 if (icbSensor.MeasureType.MeasureUnit == measureUnit)
                 {
+                    icbSensor.ModifiedOn = timeStamp;
                     icbSensor.LastUpdateOn = timeStamp;
                     icbSensor.CurrentValue = this.ExtractLastValue(lastValue);
 
@@ -85,9 +87,6 @@ namespace SmartDormitory.Services
             }
             // return sensor?
         }
-
-        //public IEnumerable<string> HangfireGetAll()
-        //    => this.Context.IcbSensors.Select(s => s.Id);
 
         private float ExtractLastValue(string lastValue)
         {

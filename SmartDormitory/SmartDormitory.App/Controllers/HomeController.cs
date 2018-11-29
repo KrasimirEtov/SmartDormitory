@@ -1,47 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SmartDormitory.App.Data;
 using SmartDormitory.App.Models;
-using SmartDormitory.Data.Models;
-using System;
+using SmartDormitory.Services.Contracts;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly SmartDormitoryContext context;
+        private readonly ISensorsService sensorsService;
 
-        public HomeController(SmartDormitoryContext context)
+        public HomeController(ISensorsService sensorsService)
         {
-            this.context = context;
+            this.sensorsService = sensorsService;
         }
 
         public IActionResult Index()
         {
-           
-
+            // seed some fake sensonrs
+            //this.sensorsService.SeedSomeSensorsForMaps();
+            //var sensorsCoordinates = await this.sensorsService.GetAllPublicSensorsCoordinates();
+            
             return View();
+        }
+        
+        [HttpGet]
+        public async Task<JsonResult> GetSensorsCoordinates()
+        {
+            // seed some fake sensonrs
+            //this.sensorsService.SeedSomeSensorsForMaps();
+
+            var sensorsCoordinates = await this.sensorsService.GetAllPublicSensorsCoordinates();
+
+            return this.Json(sensorsCoordinates);
+            //return View(sensorsCoordinates);
         }
 
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
-
-            // Testing
-            //var apiSensor = new ApiSensor
-            //{
-            //    Id = "f1796a28-642e-401f-8129-fd7465417061",
-            //    MinRangeValue = 15,
-            //    MaxRangeValue = 28,
-            //    MinPollingInterval = 40,
-            //    Tag = "TemperatureSensor1",
-            //    Description = "This sensor will return values between 15 and 28",
-            //    MeasureType = "°C",
-            //    ApiFetchUrl = "http://telerikacademy.icb.bg/api/sensor/f1796a28-642e-401f-8129-fd7465417061"
-            //};
-
-            //this.context.Add(apiSensor);
-            //this.context.SaveChanges();
 
             return View();
         }

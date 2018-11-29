@@ -54,8 +54,10 @@ namespace SmartDormitory.App
             services.AddScoped<IUserService, UserService>();
             services.AddTransient<IIcbApiService, IcbApiService>();
             services.AddTransient<IIcbSensorsService, IcbSensorsService>();
-            services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
+            services.AddTransient<ISensorsService, SensorsService>();
 
+            services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
+            
             // IMPORTANT
             // Comment this line after 1st start of the app in development 
             this.ActivatingHangfireJobs(services);
@@ -106,9 +108,13 @@ namespace SmartDormitory.App
             //app.SeedAdminAccount();
 
             //hangfire
-            app.UseHangfireDashboard();
-            app.UseHangfireServer();
+            var hangfireServerOptions = new BackgroundJobServerOptions
+            {
+                SchedulePollingInterval = TimeSpan.FromSeconds(1)
+            };
 
+            app.UseHangfireDashboard();
+            app.UseHangfireServer(hangfireServerOptions);
 
             app.UseMvc(routes =>
             {

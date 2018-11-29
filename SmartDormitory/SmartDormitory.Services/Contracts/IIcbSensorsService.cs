@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Services.Contracts
 {
     public interface IIcbSensorsService
     {
-        Task<IReadOnlyList<string>> AddSensors();
+        Task<IEnumerable<(string Id, int PollingInterval)>> AddSensorsAsync();
+        Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measUnit);
+       
     }
 }

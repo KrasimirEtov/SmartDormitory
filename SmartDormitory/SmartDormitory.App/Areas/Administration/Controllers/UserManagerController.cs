@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartDormitory.App.Areas.Administration.Models;
 using SmartDormitory.Services.Contracts;
+using SmartDormitory.Services.Exceptions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 
 		[HttpGet]
 		public async Task<IActionResult> Users(int page = 1)
-		{			
+		{
 			var model = await UpdateAllUsersPage(page);
 
 			return PartialView("_UsersTablePartial", model);
@@ -66,18 +67,19 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Delete([FromForm]string userId)
+		public async Task<IActionResult> Delete(string userId)
 		{
-			var user = await this.userService.GetUser(userId);
-			if (user == null)
+			try
 			{
-				this.TempData["Error-Message"] = $"User does not exist!";
+				await this.userService.DeleteUser(userId);
+			}
+			catch (EntityDoesntExistException e)
+			{
+				this.TempData["Error-Message"] = e.Message;
+				// TODO: Talk about exception handling
 				return this.NotFound();
 			}
-
-			await this.userService.DeleteUser(userId);
-
-			this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
+			this.TempData["Success-Message"] = $"User was successfully deleted!";
 
 			return this.Ok();
 		}

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
+using SmartDormitory.App.Infrastructure.Hangfire;
 using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
@@ -34,16 +36,16 @@ namespace SmartDormitory.App
             //    options.CheckConsentNeeded = context => true;
             //    options.MinimumSameSitePolicy = SameSiteMode.None;
             //});
+            var connectionString = System.Environment
+                                .GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
 
-            services.AddDbContext<SmartDormitoryContext>(options =>
-            {
-                var connectionString = System.Environment.GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
-                options.UseSqlServer(connectionString);
-            });
-
+            services.AddDbContext<SmartDormitoryContext>(options => options.UseSqlServer(connectionString));
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<SmartDormitoryContext>()
                 .AddDefaultTokenProviders();
+
+            GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
+            services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
 
             // Dependency Injection
             services.AddHttpClient<IcbHttpClient>();
@@ -53,6 +55,13 @@ namespace SmartDormitory.App
             services.AddScoped<IUserService, UserService>();
             services.AddTransient<IIcbApiService, IcbApiService>();
             services.AddTransient<IIcbSensorsService, IcbSensorsService>();
+            services.AddTransient<ISensorsService, SensorsService>();
+
+            services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
+            
+            // IMPORTANT
+            // Comment this line after 1st start of the app in development 
+            this.ActivatingHangfireJobs(services);
 
             if (this.Environment.IsDevelopment())
             {
@@ -99,6 +108,15 @@ namespace SmartDormitory.App
 
             //app.SeedAdminAccount();
 
+            //hangfire
+            var hangfireServerOptions = new BackgroundJobServerOptions
+            {
+                SchedulePollingInterval = TimeSpan.FromSeconds(1)
+            };
+
+            app.UseHangfireDashboard();
+            app.UseHangfireServer(hangfireServerOptions);
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -109,6 +127,14 @@ namespace SmartDormitory.App
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private void ActivatingHangfireJobs(IServiceCollection services)
+        {
+            var sp = services.BuildServiceProvider();
+            var hangFireServices = sp.GetService<IHangfireJobsScheduler>();
+
+            hangFireServices.StartingJobsQueue();
         }
     }
 }

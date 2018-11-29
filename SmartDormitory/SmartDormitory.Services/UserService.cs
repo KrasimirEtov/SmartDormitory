@@ -55,28 +55,30 @@ namespace SmartDormitory.Services
 		public async Task<bool> IsAdmin(string userId)
 		{
 			var user = await GetUser(userId);
-			return await this.userManager.IsInRoleAsync(user, "Administrator");
-		}
-
-		public async Task CreateRole(string roleName)
-		{
-			var roleExists = await this.roleManager.RoleExistsAsync(roleName);
-			if (roleExists)
+			if (user == null)
 			{
-				throw new EntityAlreadyExistsException("Role already exists");
+				throw new EntityDoesntExistException("User does not exist");
 			}
-			await this.roleManager.CreateAsync(new IdentityRole(roleName));
+			return await this.userManager.IsInRoleAsync(user, "Administrator");
 		}
 
 		public async Task SetRole(string userId, string roleName)
 		{
 			var user = await GetUser(userId);
+			if (user == null)
+			{
+				throw new EntityDoesntExistException("User does not exist");
+			}
 			await this.userManager.AddToRoleAsync(user, roleName);
 		}
 
 		public async Task RemoveRole(string userId, string roleName)
 		{
 			var user = await GetUser(userId);
+			if (user == null)
+			{
+				throw new EntityDoesntExistException("User does not exist");
+			}
 			await this.userManager.RemoveFromRoleAsync(user, roleName);
 		}
 
@@ -88,6 +90,7 @@ namespace SmartDormitory.Services
 				throw new EntityDoesntExistException($"\nUser doesn't exists!");
 			}
 
+			// TODO: This does not set IsDeleted flag, it directly deletes the entity
 			this.Context.Users.Remove(user);
 			await this.Context.SaveChangesAsync();
 		}

@@ -3,6 +3,7 @@ using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -19,10 +20,10 @@ namespace SmartDormitory.Services
             this.icbApiService = icbApiService;
         }
 
-        // return newly created icb sensors Guid Ids so we can add new RecurringJob for each of them
-        public async Task<IReadOnlyList<string>> AddSensors()
+        // return newly created icb sensors Guid Ids and PollingInterval so we can add new RecurringJob for each of them
+        public async Task<IEnumerable<(string Id, int PollingInterval)>> AddSensorsAsync()
         {
-            var newSensorsIds = new List<string>();
+            var createdSensorsJobData = new List<(string Id, int PollingInterval)>();
             var icbSensors = await this.icbApiService.GetAllIcbSensors();
 
             foreach (var icbSensor in icbSensors)
@@ -35,7 +36,7 @@ namespace SmartDormitory.Services
                 {
                     var measureType = await this.Context
                                                 .MeasureTypes
-                                                .FirstOrDefaultAsync(mt => 
+                                                .FirstOrDefaultAsync(mt =>
                                                                          mt.MeasureUnit == icbSensor.MeasureType
                                                                             && !mt.IsDeleted);
 
@@ -51,18 +52,52 @@ namespace SmartDormitory.Services
                             MeasureTypeId = measureType.Id,
                             PollingInterval = icbSensor.MinPollingIntervalInSeconds,
                             MinRangeValue = MinRange,
-                            MaxRangeValue = MaxRange
+                            MaxRangeValue = MaxRange,
+                            CreatedOn = DateTime.Now
                         };
 
-                        this.Context.IcbSensors.Add(icbSensorToAdd);
-                        newSensorsIds.Add(icbSensorToAdd.Id);
+                        await this.Context.IcbSensors.AddAsync(icbSensorToAdd);
+                        createdSensorsJobData.Add((icbSensorToAdd.Id, icbSensorToAdd.PollingInterval));
                     }
                 }
             }
 
             await this.Context.SaveChangesAsync();
 
-            return newSensorsIds;
+            return createdSensorsJobData;
+        }
+
+        public async Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measureUnit)
+        {
+            var icbSensor = await this.Context
+                                      .IcbSensors
+                                      .Include(s => s.MeasureType)
+                                      .FirstOrDefaultAsync(s => s.Id == id);
+            
+            if (icbSensor != null)
+            {
+                if (icbSensor.MeasureType.MeasureUnit == measureUnit)
+                {
+                    icbSensor.ModifiedOn = timeStamp;
+                    icbSensor.LastUpdateOn = timeStamp;
+                    icbSensor.CurrentValue = this.ExtractLastValue(lastValue);
+
+                    await this.Context.SaveChangesAsync();
+                }
+            }
+            // return sensor?
+        }
+
+        private float ExtractLastValue(string lastValue)
+        {
+            bool isParsable = float.TryParse(lastValue, out float value);
+
+            if (!isParsable)
+            {
+                return lastValue.Equals("true") ? 1 : lastValue.Equals("false") ? 0 : throw new InvalidOperationException("Invalid last value response");
+            }
+
+            return value;
         }
 
         private (int MinRange, int MaxRange) ExtractMinAndMaxRange(string description)

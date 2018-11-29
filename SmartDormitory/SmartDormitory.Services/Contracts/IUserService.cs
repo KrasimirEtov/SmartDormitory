@@ -11,7 +11,6 @@ namespace SmartDormitory.Services.Contracts
 		Task<IEnumerable<UserListServiceModel>> GetAllUsers(int page = 1, int pageSize = 3);
 		Task<User> GetUser(string userId);
 		Task<bool> IsAdmin(string userId);
-		Task CreateRole(string roleName);
 		Task SetRole(string userId, string roleName);
 		Task RemoveRole(string userId, string roleName);
 		Task DeleteUser(string userId);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartDormitory.App.Areas.Administration.Models;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 	[Authorize(Roles = "Administrator")]
 	public class UserManagerController : Controller
 	{
+		private const int PageSize = 3;
 		private readonly IUserService userService;
 
 		public UserManagerController(IUserService userService)
@@ -20,64 +22,47 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Users()
+		public async Task<IActionResult> Index()
 		{
-			// TODO: Delete user account
-			var users = await userService.GetAllUsers();
-			var userViewModels = users.Select(u => new UserViewModel(u)).ToList();
-			try
-			{
-				foreach (var user in userViewModels)
-				{
-					if (await userService.IsInRole(user.Id, "Administrator"))
-					{
-						user.IsAdmin = true;
-					}
-				}
-			}
-			catch (EntityDoesntExistException e)
-			{
-				// TODO: Talk about exception handling
-				return this.NotFound();
-			}
+			var model = await UpdateAllUsersPage();
 
-			var userViewModelList = new UserViewModelList(userViewModels);
+			return View(model);
 
-			return View(userViewModelList);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Users(int page = 1)
+		{
+			var model = await UpdateAllUsersPage(page);
+
+			return PartialView("_UsersTablePartial", model);
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> ToggleRole(string userId)
+		public async Task<IActionResult> ToggleRole([FromForm]string userId)
 		{
+
 			var user = await this.userService.GetUser(userId);
 			if (user == null)
 			{
 				this.TempData["Error-Message"] = $"User does not exist!";
-				return NoContent();
-			}
-			try
-			{
-				if (await userService.IsInRole(userId, "Administrator"))
-				{
-					this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
-
-					await this.userService.RemoveRole(user.Id, "Administrator");
-				}
-				else
-				{
-					this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
-
-					await this.userService.SetRole(user.Id, "Administrator");
-				}
-			}
-			catch (EntityDoesntExistException e)
-			{
-				// TODO: Talk about exception handling
 				return this.NotFound();
 			}
 
-			return NoContent();
+			if (await userService.IsAdmin(user.Id))
+			{
+				// try catch ? 
+				await this.userService.RemoveRole(user.Id, "Administrator");
+				this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
+			}
+			else
+			{
+				await this.userService.SetRole(user.Id, "Administrator");
+				this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
+			}
+
+			return this.Ok();
 		}
 
 		[HttpPost]
@@ -97,6 +82,27 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 			this.TempData["Success-Message"] = $"User was successfully deleted!";
 
 			return this.Ok();
+		}
+
+		private async Task<UsersPagingViewModel> UpdateAllUsersPage(int page = 1)
+		{
+			var users = await userService.GetAllUsers(page);
+			var userViewModels = users.Select(u => new UserViewModel(u)).ToList();
+			var totalUsers = await userService.TotalUsers();
+
+			foreach (var user in userViewModels)
+			{
+				user.IsAdmin = await userService.IsAdmin(user.Id);
+			}
+
+			var model = new UsersPagingViewModel
+			{
+				Users = userViewModels,
+				CurrentPage = page,
+				TotalPages = (int)Math.Ceiling(totalUsers / (double)PageSize)
+			};
+
+			return model;
 		}
 	}
 }

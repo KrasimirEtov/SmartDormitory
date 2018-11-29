@@ -1,12 +1,36 @@
-﻿@model UserViewModelList
+﻿@model UsersPagingViewModel
 
 @{
-    string adminBtnStyle = "btn-outline-danger";
-    string nonAdminBtnStyle = "btn-outline-dark-green";
 
-
-    //string buttonTitle = user.IsAdmin ? "Remove admin" : "Make admin";
+    var previousDisabled = Model.CurrentPage == 1 ? "disabled" : string.Empty;
+    var nextDisabled = Model.CurrentPage == Model.TotalPages ? "disabled" : string.Empty;
 }
+
+<ul class="pagination">
+    <li class="page-item">
+        <a class="page-link @previousDisabled" id="prevPage" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+        </a>
+    </li>
+    @*@if (Model.TotalPages > 1)
+        {
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(Model.CurrentPage == i ? "active" : string.Empty)">
+                    <a onclick="goToPageNumber(this)" data-assigned-page="@i" class="page-link">
+                        @i
+                    </a>
+                </li>
+            }
+        }*@
+    <li class="page-item">
+        <a class="page-link @nextDisabled" id="nextPage" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+        </a>
+    </li>
+</ul>
 
 <div id="users-table">
     <div class="table-responsive">
@@ -21,29 +45,33 @@
                 </tr>
             </thead>
             <tbody id="user-section">
-                @foreach (var user in Model.UserViewModels)
+                @foreach (var user in Model.Users)
                 {
                     <tr style="text-align:center">
                         <td>@user.UserName</td>
                         <td>@user.SensorsCount</td>
                         <td>
-                            @if (user.UserName == User.Identity.Name)
+                            @if (user.UserName == User.Identity.Name || user.UserName == "admin")
                             {
                                 <button class="btn btn-dark-green" disabled>Admin</button>
                             }
                             else
                             {
-                                string buttonClass = user.IsAdmin ? adminBtnStyle : nonAdminBtnStyle;
+                                string buttonClass = user.IsAdmin ? "btn-danger" : "btn-dark-green";
+                                string buttonTitle = user.IsAdmin ? "Remove Admin" : "Make Admin";
 
-                                <form id="removeAdmin-form" asp-area="Administration" asp-controller="UserManager"
-                                      asp-action="ToggleRole" asp-route-userId ="@user.Id" method="post">
-                                    <button class="adminButton btn waves-effect @buttonClass" type="submit">test</button>
+                                <form asp-area="Administration" asp-controller="UserManager"
+                                      asp-action="ToggleRole" data-user-id="@user.Id" method="post" class="roleForm">
+                                    <button class="roleButton btn @buttonClass"
+                                            data-user-id="@user.Id" type="submit">
+                                        @buttonTitle
+                                    </button>
                                 </form>
                             }
                         </td>
                         <td>
                             <a asp-area="Identity" asp-route-userId="@user.Id"
-                               asp-page="/Account/Manage/Index" class="btn btn-outline-brown waves-effect">Profile</a>
+                               asp-page="/Account/Manage/Index" class="btn btn-brown waves-effect">Profile</a>
                         </td>
                         <td>
                             @if (user.IsDeleted)
@@ -54,11 +82,10 @@
                             }
                             else
                             {
-                                <button type="button" data-id="@user.Id" class="btn btn-outline-danger waves-effect"
-                                        data-toggle="modal" data-target="#deleteModal">
+                                <button type="button" class="modalBtn btn btn-danger waves-effect"
+                                        data-toggle="modal" data-target="#deleteModal" data-testId="@user.Id">
                                     Disable
                                 </button>
-
                             }
                         </td>
                     </tr>
@@ -68,14 +95,19 @@
     </div>
 </div>
 
-<script>
-    $('.adminButton').click(function () {
-        if ($(this).hasClass("adminBtnStyle")) {
-            $(this).removeClass('adminBtnStyle').addClass('nonAdminBtnStyle');
-        }
-        else if ($(this).hasClass("nonAdminBtnStyle")) {
-            $(this).removeClass('nonAdminBtnStyle').addClass('adminBtnStyle');
+<script src="~/js/roleManager.js"></script>
 
+<script>
+    $(function () {
+        movePage("#nextPage", @Model.NextPage);
+        movePage("#prevPage", @Model.PreviousPage);
+
+        function movePage(tagId, targetPage) {
+            $(tagId).click(function () {
+                let url = "@Url.Action("Users", "UserManager")?page=" + targetPage;
+
+                $("#usersTable").load(url);
+            })
         }
-    })
+    });
 </script>

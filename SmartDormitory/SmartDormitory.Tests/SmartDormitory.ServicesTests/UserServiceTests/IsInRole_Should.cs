@@ -31,7 +31,6 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 				.Options;
 
 			string userId = "myId";
-			string roleName = "AdministratorTest";
 
 			user = new User()
 			{
@@ -57,7 +56,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			{
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
 
-				var result = await userService.IsInRole(userId, roleName);
+				var result = await userService.IsAdmin(userId);
 
 				Assert.IsTrue(result);
 			}
@@ -72,7 +71,6 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 				.Options;
 
 			string userId = "myId";
-			string roleName = "AdministratorTest";
 
 			user = new User()
 			{
@@ -99,7 +97,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
 
 				await Assert.ThrowsExceptionAsync<EntityDoesntExistException>(
-					() => userService.IsInRole("noSuchId", roleName));
+					() => userService.IsAdmin("NoSuchId"));
 			}
 		}
 
@@ -121,7 +119,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 
 			userManagerMock = MockUserManager<User>();
 			userManagerMock
-				.Setup(x => x.IsInRoleAsync(It.IsAny<User>(), "Administrator"))
+				.Setup(x => x.IsInRoleAsync(It.IsAny<User>(), "Administrator2"))
 				.ReturnsAsync(true);
 
 			roleManagerMock = MockRoleManager();
@@ -137,7 +135,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			{
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
 
-				var result = await userService.IsInRole(userId, "NotFoundRole");
+				var result = await userService.IsAdmin(userId);
 
 				Assert.IsFalse(result);
 			}

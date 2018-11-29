@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
 using SmartDormitory.App.Infrastructure.Hangfire;
+using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
 using SmartDormitory.Services.Contracts;

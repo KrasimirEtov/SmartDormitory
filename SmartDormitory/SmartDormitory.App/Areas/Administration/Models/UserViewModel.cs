@@ -1,4 +1,5 @@
 ﻿using SmartDormitory.Data.Models;
+using SmartDormitory.Services.Models.Users;
 
 namespace SmartDormitory.App.Areas.Administration.Models
 {
@@ -9,14 +10,13 @@ namespace SmartDormitory.App.Areas.Administration.Models
 
 		}
 
-		public UserViewModel(User user)
+		public UserViewModel(UserListServiceModel user)
 		{
 			Id = user.Id;
 			FirstName = user.FirstName;
 			LastName = user.LastName;
 			UserName = user.UserName;
-			Email = user.Email;
-			SensorsCount = user.Sensors.Count;
+			SensorsCount = user.SensorsCount;
 			IsDeleted = user.IsDeleted;
 		}
 
@@ -24,7 +24,6 @@ namespace SmartDormitory.App.Areas.Administration.Models
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public string UserName { get; set; }
-		public string Email { get; set; }
 		public int SensorsCount { get; set; }
 		public bool IsAdmin { get; set; }
 		public bool IsDeleted { get; set; }

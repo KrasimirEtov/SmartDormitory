@@ -2,19 +2,29 @@
 @{
     ViewData["Title"] = "RegisterIndex";
 }
+<div class="row">
+    <div class="col-md-2">
+        <h4><span class="form-row badge badge-pill badge-light text-secondary"> Creating sensor </span></h4>
+    </div>
 
-<p class="display-4 text-center text-success">Select sensor type</p>
+    <div class="col-md-2">
+        <h4><span class="h5 badge badge-pill badge-warning"> Step 1: </span></h4>
+    </div>
+</div>
 
-
-<div id="form-row">
-    <div class="form-group">
-        <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes" class="form-control input-sm">
-            <option value="all">--All--</option>
+<br />
+<div class="form-row">
+    <div class="form-group  col-md-3">
+        <label class="form-control form-control-lg h4 text-center text-black-50">Choose sensor type</label>
+    </div>
+    <div class="form-group col-md-9">
+        <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes" class="form-control form-control-lg text-capitalize text-success   text-monospace">
+            <option value="all">-- All --</option>
         </select>
     </div>
 
     <div id="icbSensorsResults" class="form-group">
-        <partial name="_IcbSensorsByTypeResult" , model="@Model.IcbSensors"/>
+        <partial name="_IcbSensorsByTypeResult" model="@Model.IcbSensors" />
     </div>
 </div>
 
@@ -23,10 +33,10 @@
          $("#MeasureTypeId").change(function () {
          let typeId = $("#MeasureTypeId").val();
          let url = "@Url.Action("LoadSensorsByType", "Sensor")?measureTypeId=" + typeId;
-         console.log(url)
+
          $("#icbSensorsResults").load(url);
      });
     })
-    
+
 </script>
 

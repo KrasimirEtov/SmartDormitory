@@ -73,6 +73,7 @@ namespace SmartDormitory.Services
              => await this.Context
                             .MeasureTypes
                             .Where(mt => !mt.IsDeleted)
+                            .OrderBy(mt => mt.SuitableSensorType)
                             .Select(mt => new IcbSensorTypesRegisterServiceModel
                             {
                                 MeasureUnit = mt.MeasureUnit,
@@ -100,6 +101,8 @@ namespace SmartDormitory.Services
             }
 
             return await sensors
+                              .OrderBy(s => s.MeasureTypeId)
+                              .ThenBy(s => s.Tag)
                               .Select(s => new IcbSensorRegisterListServiceModel
                               {
                                   Description = s.Description,

@@ -60,7 +60,8 @@ namespace SmartDormitory.App.Controllers
                 Id = s.Id,
                 Description = s.Description,
                 PollingInterval = "Minimum refresh time: " + s.PollingInterval,
-                Tag = this.ExtractTag(s.Tag)
+                Tag = this.ExtractTag(s.Tag),
+                //set image url depends on tag
             }).ToList();
         }
 

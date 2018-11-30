@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmartDormitory.Services.Models.IcbSensors;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ namespace SmartDormitory.Services.Contracts
     {
         Task<IEnumerable<(string Id, int PollingInterval)>> AddSensorsAsync();
         Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measUnit);
-       
+        Task<IEnumerable<IcbSensorTypesRegisterServiceModel>> GetIcbSensorsTypes();
+        Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(string measureTypeId = "all");
     }
 }

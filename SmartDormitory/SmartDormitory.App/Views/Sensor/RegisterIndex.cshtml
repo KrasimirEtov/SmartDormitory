@@ -1,0 +1,32 @@
+﻿@model IcbSensorTypesViewModel
+@{
+    ViewData["Title"] = "RegisterIndex";
+}
+
+<p class="display-4 text-center text-success">Select sensor type</p>
+
+
+<div id="form-row">
+    <div class="form-group">
+        <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes" class="form-control input-sm">
+            <option value="all">--All--</option>
+        </select>
+    </div>
+
+    <div id="icbSensorsResults" class="form-group">
+        <partial name="_IcbSensorsByTypeResult" , model="@Model.IcbSensors"/>
+    </div>
+</div>
+
+<script>
+    $(function () {
+         $("#MeasureTypeId").change(function () {
+         let typeId = $("#MeasureTypeId").val();
+         let url = "@Url.Action("LoadSensorsByType", "Sensor")?measureTypeId=" + typeId;
+         console.log(url)
+         $("#icbSensorsResults").load(url);
+     });
+    })
+    
+</script>
+

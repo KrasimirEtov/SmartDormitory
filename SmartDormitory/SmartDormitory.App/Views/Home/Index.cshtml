@@ -7,7 +7,7 @@
     /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
     #map {
-        height: 400px; /* The height is 400 pixels */
+        height: 600px; /* The height is 400 pixels */
         width: 100%; /* The width is the width of the web page */
     }
 </style>
@@ -21,7 +21,7 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&callback=initMap">
 </script>
 <script src="~/lib/markerclusterer/js/markerclusterer.js"></script>
-<script defer >
+<script defer>
     var map;
     // Initialize and add the map
     function initMap() {
@@ -37,6 +37,7 @@
     $(function () {
         let markers = [];
         $.getJSON("/Home/GetSensorsCoordinates", function (data) {
+            console.log(data)
             for (var i = 0; i < data.length; i++) {
 
                 //console.log(data[i].latitude)
@@ -52,6 +53,14 @@
 
                 console.log(markers[i]);
             }
+            markers[4] = new google.maps.Marker({
+                position: { lat: 42.6977, lng: 23.3219 },
+                map: map
+            })
+            markers[4] = new google.maps.Marker({
+                position: { lat: 42.6677, lng: 23.3219 },
+                map: map
+            })
             //console.log(data)
         });
 
@@ -62,11 +71,11 @@
         //    });
         //});
 
-        // Add a marker clusterer to manage the markers.
-        //var markerCluster = new MarkerClusterer(map, markers,
-        //    {
-        //        imagePath: "~/lib/markerclusterer/img/"
-        //    });
+        //Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(map, markers,
+            {
+                imagePath: "~/lib/markerclusterer/img/"
+            });
 
     });
 </script>

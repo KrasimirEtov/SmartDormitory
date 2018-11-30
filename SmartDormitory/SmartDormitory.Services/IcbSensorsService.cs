@@ -3,6 +3,8 @@ using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
+using SmartDormitory.Services.Exceptions;
+using SmartDormitory.Services.Models.IcbSensors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,13 +69,54 @@ namespace SmartDormitory.Services
             return createdSensorsJobData;
         }
 
+        public async Task<IEnumerable<IcbSensorTypesRegisterServiceModel>> GetIcbSensorsTypes()
+             => await this.Context
+                            .MeasureTypes
+                            .Where(mt => !mt.IsDeleted)
+                            .Select(mt => new IcbSensorTypesRegisterServiceModel
+                            {
+                                MeasureUnit = mt.MeasureUnit,
+                                SuitableSensorType = mt.SuitableSensorType,
+                                Id = mt.Id
+                            })
+                            .ToListAsync();
+
+        public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(string measureTypeId = "all")
+        {
+            var sensors = this.Context.IcbSensors.Where(s => !s.IsDeleted);
+
+            if (measureTypeId != "all")
+            {
+                var measureTypeExists = this.Context
+                                      .MeasureTypes
+                                      .Any(mt => !mt.IsDeleted && mt.Id == measureTypeId);
+
+                if (!measureTypeExists)
+                {
+                    throw new EntityDoesntExistException("Measure type doesnt exists!");
+                }
+
+                sensors = sensors.Where(s => s.MeasureTypeId == measureTypeId);
+            }
+
+            return await sensors
+                              .Select(s => new IcbSensorRegisterListServiceModel
+                              {
+                                  Description = s.Description,
+                                  Id = s.Id,
+                                  PollingInterval = s.PollingInterval,
+                                  Tag = s.Tag
+                              })
+                              .ToListAsync();
+        }
+
         public async Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measureUnit)
         {
             var icbSensor = await this.Context
                                       .IcbSensors
                                       .Include(s => s.MeasureType)
                                       .FirstOrDefaultAsync(s => s.Id == id);
-            
+
             if (icbSensor != null)
             {
                 if (icbSensor.MeasureType.MeasureUnit == measureUnit)

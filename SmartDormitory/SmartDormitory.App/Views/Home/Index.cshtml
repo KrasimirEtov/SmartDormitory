@@ -3,6 +3,10 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment env
+@{
+    string path = env.WebRootFileProvider.GetFileInfo("images/m1.png")?.PhysicalPath;
+}
 <style>
     /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -13,7 +17,10 @@
 </style>
 
 <h1>Google maps magic</h1>
-
+<img src='~/images/m1.png'>
+<img src='~/images/m2.png'>
+<img src='~/images/m3.png'>
+<img src='~/images/m4.png'>
 
 <div id="map"></div>
 
@@ -21,49 +28,108 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&callback=initMap">
 </script>
 <script src="~/lib/markerclusterer/js/markerclusterer.js"></script>
-<script defer>
-    var map;
+<script>
+    var gm_map;
     // Initialize and add the map
     function initMap() {
         var sofiaCenterOfTheMap = { lat: 42.6977, lng: 23.3219 };
-
-        map = new google.maps.Map(document.getElementById('map'), {
+        var options_googlemaps = {
+            minZoom: 4,
             zoom: 11,
-            center: sofiaCenterOfTheMap
-        });
-    }
+            center: new google.maps.LatLng(42.6977, 23.3219), //sofia coords
+            maxZoom: 18,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            streetViewControl: false
+        }
 
+        gm_map = new google.maps.Map(document.getElementById('map'), options_googlemaps);
 
-    $(function () {
-        let markers = [];
+        var markers = [];
+        var infoWindows = [];
+
         $.getJSON("/Home/GetSensorsCoordinates", function (data) {
-            console.log(data)
-            for (var i = 0; i < data.length; i++) {
-
+            //console.log(data)
+            for (let i = 0; i < data.length; i++) {
                 //console.log(data[i].latitude)
                 //console.log(data[i].longitude)
 
-                var latLng = new google.maps.LatLng(data[i].latitude,
-                    data[i].longitude);
+                let latLng = new google.maps.LatLng(data[i].coordinates.latitude, data[i].coordinates.longitude);
 
                 markers[i] = new google.maps.Marker({
                     position: latLng,
-                    map: map
+                    map: gm_map,
+                    animation: google.maps.Animation.DROP
+                    //icon: '/images/m1.png'    --- change marker icon
                 });
 
-                console.log(markers[i]);
+                var contentString = '<div id="content">' +
+                    '<div id="siteNotice">' +
+                    '</div>' +
+                    '<h1 id="firstHeading" class="firstHeading">' + data[i].name + '</h1>' +
+                    '<div id="bodyContent">' +
+                    '<p><b>' + data[i].description + '</b></p>' +
+                    '<p>Sensor link for owners only!:, ID:' + data[i].id + '</p>'
+                '<p>(sensor created: June 22, 2009).</p>' +
+                    '</div>' +
+                    '</div>';
+
+                infoWindows[i] = new google.maps.InfoWindow({
+                    content: contentString
+                });
+
+                markers[i].addListener('mouseover', function () {
+                    infoWindows[i].open(gm_map, markers[i]);
+                })
+
+                markers[i].addListener('mouseout', function () {
+                    infoWindows[i].close();
+                })
             }
-            markers[4] = new google.maps.Marker({
-                position: { lat: 42.6977, lng: 23.3219 },
-                map: map
-            })
-            markers[4] = new google.maps.Marker({
-                position: { lat: 42.6677, lng: 23.3219 },
-                map: map
-            })
             //console.log(data)
         });
+        //var options_markerclusterer = {
+        //    gridSize: 20,
+        //    maxZoom: 18,
+        //    zoomOnClick: false,
+        //    imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+        //};
 
+        // Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(gm_map, markers, { imagePath: '/images/m' }
+            //{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }
+        );
+
+    }
+
+    $(function () {
+
+
+        var marker = new google.maps.Marker({
+            //map: gm_map,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+            position: { lat: 42.646928, lng: 23.393174 }
+        });
+        marker.setMap(gm_map)
+        marker.addListener('click', toggleBounce);
+
+        function toggleBounce() {
+            if (marker.getAnimation() !== null) {
+                marker.setAnimation(null);
+            } else {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+            }
+        }
+
+        const drop = function () {
+            for (var i = 0; i < markers.length; i++) {
+                setTimeout(function () {
+                    addMarkerMethod();
+                    markers[i].setMap(gm_map);
+                    markers[i].setAnimation(google.maprs.Animation.DROP)
+                }, i * 200);
+            }
+        }
         //var markers = locations.map(function (location, i) {
         //    return new google.maps.Marker({
         //        position: location,
@@ -72,10 +138,16 @@
         //});
 
         //Add a marker clusterer to manage the markers.
-        var markerCluster = new MarkerClusterer(map, markers,
-            {
-                imagePath: "~/lib/markerclusterer/img/"
-            });
+        //var mcOptions = { gridSize: 50, maxZoom: 15, imagePath: '~/images/m1.png' };
+        //var mc = new MarkerClusterer(gm_map, markers, mcOptions);
+        //var markerCluster = new MarkerClusterer(gm_map, markers,
+        //    //{
+
+        //    //    imagePath: '/images/m1.png'
+        //    //    //imagePath: "~/images/"
+        //    //    //imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+        //    //}
+        //);
 
     });
 </script>

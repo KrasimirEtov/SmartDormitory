@@ -53,6 +53,12 @@ namespace SmartDormitory.App.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult GoogleMapChooseAdress()
+        {
+            return View();
+        }
+
         private List<IcbSensorsListViewModel> MapSensorServiceModelToViewModel(IEnumerable<IcbSensorRegisterListServiceModel> sensors)
         {
             return sensors.Select(s => new IcbSensorsListViewModel

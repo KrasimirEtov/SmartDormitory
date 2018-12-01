@@ -1,0 +1,126 @@
+﻿@model CreateSensorViewModel
+
+@inject UserManager<User> UserManager
+
+<h2 style="text-align:center">Create a new sensor</h2>
+<hr />
+<partial name="_ResultPartial" />
+
+<form asp-area="" asp-controller="Sensor" asp-action="Create" id="registerSensorForm" method="post">
+    <input asp-for="IcbSensorId" hidden />
+    <input asp-for="OwnerId" hidden value="@((await UserManager.GetUserAsync(User)).Id)" />
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"><b>Name</b></label>
+        <input asp-for="Name" class="form-control" placeholder="Type a sensor name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"><b>Description</b></label>
+        <textarea asp-for="Description" class="form-control rounded-0" rows="3" placeholder="Type a description"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PollingInterval" class="control-label"><b>Custom polling interval (seconds)</b></label>
+        <input asp-for="PollingInterval" class="form-control" min="@Model.PollingInterval" />
+        <span asp-validation-for="PollingInterval" class="text-danger"></span>
+    </div>
+
+    @* MAP START *@
+    <div class="form-row">
+        <div class="col-lg-4 form-control-lg">
+            <div class="input-group mb-4">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="lat1">Latitude</span>
+                </div>
+                <input asp-for="Latitude" type="text" id="lat" class="form-control" aria-describedby="lat1" readonly />
+                @*<input type="text" id="lat" class="form-control" aria-describedby="lat1" readonly>*@
+            </div>
+        </div>
+        <div class="col-lg-4 form-control-lg">
+            <div class="input-group mb-4">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="lon1">Longitude</span>
+                </div>
+                <input asp-for="Longtitude" type="text" id="lon" class="form-control" aria-describedby="lon1" readonly />
+                @*<input type="text" id="lon" class="form-control" aria-describedby="lon1" readonly>*@
+            </div>
+        </div>
+        <div class="col-lg-4 form-control-lg">
+            <button type="button" class="btn btn-light" data-toggle="modal" data-target="#mapsModal">
+                Choose coordinates
+            </button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="mapsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body mb-0 p-0">
+                    <div id="mapModal"></div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button"
+                            class="btn btn-light" data-dismiss="modal">
+                        Close <i class="fa fa-times ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* MAP END *@
+
+    <br />
+    @if (!Model.IsSwitch)
+    {
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="MinRangeValue" class="control-label"><b>Minimum range value</b></label>
+                @*<input asp-for="MinRangeValue" class="form-control" min="@Model.MinRangeValue" max="@Model.MaxRangeValue - 1" />*@
+                <input asp-for="MinRangeValue" class="form-control" data-val="true"
+                       data-val-range-min="@Model.MinRangeValue" data-val-range-max="@Model.MaxRangeValue"
+                       data-val-range="The field MinRangeValue must be between @Model.MinRangeValue and @Model.MaxRangeValue." />
+
+                <span asp-validation-for="MinRangeValue" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="MaxRangeValue" class="control-label"><b>Maximum range value</b></label>
+                @*<input asp-for="MaxRangeValue" class="form-control" min="@Model.MaxRangeValue + 1" max="@Model.MaxRangeValue" />*@
+                <input asp-for="MaxRangeValue" class="form-control" data-val="true"
+                       data-val-range-min="@Model.MinRangeValue" data-val-range-max="@Model.MaxRangeValue"
+                       data-val-range="The field MinRangeValue must be between @Model.MinRangeValue and @Model.MaxRangeValue." />
+                <span asp-validation-for="MaxRangeValue" class="text-danger"></span>
+            </div>
+        </div>
+    }
+    else
+    {
+        // TODO : Figure this out
+    }
+    <div class="custom-control custom-checkbox">
+
+        <input asp-for="AlarmOn" type="checkbox" class="custom-control-input" id="alarmCheckbox" />
+        <label asp-for="AlarmOn" class="custom-control-label" for="alarmCheckbox">Alarm On</label>
+    </div>
+    <br />
+    <div class="custom-control custom-checkbox">
+        <input asp-for="IsPublic" type="checkbox" class="custom-control-input" id="privacyCheckbox" />
+        <label asp-for="IsPublic" class="custom-control-label" for="privacyCheckbox">Make Public</label>
+    </div>
+
+    <br />
+    <div class="form-group">
+        <button class="btn btn-light waves-effect my-sm-0" type="submit">Create</button>
+        <a asp-area="" asp-controller="Sensor" asp-action="RegisterIndex" class="btn btn-primary waves-effect">Go Back</a>
+    </div>
+</form>
+<div asp-validation-summary="All" class="text-danger"></div>
+
+
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&callback=initMap">
+</script>
+<script src="~/js/mapsModal.js"></script>
+@* TODO: Не връща модела правилно с ajax - не съм сигурен защо все още *@
+@*<script src="~/js/registerSensor.js"></script>*@

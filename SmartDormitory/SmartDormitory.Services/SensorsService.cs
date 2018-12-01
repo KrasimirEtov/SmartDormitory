@@ -47,5 +47,31 @@ namespace SmartDormitory.Services
                 })
                 .ToListAsync();
         }
-    }
+
+		public async Task RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
+			int userPollingInterval, bool isPublic, bool alarmOn, float AlarmMinRange, float AlarmMaxRange,
+			double longtitude, double latitude)
+		{
+			// TODO: Create a model for this long parameters list
+			var sensor = new Sensor()
+			{
+				AlarmMaxRangeValue = AlarmMaxRange,
+				AlarmMinRangeValue = AlarmMinRange,
+				AlarmOn = alarmOn,
+				Description = description,
+				Name = name,
+				OwnerId = ownerId,
+				IsPublic = isPublic,
+				UserPollingInterval = userPollingInterval,
+				IcbSensorId = icbSensorId,
+				Coordinates = new Coordinates
+				{
+					Latitude = latitude,
+					Longitude = longtitude
+				}
+			};
+			await this.Context.Sensors.AddAsync(sensor);
+			await this.Context.SaveChangesAsync();
+		}
+	}
 }

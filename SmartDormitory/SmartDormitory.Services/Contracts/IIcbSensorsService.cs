@@ -11,5 +11,7 @@ namespace SmartDormitory.Services.Contracts
         Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measUnit);
         Task<IEnumerable<IcbSensorTypesRegisterServiceModel>> GetIcbSensorsTypes();
         Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(string measureTypeId = "all");
-    }
+		Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId);
+
+	}
 }

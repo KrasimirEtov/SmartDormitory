@@ -28,7 +28,8 @@
                             <p class="card-text">@Model[c].Description</p>
                             <p class="card-text">@Model[c].PollingInterval</p>
                             <!-- Button -->
-                            <a href="#" class="btn btn-primary">Register</a>
+                            <a asp-controller="Sensor" asp-action="Create" asp-route-sensorId="@Model[c].Id"
+                               class="btn btn-primary">Register</a>
 
                         </div>
 

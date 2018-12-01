@@ -134,6 +134,23 @@ namespace SmartDormitory.Services
             // return sensor?
         }
 
+		public async Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId)
+		{
+			var sensor = await this.Context.IcbSensors
+				.Where(s => s.Id == sensorId)
+				.Select(s => new IcbSensorCreateServiceModel()
+				{
+					Id = s.Id,
+					MinRangeValue = s.MinRangeValue,
+					MaxRangeValue = s.MaxRangeValue,
+					PollingInterval = s.PollingInterval,
+					MeasureType = s.MeasureType					
+				})
+				.FirstOrDefaultAsync();
+
+			return sensor;
+		}
+
         private float ExtractLastValue(string lastValue)
         {
             bool isParsable = float.TryParse(lastValue, out float value);

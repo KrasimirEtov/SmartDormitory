@@ -58,6 +58,13 @@
                     <a asp-area="" asp-controller="Home" asp-action="Contact"
                        class="nav-link waves-effect">Contact</a>
                 </li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a asp-area="" asp-controller="Sensor" asp-action="RegisterIndex"
+                           class="nav-link waves-effect">Register sensor</a>
+                    </li>
+                }
                 @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
                 {
                     <partial name="_AdminPartial" />

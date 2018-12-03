@@ -1,28 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using SmartDormitory.Data.Models;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly ILogger<LoginModel> _logger;
+        private readonly SignInManager<User> signInManager;
+        private readonly ILogger<LoginModel> logger;
+        private readonly UserManager<User> userManager;
 
-        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger,
+            UserManager<User> userManager)
         {
-            _signInManager = signInManager;
-            _logger = logger;
+            this.signInManager = signInManager;
+            this.logger = logger;
+            this.userManager = userManager;
         }
 
         [BindProperty]
@@ -61,7 +63,7 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             ReturnUrl = returnUrl;
         }
@@ -74,11 +76,25 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+                var result = await signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    logger.LogInformation("User logged in.");
+
+                    var user = await this.userManager.FindByNameAsync(Input.Username);
+                    var roles = await this.userManager.GetRolesAsync(user);
+
+                    if (roles.Contains("Administrator"))
+                    {
+                        this.logger.LogInformation("Administrator logged in.");
+                        return RedirectToAction("Index", "Home", new { Area = "Administration" });
+                    }
+                    else
+                    {
+                        logger.LogInformation("Regular user logged in.");
+                        //return LocalRedirect(returnUrl);
+                        return RedirectToAction("Index", "Home", new { Area = "" });
+                    }
                 }
                 if (result.RequiresTwoFactor)
                 {
@@ -86,7 +102,7 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out.");
+                    logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
                 else

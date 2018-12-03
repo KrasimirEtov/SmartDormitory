@@ -77,6 +77,7 @@ namespace SmartDormitory.App.Controllers
 
 			if (sensor.MeasureType.MeasureUnit == "(true/false)")
 			{
+				// TODO: Попълване ако иска аларма да пита кога да се пуска - при false или true (отв, затв)
 				model.IsSwitch = true;
 			}
 			else
@@ -90,19 +91,42 @@ namespace SmartDormitory.App.Controllers
 		[HttpPost]
 		[Authorize]
 		[ValidateAntiForgeryToken]
-		public IActionResult Create(CreateSensorViewModel model)
+		public async Task<IActionResult> Create(CreateSensorViewModel model)
 		{
 			if (!this.ModelState.IsValid)
 			{
 				throw new InvalidClientInputException("Register new sensor failed");
 			}
+			// TODO: Add validation for model
+			// TODO: Tests
 
-			this.sensorsService.RegisterNewSensor(model.OwnerId, model.IcbSensorId, model.Name, model.Description,
+			var createdSensorId = await this.sensorsService.RegisterNewSensor(model.OwnerId, model.IcbSensorId, model.Name, model.Description,
 				model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
 				model.Longtitude, model.Latitude);
+			
+			//this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
+			return this.RedirectToAction("Details", "Sensor", new { sensorId = createdSensorId });
+		}
 
-			this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
-			return this.RedirectToAction("Create", "Sensor", new { sensorId = model.IcbSensorId });
+		[HttpGet]
+		[Authorize]
+		public async Task<IActionResult> Details(string sensorId)
+		{
+			var sensor = await sensorsService.GetSensorById(sensorId);
+			var model = new DetailsSensorViewModel()
+			{
+				AlarmOn = sensor.AlarmOn,
+				Description = sensor.Description,
+				IsPublic = sensor.IsPublic,
+				Latitude = sensor.Coordinates.Latitude,
+				Longtitude = sensor.Coordinates.Longitude,
+				MaxRangeValue = sensor.AlarmMaxRangeValue,
+				MinRangeValue = sensor.AlarmMinRangeValue,
+				Name = sensor.Name,
+				PollingInterval = sensor.UserPollingInterval
+			};
+
+			return View(model);
 		}
 
 		private List<IcbSensorsListViewModel> MapSensorServiceModelToViewModel(

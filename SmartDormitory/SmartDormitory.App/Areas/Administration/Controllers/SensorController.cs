@@ -51,20 +51,5 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 
             return this.Ok();
         }
-
-        [HttpPost]
-        public async Task<IActionResult> Restore(string sensorId)
-        {
-            try
-            {
-                await this.sensorsService.RestoreSensor(sensorId);
-            }
-            catch (EntityDoesntExistException e)
-            {
-                return this.NotFound(e.Message);
-            }
-
-            return this.Ok();
-        }
     }
 }

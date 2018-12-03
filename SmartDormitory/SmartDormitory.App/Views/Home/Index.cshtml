@@ -84,8 +84,10 @@
                 markers[i].addListener('mouseout', function () {
                     infoWindows[i].close();
                 })
+                
             }
             //console.log(data)
+            var markerCluster = new MarkerClusterer(gm_map, markers);
         });
         //var options_markerclusterer = {
         //    gridSize: 20,
@@ -95,9 +97,7 @@
         //};
 
         // Add a marker clusterer to manage the markers.
-        var markerCluster = new MarkerClusterer(gm_map, markers, { imagePath: '/images/m' }
-            //{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }
-        );
+        
 
     }
 

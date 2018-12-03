@@ -12,14 +12,14 @@ namespace SmartDormitory.Services.Contracts
 
         Task<IEnumerable<MapSensorServiceModel>> GetAllPublicSensorsCoordinates();
 
-		Task RegisterNewSensor(string ownerId, string icbSensorId, string Name, string Description,
-			int userPollingInterval, bool isPublic, bool alarmOn, float AlarmMinRange, float AlarmMaxRange,
-			double longtitude, double latitude);
-
         IEnumerable<AdminSensorListServiceModel> AllAdmin();
 
         Task ToggleDeleteSensor(string sensorId);
 
-        Task RestoreSensor(string sensorId);
+        Task<string> RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
+            int userPollingInterval, bool isPublic, bool alarmOn, float alarmMinRange, float alarmMaxRange,
+            double longtitude, double latitude);
+
+        Task<Sensor> GetSensorById(string sensorId);
     }
 }

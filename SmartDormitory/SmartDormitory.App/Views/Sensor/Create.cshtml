@@ -16,7 +16,6 @@
 </div>
 
 <hr />
-<partial name="_ResultPartial" />
 
 <form asp-area="" asp-controller="Sensor" asp-action="Create" id="registerSensorForm" method="post">
     <input asp-for="IcbSensorId" hidden />
@@ -34,7 +33,10 @@
 
     <div class="form-group">
         <label asp-for="PollingInterval" class="control-label"><b>Custom polling interval (seconds)</b></label>
-        <input asp-for="PollingInterval" class="form-control" min="@Model.PollingInterval" />
+        <input asp-for="PollingInterval" class="form-control"
+               min="@Model.PollingInterval"
+               data-val-range="The field PollingInterval must be at least @Model.PollingInterval"
+               data-val-number="The field Polling Interval Value must be a number.">
         <span asp-validation-for="PollingInterval" class="text-danger"></span>
     </div>
 
@@ -46,7 +48,6 @@
                     <span class="input-group-text" id="lat1">Latitude</span>
                 </div>
                 <input asp-for="Latitude" type="text" id="lat" class="form-control" aria-describedby="lat1" readonly />
-                @*<input type="text" id="lat" class="form-control" aria-describedby="lat1" readonly>*@
             </div>
         </div>
         <div class="col-lg-4 form-control-lg">
@@ -55,7 +56,6 @@
                     <span class="input-group-text" id="lon1">Longitude</span>
                 </div>
                 <input asp-for="Longtitude" type="text" id="lon" class="form-control" aria-describedby="lon1" readonly />
-                @*<input type="text" id="lon" class="form-control" aria-describedby="lon1" readonly>*@
             </div>
         </div>
         <div class="col-lg-4 form-control-lg">
@@ -89,39 +89,61 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label asp-for="MinRangeValue" class="control-label"><b>Minimum range value</b></label>
-                @*<input asp-for="MinRangeValue" class="form-control" min="@Model.MinRangeValue" max="@Model.MaxRangeValue - 1" />*@
                 <input asp-for="MinRangeValue" class="form-control" data-val="true"
                        data-val-range-min="@Model.MinRangeValue" data-val-range-max="@Model.MaxRangeValue"
-                       data-val-range="The field MinRangeValue must be between @Model.MinRangeValue and @Model.MaxRangeValue." />
+                       data-val-range="The field Min Range Value must be between @Model.MinRangeValue and @Model.MaxRangeValue."
+                       data-val-number="The field Min Range Value must be a number."
+                       data-val-required="The MinRangeValue field is required." />
 
                 <span asp-validation-for="MinRangeValue" class="text-danger"></span>
             </div>
             <div class="form-group col-md-6">
                 <label asp-for="MaxRangeValue" class="control-label"><b>Maximum range value</b></label>
-                @*<input asp-for="MaxRangeValue" class="form-control" min="@Model.MaxRangeValue + 1" max="@Model.MaxRangeValue" />*@
                 <input asp-for="MaxRangeValue" class="form-control" data-val="true"
                        data-val-range-min="@Model.MinRangeValue" data-val-range-max="@Model.MaxRangeValue"
-                       data-val-range="The field MinRangeValue must be between @Model.MinRangeValue and @Model.MaxRangeValue." />
+                       data-val-range="The field MinRangeValue must be between @Model.MinRangeValue and @Model.MaxRangeValue."
+                       data-val-number="The field Max Range Value must be a number."
+                       data-val-required="The MaxRangeValue field is required." />
                 <span asp-validation-for="MaxRangeValue" class="text-danger"></span>
             </div>
         </div>
     }
     else
     {
-        // TODO : Figure this out
+        <input asp-for="MinRangeValue" value="0" class="form-control" data-val="true" hidden
+               data-val-range-min="0" data-val-range-max="0"
+               data-val-range="The field must be 0."
+               data-val-number="The field Min Range Value must be a number." />
+        <input asp-for="MaxRangeValue" value="1" class="form-control" data-val="true" hidden
+               data-val-range-min="1" data-val-range-max="1"
+               data-val-range="The field must be 1."
+               data-val-number="The field Min Range Value must be a number." />
+        <input asp-for="IsSwitch" value="true" hidden />
     }
-    <div class="custom-control custom-checkbox">
-
-        <input asp-for="AlarmOn" type="checkbox" class="custom-control-input" id="alarmCheckbox" />
-        <label asp-for="AlarmOn" class="custom-control-label" for="alarmCheckbox">Alarm On</label>
-    </div>
-    <br />
-    <div class="custom-control custom-checkbox">
-        <input asp-for="IsPublic" type="checkbox" class="custom-control-input" id="privacyCheckbox" />
-        <label asp-for="IsPublic" class="custom-control-label" for="privacyCheckbox">Make Public</label>
-    </div>
 
     <br />
+    <div class="form-row">
+        <div class="form-group col-md-1">
+            <label class="bs-switch">
+                <input asp-for="AlarmOn" type="checkbox" class="custom-control-input" id="alarmCheckbox" />
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="form-group col-md-2">
+            <h4 id="alarmSwitchText">Alarm is off</h4>
+        </div>
+
+        <div class="form-group col-md-1">
+            <label class="bs-switch">
+                <input asp-for="IsPublic" type="checkbox" class="custom-control-input" id="privacyCheckbox" />
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="form-group col-md-2">
+            <h4 id="privacySwitchText">Sensor is private</h4>
+        </div>
+    </div>
+
     <div class="form-group">
         <button class="btn btn-light waves-effect my-sm-0" type="submit">Create</button>
         <a asp-area="" asp-controller="Sensor" asp-action="RegisterIndex" class="btn btn-primary waves-effect">Go Back</a>
@@ -134,5 +156,26 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&callback=initMap">
 </script>
 <script src="~/js/mapsModal.js"></script>
+<script>
+    $(function () {
+        $("#alarmCheckbox").click(function () {
+            if ($(this).is(':checked')) {
+                $('#alarmSwitchText').text('Alarm is on');
+            }
+            else {
+                $('#alarmSwitchText').text('Alarm is off');
+            }
+        });
+
+        $("#privacyCheckbox").click(function () {
+            if ($(this).is(':checked')) {
+                $('#privacySwitchText').text('Sensor is public');
+            }
+            else {
+                $('#privacySwitchText').text('Sensor is private');
+            }
+        });
+    });
+</script>
 @* TODO: Не връща модела правилно с ajax - не съм сигурен защо все още *@
 @*<script src="~/js/registerSensor.js"></script>*@

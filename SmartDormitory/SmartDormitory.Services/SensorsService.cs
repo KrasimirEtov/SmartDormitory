@@ -5,6 +5,7 @@ using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
 using SmartDormitory.Services.Models.Sensors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace SmartDormitory.Services
 {
     public class SensorsService : BaseService, ISensorsService
     {
+        private Sensor sensor;
         public SensorsService(SmartDormitoryContext context) : base(context)
         {
         }
@@ -49,32 +51,6 @@ namespace SmartDormitory.Services
                 .ToListAsync();
         }
 
-        public async Task RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
-            int userPollingInterval, bool isPublic, bool alarmOn, float AlarmMinRange, float AlarmMaxRange,
-            double longtitude, double latitude)
-        {
-            // TODO: Create a model for this long parameters list
-            var sensor = new Sensor()
-            {
-                AlarmMaxRangeValue = AlarmMaxRange,
-                AlarmMinRangeValue = AlarmMinRange,
-                AlarmOn = alarmOn,
-                Description = description,
-                Name = name,
-                OwnerId = ownerId,
-                IsPublic = isPublic,
-                UserPollingInterval = userPollingInterval,
-                IcbSensorId = icbSensorId,
-                Coordinates = new Coordinates
-                {
-                    Latitude = latitude,
-                    Longitude = longtitude
-                }
-            };
-            await this.Context.Sensors.AddAsync(sensor);
-            await this.Context.SaveChangesAsync();
-        }
-
         public IEnumerable<AdminSensorListServiceModel> AllAdmin()
             => this.Context
                     .Sensors
@@ -108,18 +84,41 @@ namespace SmartDormitory.Services
             await this.Context.SaveChangesAsync();
         }
 
-        public async Task RestoreSensor(string sensorId)
+        public async Task<string> RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
+            int userPollingInterval, bool isPublic, bool alarmOn, float alarmMinRange, float alarmMaxRange,
+            double longtitude, double latitude)
         {
-            var sensor = await this.Context.Sensors.FirstOrDefaultAsync(s => s.Id == sensorId);
-
-            if (sensor is null)
-                throw new EntityDoesntExistException(nameof(Sensor).ToLower(), sensorId);
-
-            if (sensor.IsDeleted == true)
+            if (await this.Context.IcbSensors.AnyAsync(s => s.Id == icbSensorId))
             {
-                sensor.IsDeleted = false;
+                sensor = new Sensor()
+                {
+                    AlarmMaxRangeValue = alarmMaxRange,
+                    AlarmMinRangeValue = alarmMinRange,
+                    AlarmOn = alarmOn,
+                    Description = description,
+                    Name = name,
+                    OwnerId = ownerId,
+                    IsPublic = isPublic,
+                    UserPollingInterval = userPollingInterval,
+                    IcbSensorId = icbSensorId,
+                    Coordinates = new Coordinates
+                    {
+                        Latitude = latitude,
+                        Longitude = longtitude
+                    },
+                    CreatedOn = DateTime.Now
+                };
+                await this.Context.Sensors.AddAsync(sensor);
                 await this.Context.SaveChangesAsync();
             }
+            return sensor.Id;
+        }
+
+        public async Task<Sensor> GetSensorById(string sensorId)
+        {
+            return await this.Context.Sensors
+                .Where(s => s.Id == sensorId)
+                .FirstOrDefaultAsync();
         }
     }
 }

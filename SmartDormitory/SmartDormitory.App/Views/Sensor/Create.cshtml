@@ -69,6 +69,9 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-body mb-0 p-0">
+                    <div class="row">
+                        <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+                    </div>
                     <div id="mapModal"></div>
                 </div>
 
@@ -152,9 +155,8 @@
 <div asp-validation-summary="All" class="text-danger"></div>
 
 
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&callback=initMap">
-</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&libraries=places&callback=initMap"
+        async defer></script>
 <script src="~/js/mapsModal.js"></script>
 <script>
     $(function () {

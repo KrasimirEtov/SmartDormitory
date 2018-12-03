@@ -11,6 +11,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 
 		public IActionResult Index()
 		{
+            // TODO: Dashboard
 			return View();
 		}
 	}

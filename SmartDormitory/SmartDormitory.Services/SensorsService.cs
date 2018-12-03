@@ -3,6 +3,7 @@ using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
+using SmartDormitory.Services.Exceptions;
 using SmartDormitory.Services.Models.Sensors;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,30 +49,77 @@ namespace SmartDormitory.Services
                 .ToListAsync();
         }
 
-		public async Task RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
-			int userPollingInterval, bool isPublic, bool alarmOn, float AlarmMinRange, float AlarmMaxRange,
-			double longtitude, double latitude)
-		{
-			// TODO: Create a model for this long parameters list
-			var sensor = new Sensor()
-			{
-				AlarmMaxRangeValue = AlarmMaxRange,
-				AlarmMinRangeValue = AlarmMinRange,
-				AlarmOn = alarmOn,
-				Description = description,
-				Name = name,
-				OwnerId = ownerId,
-				IsPublic = isPublic,
-				UserPollingInterval = userPollingInterval,
-				IcbSensorId = icbSensorId,
-				Coordinates = new Coordinates
-				{
-					Latitude = latitude,
-					Longitude = longtitude
-				}
-			};
-			await this.Context.Sensors.AddAsync(sensor);
-			await this.Context.SaveChangesAsync();
-		}
-	}
+        public async Task RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
+            int userPollingInterval, bool isPublic, bool alarmOn, float AlarmMinRange, float AlarmMaxRange,
+            double longtitude, double latitude)
+        {
+            // TODO: Create a model for this long parameters list
+            var sensor = new Sensor()
+            {
+                AlarmMaxRangeValue = AlarmMaxRange,
+                AlarmMinRangeValue = AlarmMinRange,
+                AlarmOn = alarmOn,
+                Description = description,
+                Name = name,
+                OwnerId = ownerId,
+                IsPublic = isPublic,
+                UserPollingInterval = userPollingInterval,
+                IcbSensorId = icbSensorId,
+                Coordinates = new Coordinates
+                {
+                    Latitude = latitude,
+                    Longitude = longtitude
+                }
+            };
+            await this.Context.Sensors.AddAsync(sensor);
+            await this.Context.SaveChangesAsync();
+        }
+
+        public IEnumerable<AdminSensorListServiceModel> AllAdmin()
+            => this.Context
+                    .Sensors
+                    //.Include(s => s.Owner)
+                    .Select(s => new AdminSensorListServiceModel
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        IsDeleted = s.IsDeleted,
+                        SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
+                        OwnerId = s.OwnerId,
+                        OwnerUsername = s.Owner.UserName
+                    });
+
+        public async Task ToggleDeleteSensor(string sensorId)
+        {
+            var sensor = await this.Context.Sensors.FirstOrDefaultAsync(s => s.Id == sensorId);
+
+            if (sensor is null)
+                throw new EntityDoesntExistException(nameof(Sensor).ToLower(), sensorId);
+
+            if (sensor.IsDeleted == false)
+            {
+                sensor.IsDeleted = true;
+            }
+            else
+            {
+                sensor.IsDeleted = false;
+            }
+
+            await this.Context.SaveChangesAsync();
+        }
+
+        public async Task RestoreSensor(string sensorId)
+        {
+            var sensor = await this.Context.Sensors.FirstOrDefaultAsync(s => s.Id == sensorId);
+
+            if (sensor is null)
+                throw new EntityDoesntExistException(nameof(Sensor).ToLower(), sensorId);
+
+            if (sensor.IsDeleted == true)
+            {
+                sensor.IsDeleted = false;
+                await this.Context.SaveChangesAsync();
+            }
+        }
+    }
 }

@@ -1,0 +1,75 @@
+﻿@model IEnumerable<SensorListViewModel>
+
+
+<table class="table table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th class="h5">Sensor name</th>
+            <th class="h5">Owner</th>
+            <th class="h5">Sensor type</th>
+            <th class="h5">Is deleted</th>
+            <th class="h5">Actions</th>
+        </tr>
+    </thead>
+    <tbody class="bg-white">
+        @foreach (var sensor in Model)
+        {
+            <tr>
+                <td>@sensor.Name</td>
+                <td>@sensor.OwnerUsername</td>
+                <td class="text-danger">@sensor.SensorType</td>
+                <td>
+                    @{
+                        string buttonClass = !sensor.IsDeleted ? "btn-danger" : "btn-dark-green";
+                        string buttonTitle = sensor.IsDeleted ? "Restore sensor" : "Delete sensor";
+                        string glyph = sensor.IsDeleted ? "fas fa-redo" : "fas fa-recycle";
+
+                        <form asp-area="Administration" asp-controller="Sensor" class="toggleDeleteForm"
+                              asp-action="ToggleDelete" method="post" data-sensor-id="@sensor.Id">
+                            <button class="deleteToggleButton btn waves-effect @buttonClass" type="submit">
+                                <i class="icon @glyph"></i> @buttonTitle
+                            </button>
+                        </form>
+                    }
+
+                </td>
+                <td><i class="fas fa-info"></i> <i class="fas fa-info-circle"></i></td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+<script>
+    $(function () {
+        $('button.deleteToggleButton').click(function () {
+
+            const deleteBtn = 'btn-danger';
+            const restoreBtn = 'btn-dark-green';
+            const deleteBtnText = '<i class="fas fa-recycle"></i> Delete sensor';
+            const restoreBtnText = '<i class="fas fa-redo"></i> Restore sensor';
+
+            if ($(this).hasClass(deleteBtn)) {
+                $(this).removeClass(deleteBtn).addClass(restoreBtn);
+                $(this).html(restoreBtnText);
+            }
+            else if ($(this).hasClass(restoreBtn)) {
+                $(this).removeClass(restoreBtn).addClass(deleteBtn);
+                $(this).html(deleteBtnText);
+            }
+        });
+
+        const $toggleDeleteForm = $('.toggleDeleteForm');
+
+        $toggleDeleteForm.on('submit', function (event) {
+            event.preventDefault();
+
+            const data = $toggleDeleteForm.serialize();
+            const sensorId = $(this).data('sensorId');
+            const url = $toggleDeleteForm.attr('action') + '?sensorId=' + sensorId;
+
+            $.post(url, { __RequestVerificationToken: data.__RequestVerificationToken }, function () {
+            });
+        });
+    });
+</script>

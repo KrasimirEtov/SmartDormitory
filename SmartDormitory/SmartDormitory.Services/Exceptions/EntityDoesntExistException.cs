@@ -1,14 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SmartDormitory.Services.Exceptions
 {
-	public class EntityDoesntExistException : Exception
-	{
-		public EntityDoesntExistException(string message) : base(message)
-		{
+    public class EntityDoesntExistException : Exception
+    {
+        private const string DefaultMessage = "Not existing {0} with id: {1} !";
 
-		}
-	}
+        public EntityDoesntExistException(string message)
+         : base(message)
+        {
+
+        }
+
+        public EntityDoesntExistException(string model, string id)
+            : base(string.Format(DefaultMessage, model, id))
+        {
+
+        }
+    }
 }

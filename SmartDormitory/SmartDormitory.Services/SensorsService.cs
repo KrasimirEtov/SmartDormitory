@@ -13,6 +13,7 @@ namespace SmartDormitory.Services
 {
 	public class SensorsService : BaseService, ISensorsService
 	{
+		private Sensor sensor;
 		public SensorsService(SmartDormitoryContext context) : base(context)
 		{
 		}
@@ -49,13 +50,13 @@ namespace SmartDormitory.Services
 				.ToListAsync();
 		}
 
-		public async Task RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
+		public async Task<string> RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
 			int userPollingInterval, bool isPublic, bool alarmOn, float alarmMinRange, float alarmMaxRange,
 			double longtitude, double latitude)
 		{
 			if (await this.Context.IcbSensors.AnyAsync(s => s.Id == icbSensorId))
 			{
-				var sensor = new Sensor()
+				sensor = new Sensor()
 				{
 					AlarmMaxRangeValue = alarmMaxRange,
 					AlarmMinRangeValue = alarmMinRange,
@@ -74,8 +75,16 @@ namespace SmartDormitory.Services
 					CreatedOn = DateTime.Now
 				};
 				await this.Context.Sensors.AddAsync(sensor);
-				await this.Context.SaveChangesAsync();
+				await this.Context.SaveChangesAsync();				
 			}
+			return sensor.Id;
+		}
+
+		public async Task<Sensor> GetSensorById(string sensorId)
+		{
+			return await this.Context.Sensors
+				.Where(s => s.Id == sensorId)
+				.FirstOrDefaultAsync();
 		}
 	}
 }

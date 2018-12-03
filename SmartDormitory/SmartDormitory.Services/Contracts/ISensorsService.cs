@@ -11,8 +11,9 @@ namespace SmartDormitory.Services.Contracts
         void SeedSomeSensorsForMaps();
 
         Task<IEnumerable<MapSensorServiceModel>> GetAllPublicSensorsCoordinates();
-		Task RegisterNewSensor(string ownerId, string icbSensorId, string Name, string Description,
-			int userPollingInterval, bool isPublic, bool alarmOn, float AlarmMinRange, float AlarmMaxRange,
+		Task<string> RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
+			int userPollingInterval, bool isPublic, bool alarmOn, float alarmMinRange, float alarmMaxRange,
 			double longtitude, double latitude);
+		Task<Sensor> GetSensorById(string sensorId);
 	}
 }

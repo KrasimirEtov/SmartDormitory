@@ -77,7 +77,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 			{
 				this.TempData["Error-Message"] = e.Message;
 				// TODO: Talk about exception handling
-				return this.NotFound();
+				return this.NotFound(e.Message);
 			}
 			this.TempData["Success-Message"] = $"User was successfully deleted!";
 

@@ -12,6 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Identity\Services\**" />
+    <Content Remove="Areas\Identity\Services\**" />
+    <EmbeddedResource Remove="Areas\Identity\Services\**" />
+    <None Remove="Areas\Identity\Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Hangfire.AspNetCore" Version="1.6.21" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.6.21" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.6" />
@@ -29,7 +36,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Administration\Views\Shared\" />
-    <Folder Include="Areas\Identity\Services\" />
     <Folder Include="wwwroot\images\sensortypes\" />
   </ItemGroup>
 

@@ -91,6 +91,7 @@ namespace SmartDormitory.Services
 			}
 
 			// TODO: This does not set IsDeleted flag, it directly deletes the entity
+			// TODO: user.IsDeleted = true;
 			this.Context.Users.Remove(user);
 			await this.Context.SaveChangesAsync();
 		}

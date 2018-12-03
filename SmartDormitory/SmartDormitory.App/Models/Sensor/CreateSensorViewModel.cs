@@ -17,6 +17,7 @@ namespace SmartDormitory.App.Models.Sensor
 		[Required]
 		[StringLength(100, ErrorMessage = "Sensor description should be between 3 and 30 symbols.", MinimumLength = 3)]
 		public string Description { get; set; }
+		[Required]
 		public int PollingInterval { get; set; }
 		public bool IsPublic { get; set; }
 		public bool AlarmOn { get; set; }

@@ -77,6 +77,7 @@ namespace SmartDormitory.App.Controllers
 
 			if (sensor.MeasureType.MeasureUnit == "(true/false)")
 			{
+				// TODO: Попълване ако иска аларма да пита кога да се пуска - при false или true (отв, затв)
 				model.IsSwitch = true;
 			}
 			else
@@ -96,6 +97,8 @@ namespace SmartDormitory.App.Controllers
 			{
 				throw new InvalidClientInputException("Register new sensor failed");
 			}
+			// TODO: Add validation for model
+			// TODO: Tests
 
 			this.sensorsService.RegisterNewSensor(model.OwnerId, model.IcbSensorId, model.Name, model.Description,
 				model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,

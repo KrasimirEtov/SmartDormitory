@@ -1,6 +1,6 @@
-﻿namespace SmartDormitory.App.Areas.Administration.Models.Sensor
+﻿namespace SmartDormitory.Services.Models.Sensors
 {
-    public class SensorListViewModel
+    public class AdminListSensorModel
     {
         public string Id { get; set; }
 
@@ -13,5 +13,9 @@
         public string OwnerId { get; set; }
 
         public string SensorType { get; set; }
+
+        public bool IsPublic { get; set; }
+
+        public bool AlarmOn { get; set; }
     }
 }

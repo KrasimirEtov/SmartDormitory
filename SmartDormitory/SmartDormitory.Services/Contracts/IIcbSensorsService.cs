@@ -8,10 +8,12 @@ namespace SmartDormitory.Services.Contracts
     public interface IIcbSensorsService
     {
         Task<IEnumerable<(string Id, int PollingInterval)>> AddSensorsAsync();
-        Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measUnit);
-        Task<IEnumerable<IcbSensorTypesRegisterServiceModel>> GetIcbSensorsTypes();
-        Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(string measureTypeId = "all");
-		Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId);
 
-	}
+        Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measUnit);
+
+        Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(string measureTypeId = "all");
+
+        Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId);
+
+    }
 }

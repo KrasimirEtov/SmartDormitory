@@ -1,6 +1,6 @@
-﻿namespace SmartDormitory.Services.Models.IcbSensors
+﻿namespace SmartDormitory.Services.Models.MeasureTypes
 {
-    public class IcbSensorTypesRegisterServiceModel
+    public class MeasureTypeServiceModel
     {
         public string Id { get; set; }
 

@@ -12,7 +12,7 @@ namespace SmartDormitory.Services.Contracts
 
         Task<IEnumerable<MapSensorServiceModel>> GetAllPublicSensorsCoordinates();
 
-        IEnumerable<AdminSensorListServiceModel> AllAdmin();
+        Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10);
 
         Task ToggleDeleteSensor(string sensorId);
 
@@ -21,5 +21,7 @@ namespace SmartDormitory.Services.Contracts
             double longtitude, double latitude);
 
         Task<Sensor> GetSensorById(string sensorId);
+
+        Task<int> TotalSensorsByCriteria(string measureTypeId, int isPublic = -1, int alarmSet = -1);
     }
 }

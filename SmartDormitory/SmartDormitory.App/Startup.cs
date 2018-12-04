@@ -55,6 +55,7 @@ namespace SmartDormitory.App
             services.AddTransient<IIcbApiService, IcbApiService>();
             services.AddTransient<IIcbSensorsService, IcbSensorsService>();
             services.AddTransient<ISensorsService, SensorsService>();
+            services.AddTransient<IMeasureTypeService, MeasureTypeService>();
 
             services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
 

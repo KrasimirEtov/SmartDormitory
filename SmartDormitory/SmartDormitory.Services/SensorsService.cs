@@ -14,9 +14,14 @@ namespace SmartDormitory.Services
 {
     public class SensorsService : BaseService, ISensorsService
     {
-        private Sensor sensor;
-        public SensorsService(SmartDormitoryContext context) : base(context)
+        private readonly IMeasureTypeService measureTypeService;
+
+        public SensorsService(
+            SmartDormitoryContext context,
+            IMeasureTypeService measureTypeService)
+            : base(context)
         {
+            this.measureTypeService = measureTypeService;
         }
 
         // for test purposes google map
@@ -51,19 +56,44 @@ namespace SmartDormitory.Services
                 .ToListAsync();
         }
 
-        public IEnumerable<AdminSensorListServiceModel> AllAdmin()
-            => this.Context
-                    .Sensors
-                    //.Include(s => s.Owner)
-                    .Select(s => new AdminSensorListServiceModel
-                    {
-                        Id = s.Id,
-                        Name = s.Name,
-                        IsDeleted = s.IsDeleted,
-                        SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
-                        OwnerId = s.OwnerId,
-                        OwnerUsername = s.Owner.UserName
-                    });
+        public async Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10)
+        {
+            var sensors = this.Context.Sensors.AsQueryable();
+
+            if (measureTypeId != "all")
+            {
+                if (await this.measureTypeService.Exists(measureTypeId))
+                {
+                    sensors = sensors.Where(s => s.IcbSensor.MeasureTypeId == measureTypeId);
+                }
+            }
+            if (isPublic != -1 && (isPublic == 0 || isPublic == 1))
+            {
+                bool isPublicValue = isPublic != 0;
+                sensors = sensors.Where(s => s.IsPublic == isPublicValue);
+            }
+            if (alarmSet != -1 && (alarmSet == 0 || alarmSet == 1))
+            {
+                bool alarmSetValue = alarmSet != 0;
+                sensors = sensors.Where(s => s.AlarmOn == alarmSetValue);
+            }
+
+            return sensors
+                       .OrderByDescending(s => s.CreatedOn)
+                       .Skip((page - 1) * pageSize)
+                       .Take(pageSize)
+                       .Select(s => new AdminListSensorModel
+                       {
+                           Id = s.Id,
+                           Name = s.Name,
+                           IsDeleted = s.IsDeleted,
+                           SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
+                           OwnerId = s.OwnerId,
+                           OwnerUsername = s.Owner.UserName,
+                           IsPublic = s.IsPublic,
+                           AlarmOn = s.AlarmOn
+                       });
+        }
 
         public async Task ToggleDeleteSensor(string sensorId)
         {
@@ -84,13 +114,11 @@ namespace SmartDormitory.Services
             await this.Context.SaveChangesAsync();
         }
 
-        public async Task<string> RegisterNewSensor(string ownerId, string icbSensorId, string name, string description,
-            int userPollingInterval, bool isPublic, bool alarmOn, float alarmMinRange, float alarmMaxRange,
-            double longtitude, double latitude)
+        public async Task<string> RegisterNewSensor(string ownerId, string icbSensorId, string name, string description, int userPollingInterval, bool isPublic, bool alarmOn, float alarmMinRange, float alarmMaxRange, double longtitude, double latitude)
         {
             if (await this.Context.IcbSensors.AnyAsync(s => s.Id == icbSensorId))
             {
-                sensor = new Sensor()
+                var sensor = new Sensor()
                 {
                     AlarmMaxRangeValue = alarmMaxRange,
                     AlarmMinRangeValue = alarmMinRange,
@@ -110,8 +138,10 @@ namespace SmartDormitory.Services
                 };
                 await this.Context.Sensors.AddAsync(sensor);
                 await this.Context.SaveChangesAsync();
+                return sensor.Id;
             }
-            return sensor.Id;
+
+            return null;
         }
 
         public async Task<Sensor> GetSensorById(string sensorId)
@@ -119,6 +149,31 @@ namespace SmartDormitory.Services
             return await this.Context.Sensors
                 .Where(s => s.Id == sensorId)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<int> TotalSensorsByCriteria(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1)
+        {
+            var sensors = this.Context.Sensors.AsQueryable();
+
+            if (measureTypeId != "all")
+            {
+                if (await this.measureTypeService.Exists(measureTypeId))
+                {
+                    sensors = sensors.Where(s => s.IcbSensor.MeasureTypeId == measureTypeId);
+                }
+            }
+            if (isPublic != -1 && (isPublic == 0 || isPublic == 1))
+            {
+                bool isPublicValue = isPublic != 0;
+                sensors = sensors.Where(s => s.IsPublic == isPublicValue);
+            }
+            if (alarmSet != -1 && (alarmSet == 0 || alarmSet == 1))
+            {
+                bool alarmSetValue = alarmSet != 0;
+                sensors = sensors.Where(s => s.AlarmOn == alarmSetValue);
+            }
+
+            return await sensors.CountAsync();
         }
     }
 }

@@ -1,74 +1,73 @@
-﻿@model IEnumerable<SensorListViewModel>
+﻿@model SensorsIndexViewModel
 
-<table class="table table-hover">
-    <thead class="thead-dark">
-        <tr>
-            <th class="h5">Sensor name</th>
-            <th class="h5">Owner</th>
-            <th class="h5">Sensor type</th>
-            <th class="h5">Is deleted</th>
-            <th class="h5">Actions</th>
-        </tr>
-    </thead>
-    <tbody class="bg-white">
-        @foreach (var sensor in Model)
-        {
-            <tr>
-                <td>@sensor.Name</td>
-                <td>@sensor.OwnerUsername</td>
-                <td class="text-danger">@sensor.SensorType</td>
-                <td>
-                    @{
-                        string buttonClass = !sensor.IsDeleted ? "btn-danger" : "btn-dark-green";
-                        string buttonTitle = sensor.IsDeleted ? "Restore sensor" : "Delete sensor";
-                        string glyph = sensor.IsDeleted ? "fas fa-redo" : "fas fa-recycle";
+<div class="form-row">
+    <label asp-for="@Model.SearchTerm" class="text-muted">Search for username, sensor name or description</label>
+    <input asp-for="@Model.SearchTerm" type="text" class="form-control" placeholder="Type here" />
+</div>
+<hr />
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label asp-for="MeasureTypes"></label>
+        <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes" class="form-control form-control-lg text-monospace">
+            <option value="all">-- All --</option>
+        </select>
+    </div>
 
-                        <form asp-area="Administration" asp-controller="Sensor" class="toggleDeleteForm"
-                              asp-action="ToggleDelete" method="post" data-sensor-id="@sensor.Id">
-                            <button class="deleteToggleButton btn waves-effect @buttonClass" type="submit">
-                                <i class="icon @glyph"></i> @buttonTitle
-                            </button>
-                        </form>
-                    }
+    <div class="form-group col-md-3">
+        <label asp-for="IsPublic"></label>
+        <select asp-for="@Model.IsPublic" class="form-control form-control-lg text-monospace">
+            <option value="-1">-- All --</option>
+            <option value="1">Public</option>
+            <option value="0">Private</option>
+        </select>
+    </div>
 
-                </td>
-                <td><i class="fas fa-info"></i> <i class="fas fa-info-circle"></i></td>
-            </tr>
-        }
+    <div class="form-group col-md-3">
+        <label asp-for="AlarmSet"></label>
+        <select asp-for="@Model.AlarmSet" class="form-control form-control-lg text-monospace">
+            <option value="-1">-- All --</option>
+            <option value="1">Alarm on</option>
+            <option value="0">Alarm off</option>
+        </select>
+    </div>
 
-    </tbody>
-</table>
+</div>
+
+<div id="sensorsTable" class="form-group">
+    <partial name="_SensorsTablePartialView" model="@Model.PartialModel" />
+</div>
 
 <script>
+
+    //used in partial view pagination
+    function goToPageNumber(elem) {
+        let selectedPage = $(elem).data('page-number');
+        let typeId = $("#MeasureTypeId").val();
+        let isPublic = $("#IsPublic").val();
+        let alarmSet = $("#AlarmSet").val();
+        let url = "@Url.Action("LoadSensorsTable", "Sensor")?measureTypeId=" + typeId +
+            "&isPublic=" + isPublic + "&alarmSet=" + alarmSet + "&page=" + selectedPage;
+
+        $("#sensorsTable").load(url);
+    }
+
+
+
     $(function () {
-        $('button.deleteToggleButton').click(function () {
+        const reloadTable = function () {
+             let typeId = $("#MeasureTypeId").val();
+             let isPublic = $("#IsPublic").val();
+             let alarmSet = $("#AlarmSet").val();
+             let url = "@Url.Action("LoadSensorsTable", "Sensor")?measureTypeId=" +
+                 typeId +"&isPublic=" + isPublic + "&alarmSet=" + alarmSet;
 
-            const deleteBtn = 'btn-danger';
-            const restoreBtn = 'btn-dark-green';
-            const deleteBtnText = '<i class="fas fa-recycle"></i> Delete sensor';
-            const restoreBtnText = '<i class="fas fa-redo"></i> Restore sensor';
+             console.log(url)
+             $("#sensorsTable").load(url);
+        }
 
-            if ($(this).hasClass(deleteBtn)) {
-                $(this).removeClass(deleteBtn).addClass(restoreBtn);
-                $(this).html(restoreBtnText);
-            }
-            else if ($(this).hasClass(restoreBtn)) {
-                $(this).removeClass(restoreBtn).addClass(deleteBtn);
-                $(this).html(deleteBtnText);
-            }
-        });
+        $("#MeasureTypeId").change(reloadTable);
+        $("#IsPublic").change(reloadTable);
+        $("#AlarmSet").change(reloadTable);
 
-        const $toggleDeleteForm = $('.toggleDeleteForm');
-
-        $toggleDeleteForm.on('submit', function (event) {
-            event.preventDefault();
-
-            const data = $toggleDeleteForm.serialize();
-            const sensorId = $(this).data('sensorId');
-            const url = $toggleDeleteForm.attr('action') + '?sensorId=' + sensorId;
-
-            $.post(url, { __RequestVerificationToken: data.__RequestVerificationToken }, function () {
-            });
-        });
     });
 </script>

@@ -3,7 +3,6 @@ using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
-using SmartDormitory.Services.Exceptions;
 using SmartDormitory.Services.Models.IcbSensors;
 using System;
 using System.Collections.Generic;
@@ -16,10 +15,14 @@ namespace SmartDormitory.Services
     public class IcbSensorsService : BaseService, IIcbSensorsService
     {
         private readonly IIcbApiService icbApiService;
+        private readonly IMeasureTypeService measureTypeService;
 
-        public IcbSensorsService(SmartDormitoryContext context, IIcbApiService icbApiService) : base(context)
+        public IcbSensorsService(SmartDormitoryContext context, IIcbApiService icbApiService,
+            IMeasureTypeService measureTypeService)
+            : base(context)
         {
             this.icbApiService = icbApiService;
+            this.measureTypeService = measureTypeService;
         }
 
         // return newly created icb sensors Guid Ids and PollingInterval so we can add new RecurringJob for each of them
@@ -69,18 +72,7 @@ namespace SmartDormitory.Services
             return createdSensorsJobData;
         }
 
-        public async Task<IEnumerable<IcbSensorTypesRegisterServiceModel>> GetIcbSensorsTypes()
-             => await this.Context
-                            .MeasureTypes
-                            .Where(mt => !mt.IsDeleted)
-                            .OrderBy(mt => mt.SuitableSensorType)
-                            .Select(mt => new IcbSensorTypesRegisterServiceModel
-                            {
-                                MeasureUnit = mt.MeasureUnit,
-                                SuitableSensorType = mt.SuitableSensorType,
-                                Id = mt.Id
-                            })
-                            .ToListAsync();
+
 
         public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(string measureTypeId = "all")
         {
@@ -88,16 +80,10 @@ namespace SmartDormitory.Services
 
             if (measureTypeId != "all")
             {
-                var measureTypeExists = this.Context
-                                      .MeasureTypes
-                                      .Any(mt => !mt.IsDeleted && mt.Id == measureTypeId);
-
-                if (!measureTypeExists)
+                if (await this.measureTypeService.Exists(measureTypeId))
                 {
-                    throw new EntityDoesntExistException("Measure type doesnt exists!");
+                    sensors = sensors.Where(s => s.MeasureTypeId == measureTypeId);
                 }
-
-                sensors = sensors.Where(s => s.MeasureTypeId == measureTypeId);
             }
 
             return await sensors
@@ -134,22 +120,22 @@ namespace SmartDormitory.Services
             // return sensor?
         }
 
-		public async Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId)
-		{
-			var sensor = await this.Context.IcbSensors
-				.Where(s => s.Id == sensorId)
-				.Select(s => new IcbSensorCreateServiceModel()
-				{
-					Id = s.Id,
-					MinRangeValue = s.MinRangeValue,
-					MaxRangeValue = s.MaxRangeValue,
-					PollingInterval = s.PollingInterval,
-					MeasureType = s.MeasureType					
-				})
-				.FirstOrDefaultAsync();
+        public async Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId)
+        {
+            var sensor = await this.Context.IcbSensors
+                .Where(s => s.Id == sensorId)
+                .Select(s => new IcbSensorCreateServiceModel()
+                {
+                    Id = s.Id,
+                    MinRangeValue = s.MinRangeValue,
+                    MaxRangeValue = s.MaxRangeValue,
+                    PollingInterval = s.PollingInterval,
+                    MeasureType = s.MeasureType
+                })
+                .FirstOrDefaultAsync();
 
-			return sensor;
-		}
+            return sensor;
+        }
 
         private float ExtractLastValue(string lastValue)
         {

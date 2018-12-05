@@ -1,7 +1,53 @@
-﻿@{
+﻿@model DashboardViewModel
+@{
     ViewData["Title"] = "Index page";
 }
-<h1>we need to see how will this look</h1>
+<h1>Dashboard</h1>
 <hr />
-<a asp-area="Administration" asp-controller="UserManager" asp-action="Index"
-   class="btn btn-primary waves-effect"><span>View All Users</span></a>
+
+<div class="form-row">
+    <div class="col-4 text-center">
+        <div class="card text-white bg-info mb-3 border-dark" style="max-width: 20rem;">
+            <div class="card-header"><b>Users</b></div>
+            <div class="card-body">
+                <p class="card-text text-white">Total number of registered users: <b>@Model.UsersCount</b></p>
+            </div>
+            <a asp-area="Administration" asp-controller="UserManager" asp-action="Index"
+               class="card-footer bg-transparent border-grey text-center">
+                <span class="pull-left text-white">View All</span>
+                <span class="pull-right text-white"><i class="fa fa-arrow-circle-right"></i></span>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="col-4 text-center">
+        <div class="card text-white bg-secondary mb-3 border-dark" style="max-width: 20rem;">
+            <div class="card-header"><b>Sensors</b></div>
+            <div class="card-body">
+                <p class="card-text text-white">Total number of registered sensors: <b>@Model.SensorsCount</b></p>
+            </div>
+
+            <a asp-area="Administration" asp-controller="Sensor" asp-action="Index"
+               class="card-footer bg-transparent border-grey text-center">
+                <span class="pull-left text-white">View All</span>
+                <span class="pull-right text-white"><i class="fa fa-arrow-circle-right"></i></span>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-4 text-center">
+        <div class="card text-white bg-primary mb-3 border-dark" style="max-width: 20rem;">
+            <div class="card-header"><b>Admin Count</b></div>
+            <div class="card-body">
+                <p class="card-text text-white">Total number of admins: <b>5000</b></p>
+            </div>
+
+            <a asp-area="Administration" asp-controller="Sensor" asp-action="Index"
+               class="card-footer bg-transparent border-grey text-center">
+                <span class="pull-left text-white">View All</span>
+                <span class="pull-right text-white"><i class="fa fa-arrow-circle-right"></i></span>
+            </a>
+        </div>
+    </div>
+</div>

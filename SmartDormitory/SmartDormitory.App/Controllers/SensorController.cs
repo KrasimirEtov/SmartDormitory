@@ -92,14 +92,14 @@ namespace SmartDormitory.App.Controllers
 
         [HttpPost]
         [Authorize]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateSensorViewModel model)
         {
             if (!this.ModelState.IsValid)
             {
                 throw new InvalidClientInputException("Register new sensor failed");
+				// TODO: Redirect to register index + temp data message
             }
-            // TODO: Add validation for model
+            // TODO: Add validation for model, change user id to here, not from view
             // TODO: Tests
 
             var createdSensorId = await this.sensorsService.RegisterNewSensor(model.OwnerId, model.IcbSensorId, model.Name, model.Description,

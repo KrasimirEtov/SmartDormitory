@@ -1,15 +1,19 @@
 ﻿$(function () {
-    const $registerSensorForm = $('#registerSensorForm');
+    $("#alarmCheckbox").click(function () {
+        if ($(this).is(':checked')) {
+            $('#alarmSwitchText').text('Alarm is on');
+        }
+        else {
+            $('#alarmSwitchText').text('Alarm is off');
+        }
+    });
 
-    const dataToSend = $registerSensorForm.serialize();
-
-    $registerSensorForm.on('submit', function (event) {
-        event.preventDefault();
-
-        const tokenValue = $('input[name="__RequestVerificationToken"]').val();
-
-        $.post($registerSensorForm.attr('action'), dataToSend, function () {
-            console.log('test');
-        });
+    $("#privacyCheckbox").click(function () {
+        if ($(this).is(':checked')) {
+            $('#privacySwitchText').text('Sensor is public');
+        }
+        else {
+            $('#privacySwitchText').text('Sensor is private');
+        }
     });
 });

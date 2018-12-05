@@ -33,13 +33,12 @@ namespace SmartDormitory.Services
 				.FirstOrDefaultAsync();
 		}
 
-		public async Task<IEnumerable<UserListServiceModel>> GetAllUsers(int page = 1, int pageSize = 3)
+		public async Task<IEnumerable<UserListServiceModel>> GetAllUsers(int page = 1, int pageSize = 4)
 		{
 			return await this.Context.Users
 				.OrderByDescending(u => u.CreatedOn)
 				.Skip((page - 1) * pageSize)
 				.Take(pageSize)
-				.Where(u => u.IsDeleted == false)
 				.Select(u => new UserListServiceModel
 				{
 					FirstName = u.FirstName,
@@ -85,14 +84,21 @@ namespace SmartDormitory.Services
 		public async Task DeleteUser(string userId)
 		{
 			var user = await GetUser(userId);
-			if (user == null || user.IsDeleted)
+			if (user == null)
 			{
 				throw new EntityDoesntExistException($"\nUser doesn't exists!");
 			}
-
+			if (user.IsDeleted)
+			{
+				user.IsDeleted = false;
+			}
+			else
+			{
+				user.IsDeleted = true;
+			}
 			// TODO: This does not set IsDeleted flag, it directly deletes the entity
 			// TODO: user.IsDeleted = true;
-			this.Context.Users.Remove(user);
+			this.Context.Users.Update(user);
 			await this.Context.SaveChangesAsync();
 		}
 

@@ -8,7 +8,7 @@ namespace SmartDormitory.Services.Contracts
 {
 	public interface IUserService
 	{
-		Task<IEnumerable<UserListServiceModel>> GetAllUsers(int page = 1, int pageSize = 3);
+		Task<IEnumerable<UserListServiceModel>> GetAllUsers(int page = 1, int pageSize = 4);
 		Task<User> GetUser(string userId);
 		Task<bool> IsAdmin(string userId);
 		Task SetRole(string userId, string roleName);

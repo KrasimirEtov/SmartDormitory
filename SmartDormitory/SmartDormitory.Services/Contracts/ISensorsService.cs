@@ -23,5 +23,7 @@ namespace SmartDormitory.Services.Contracts
         Task<Sensor> GetSensorById(string sensorId);
 
         Task<int> TotalSensorsByCriteria(string measureTypeId, int isPublic = -1, int alarmSet = -1);
-    }
+		Task<int> TotalSensors();
+
+	}
 }

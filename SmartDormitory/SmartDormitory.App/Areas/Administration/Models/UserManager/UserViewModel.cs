@@ -1,7 +1,7 @@
 ﻿using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Models.Users;
 
-namespace SmartDormitory.App.Areas.Administration.Models
+namespace SmartDormitory.App.Areas.Administration.Models.UserManager
 {
 	public class UserViewModel
 	{

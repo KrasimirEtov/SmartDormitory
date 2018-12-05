@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using SmartDormitory.App.Areas.Administration.Models.Home;
+using SmartDormitory.Services.Contracts;
+using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Areas.Administration.Controllers
 {
@@ -8,11 +10,26 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 	[Authorize(Roles = "Administrator")]
 	public class HomeController : Controller
 	{
+		private readonly IUserService userService;
+		private readonly ISensorsService sensorsService;
 
-		public IActionResult Index()
+		public HomeController(IUserService userService, ISensorsService sensorsService)
 		{
-            // TODO: Dashboard
-			return View();
+			this.userService = userService;
+			this.sensorsService = sensorsService;
+		}
+		[HttpGet]
+		public async Task<IActionResult> Index()
+		{
+			var users = await userService.TotalUsers();
+			var sensors = await sensorsService.TotalSensors();
+			var model = new DashboardViewModel()
+			{
+				UsersCount = users,
+				SensorsCount = sensors
+			};
+
+			return View(model);
 		}
 	}
 }

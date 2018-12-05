@@ -175,5 +175,8 @@ namespace SmartDormitory.Services
 
             return await sensors.CountAsync();
         }
-    }
+
+		public async Task<int> TotalSensors()
+			=> await this.Context.Sensors.CountAsync(s => s.IsDeleted == false);
+	}
 }

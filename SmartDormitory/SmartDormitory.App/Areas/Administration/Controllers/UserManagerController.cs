@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartDormitory.App.Areas.Administration.Models;
+using SmartDormitory.App.Areas.Administration.Models.UserManager;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
 using System;
@@ -13,7 +14,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 	[Authorize(Roles = "Administrator")]
 	public class UserManagerController : Controller
 	{
-		private const int PageSize = 3;
+		private const int PageSize = 4;
 		private readonly IUserService userService;
 
 		public UserManagerController(IUserService userService)
@@ -39,7 +40,6 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> ToggleRole([FromForm]string userId)
 		{
 
@@ -66,8 +66,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Delete(string userId)
+		public async Task<IActionResult> Delete([FromForm]string userId)
 		{
 			try
 			{

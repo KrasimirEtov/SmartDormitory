@@ -1,59 +1,59 @@
-﻿//$('#deleteModal').on('show.bs.modal', function (e) {
-//    $('a').attr('asp-route-userId', $(e.relatedTarget).data('id'));
-//    $("#userId").val($(e.relatedTarget).data('id'));
-//});
+﻿$(function () {
+    const isEnabledBtn = 'btn-danger';
+    const isDisabledBtn = 'btn-green';
+    const enableUserText = 'Enable';
+    const disableUserText = 'Disable';
 
-//$(function () {
-//    var userId;
+    const $deleteModalForm = $('.deleteModalForm');
+    const $deleteUserForm = $('.deleteUserForm');
+    const modalBtn = $('.modalBtn');
+    const userIdFromForm = $deleteUserForm.data('userId');
 
-//    $(document).on('click', '.modalBtn', function () {
+    $('.deleteBtnModal').click(function () {
+        const userIdFromBtn = $(this).data('userId');
 
-//        //userId = $(this).data('testId');
-//        console.log($(this).data('testId'));
-//    });
+        if ($(modalBtn).hasClass(isEnabledBtn) && userIdFromBtn === userIdFromForm) {
+            $(modalBtn).removeClass(isEnabledBtn).addClass(isDisabledBtn);
+            $(modalBtn).html(enableUserText);
+        }
+        else if ($(modalBtn).hasClass(isDisabledBtn) && userIdFromBtn === userIdFromForm) {
+            $(modalBtn).removeClass(isDisabledBtn).addClass(isEnabledBtn);
+            $(modalBtn).html(disableUserText);
+        }
+    });
 
-//    $('#deleteBtnModal').click(function () {
-//        console.log(userId);
-//    });
+    $('.enableUserBtn').click(function () {
+        if ($(this).hasClass(isEnabledBtn)) {
+            $(this).removeClass(isEnabledBtn).addClass(isDisabledBtn);
+            $(this).html(enableUserText);
+        }
+        else if ($(this).hasClass(isDisabledBtn)) {
+            $(this).removeClass(isDisabledBtn).addClass(isEnabledBtn);
+            $(this).html(disableUserText);
+        }
+    });
 
-//    const $deleteModalForm = $('#modalDelete-form');
 
-//    $deleteModalForm.on('submit', function (event) {
-//        event.preventDefault();
 
-//        const tokenValue = $('input[name="__RequestVerificationToken"]').val();
+    // If user is enabled
+    $deleteModalForm.on('submit', function (event) {
+        event.preventDefault();
 
-//        $.post($deleteModalForm.attr('action'), { userId: userId, __RequestVerificationToken: tokenValue }, function () {
-//        });
-//    });
-//});
+        const tokenValue = $('input[name="__RequestVerificationToken"]').val();
+        const userId = $(this).data('userId');
 
-//$(function () {
-//    const $modalDeleteForm = $('#modalDelete-form');
-//    const userId = $('#userId').val();
-//    const valTokenName = $('input[name="__RequestVerificationToken"]').val();
+        $.post($deleteModalForm.attr('action'), { userId: userId, __RequestVerificationToken: tokenValue }, function () {
+        });
+    });
 
-//    $toggleForm.on('submit', function (event) {
-//        event.preventDefault();
+    // If user is disabled
+    $deleteUserForm.on('submit', function (event) {
+        event.preventDefault();
 
-//        $.post($toggleForm.attr('action'), { userId: userId, __RequestVerificationToken: valTokenName }, function () {
-//            console.log('finish');
-//        });
-//    });
+        const tokenValue = $('input[name="__RequestVerificationToken"]').val();
+        const userId = $(this).data('userId');
 
-//    $('button.toggleRole').click(function () {
-//        console.log('button is clicked');
-//        var isAdminBtn = $('#adminBtnStyle').val();
-//        var isNotAdminBtn = $('#nonAdminBtnStyle').val();
-//        var isAdminText = $('#isAdminText').val();
-//        var isNotAdminText = $('#isNotAdminText').val();
-
-//        if ($(this).hasClass(isAdminBtn)) {
-//            $(this).removeClass(isAdminBtn).addClass(isNotAdminBtn).html(isNotAdminText);
-//        }
-//        else if ($(this).hasClass(isNotAdminBtn)) {
-//            $(this).removeClass(isNotAdminBtn).addClass(isAdminBtn).html(isAdminText);
-//        }
-//    });
-//});
-
+        $.post($deleteUserForm.attr('action'), { userId: userId, __RequestVerificationToken: tokenValue }, function () {
+        });
+    });
+});

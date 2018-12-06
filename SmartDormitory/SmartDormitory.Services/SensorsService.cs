@@ -95,7 +95,7 @@ namespace SmartDormitory.Services
                        });
         }
 
-        public async Task ToggleDeleteSensor(string sensorId)
+        public async Task ToggleSoftDeleteSensor(string sensorId)
         {
             var sensor = await this.Context.Sensors.FirstOrDefaultAsync(s => s.Id == sensorId);
 
@@ -176,7 +176,53 @@ namespace SmartDormitory.Services
             return await sensors.CountAsync();
         }
 
-		public async Task<int> TotalSensors()
-			=> await this.Context.Sensors.CountAsync(s => s.IsDeleted == false);
-	}
+        public async Task<int> TotalSensors()
+            => await this.Context.Sensors.CountAsync(s => s.IsDeleted == false);
+
+        public async Task<IEnumerable<UserSensorListModel>> GetUserSensors(string userId, string searchTerm = "", string measureTypeId = "all", int alarmOn = -1, int isPublic = -1)
+        {
+            var user = this.Context.Users.FirstOrDefault(u => u.Id == userId);
+            if (user is null)
+            {
+                throw new EntityDoesntExistException("User does not exist");
+            }
+
+            var sensors = this.Context.Sensors.Where(s => s.OwnerId == userId && !s.IsDeleted);
+
+            if (measureTypeId != "all")
+            {
+                if (await this.measureTypeService.Exists(measureTypeId))
+                {
+                    sensors = sensors.Where(s => s.IcbSensor.MeasureTypeId == measureTypeId);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                sensors = sensors.Where(s => s.Name.Contains(searchTerm) ||
+                                           s.Description.Contains(searchTerm));
+            }
+            if (isPublic != -1 && (isPublic == 0 || isPublic == 1))
+            {
+                bool isPublicValue = isPublic != 0;
+                sensors = sensors.Where(s => s.IsPublic == isPublicValue);
+            }
+            if (alarmOn != -1 && (alarmOn == 0 || alarmOn == 1))
+            {
+                bool alarmSetValue = alarmOn != 0;
+                sensors = sensors.Where(s => s.AlarmOn == alarmSetValue);
+            }
+
+            return await sensors
+                             .OrderByDescending(s => s.CreatedOn)
+                             .Select(s => new UserSensorListModel
+                             {
+                                 Id = s.Id,
+                                 Name = s.Name,
+                                 SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
+                                 PollingInterval = s.UserPollingInterval,
+                                 CreatedOn = (DateTime)s.CreatedOn
+                             })
+                             .ToListAsync();
+        }
+    }
 }

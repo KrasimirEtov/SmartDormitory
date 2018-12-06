@@ -29,7 +29,6 @@ namespace SmartDormitory.Services
 		{
 			return await this.Context.Users
 				.Where(u => u.Id == userId)
-
 				.FirstOrDefaultAsync();
 		}
 

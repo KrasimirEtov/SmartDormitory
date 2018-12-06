@@ -10,11 +10,10 @@
                 <div class="col-lg-4">
                     <!-- Card -->
                     <div class="card">
-
                         <!-- Card image -->
                         <div class="view overlay">
                             <img class="card-img-top" src="https://mdbootstrap.com/img/Mockups/Lightbox/Thumbnail/img%20(67).jpg" alt="Card image cap">
-                            <a href="#!">
+                            <a asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model[c].Id">
                                 <div class="mask rgba-white-slight"></div>
                             </a>
                         </div>
@@ -23,13 +22,13 @@
                         <div class="card-body">
 
                             <!-- Title -->
-                            <h4 class="card-title">@Model[c].Name</h4>
+                            <h4 class="card-title text-info">@Model[c].Name</h4>
                             <!-- Text -->
-                            <p class="card-text">@Model[c].SensorType</p>
-                            <p class="card-text">@Model[c].PollingInterval</p>
+                            <p class="card-text text-warning">(@Model[c].SensorType)</p>
+                            <p class="card-text">Refresh rate: @Model[c].PollingInterval <small>seconds</small></p>
                             <!-- Button -->
-                            <a asp-controller="Sensor" asp-action="Create" asp-route-sensorId="@Model[c].Id"
-                               class="btn btn-primary">Register</a>
+                            <a asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model[c].Id"
+                               class="btn btn-primary">Details</a>
                         </div>
 
                     </div>

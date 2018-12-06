@@ -35,7 +35,7 @@
 
                                 <form asp-area="Administration" asp-controller="UserManager"
                                       asp-action="ToggleRole" data-user-id="@user.Id" method="post" class="roleForm">
-                                    <button class="roleButton btn @buttonClass" type="submit">
+                                    <button class="roleBtn btn @buttonClass" type="submit">
                                         @buttonTitle
                                     </button>
                                 </form>
@@ -52,51 +52,16 @@
                             }
                             else
                             {
-
-
-                                @if (user.IsDeleted)
-                                {
-                                    <form asp-area="Administration" asp-controller="UserManager"
-                                          asp-action="Delete" data-user-id="@user.Id" method="post"
-                                          class="deleteUserForm">
-                                        <button class="enableUserBtn btn btn-green" type="submit">
-                                            Enable
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <button type="button" class="modalBtn btn btn-danger waves-effect"
-                                            data-toggle="modal" data-target="#deleteModal" data-user-id="@user.Id">
-                                        Disable
+                                string buttonClass = user.IsDeleted ? "btn-danger" : "btn-dark-green";
+                                string buttonTitle = user.IsDeleted ? "Disable" : "Enable";
+                                <form asp-area="Administration" asp-controller="UserManager"
+                                      asp-action="Delete" data-user-id="@user.Id" method="post"
+                                      class="deleteUserForm">
+                                    <button class="userStateBtn btn @buttonClass" data-user-id="@user.Id" type="submit">
+                                        @buttonTitle
                                     </button>
+                                </form>
 
-                                    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <form asp-area="Administration" asp-controller="UserManager" asp-action="Delete"
-                                                      class="deleteModalForm" method="post" data-user-id="@user.Id">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title w-100" id="deleteModal">Disable user</h4>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p>Are you sure you want to disable this user?</p>
-                                                        <p class="text-warning">This action cannot be undone!</p>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-                                                        <button class="deleteBtnModal btn btn-danger" type="submit">
-                                                            Disable
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
                             }
                         </td>
                     </tr>
@@ -132,10 +97,7 @@
     </li>
 </ul>
 
-
-
-<script src="~/js/roleManager.js"></script>
-
+<script src="~/js/userManagerScripts.js"></script>
 <script>
     $(function () {
         movePage("#nextPage", @Model.NextPage);

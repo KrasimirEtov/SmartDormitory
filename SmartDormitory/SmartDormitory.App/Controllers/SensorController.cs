@@ -115,8 +115,9 @@ namespace SmartDormitory.App.Controllers
         public async Task<IActionResult> Details(string sensorId)
         {
             var sensor = await sensorsService.GetSensorById(sensorId);
-            var model = new DetailsSensorViewModel()
-            {
+			var model = new DetailsSensorViewModel()
+			{
+				userId = sensor.OwnerId,
                 AlarmOn = sensor.AlarmOn,
                 Description = sensor.Description,
                 IsPublic = sensor.IsPublic,

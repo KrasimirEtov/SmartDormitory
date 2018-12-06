@@ -57,6 +57,11 @@ body {
     width: 100%; /* The width is the width of the web page */
 }
 
+#detailsMap {
+    height: 400px; /* The height is 400 pixels */
+    width: 100%; /* The width is the width of the web page */
+}
+
 #pac-input {
     background-color: #fff;
     font-family: Roboto;
@@ -71,3 +76,40 @@ body {
     #pac-input:focus {
         border-color: #4d90fe;
     }
+
+/* clearfix */
+
+.clear:before,
+.clear:after {
+    content: "";
+    display: table;
+}
+
+.clear:after {
+    clear: both;
+}
+
+.clear {
+    *zoom: 1;
+}
+
+.sensorWrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 30px;
+    border: 1px solid #cccccc;
+}
+
+.gauge {
+    display: block;
+    float: left;
+}
+
+#sensor {
+    width: 100%;
+}
+
+

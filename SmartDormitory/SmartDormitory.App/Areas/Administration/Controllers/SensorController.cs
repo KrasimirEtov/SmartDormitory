@@ -14,7 +14,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
     public class SensorController : Controller
     {
         private const int PageSize = 2;
-
+		// TODO : Details should be dynamic on the same details page
         private readonly ISensorsService sensorsService;
         private readonly IMeasureTypeService measureTypeService;
 
@@ -29,7 +29,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         {
             var measureTypes = await this.measureTypeService
                                          .GetAll();
-
+	
             var model = new SensorsIndexViewModel
             {
                 MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),

@@ -2,17 +2,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.App.Models.Sensor;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
 using SmartDormitory.Services.Models.IcbSensors;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Controllers
 {
+    [Authorize]
     public class SensorController : Controller
     {
         private readonly ISensorsService sensorsService;
@@ -26,8 +27,44 @@ namespace SmartDormitory.App.Controllers
             this.measureTypeService = measureTypeService;
         }
 
+        // user sensors
         [HttpGet]
-        [Authorize]
+        public async Task<IActionResult> MySensors()
+        {
+            var userId = this.User.GetId();
+            var measureTypes = await this.measureTypeService.GetAll();
+
+            var sensors = await this.sensorsService.GetUserSensors(userId);
+
+            var model = new MySensorsViewModel
+            {
+                MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
+                //TODO use automapper?
+                Sensors = sensors
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReloadMySensorsTable(string measureTypeId = "all", string searchTerm = "", int alarmOn = -1, int privacy = -1)
+        {
+            try
+            {
+                var userId = this.User.GetId();
+                var sensors = await this.sensorsService
+                                        .GetUserSensors(userId, searchTerm, measureTypeId,
+                                                                alarmOn, privacy);
+
+                return PartialView("_MySensorsTable", sensors);
+            }
+            catch (EntityDoesntExistException e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> RegisterIndex()
         {
             var sensorTypes = await this.measureTypeService.GetAll();
@@ -97,7 +134,7 @@ namespace SmartDormitory.App.Controllers
             if (!this.ModelState.IsValid)
             {
                 throw new InvalidClientInputException("Register new sensor failed");
-				// TODO: Redirect to register index + temp data message
+                // TODO: Redirect to register index + temp data message
             }
             // TODO: Add validation for model, change user id to here, not from view
             // TODO: Tests
@@ -139,16 +176,9 @@ namespace SmartDormitory.App.Controllers
                 Id = s.Id,
                 Description = s.Description,
                 PollingInterval = "Minimum refresh time: " + s.PollingInterval,
-                Tag = this.ExtractTag(s.Tag),
+                Tag = s.Tag.SplitTag(),
                 //set image url depends on tag
             }).ToList();
-        }
-
-        private string ExtractTag(string source)
-        {
-            var results = Regex.Split(source, @"(?<!^)(?=[A-Z0-9])");
-
-            return string.Join(" ", results);
         }
     }
 }

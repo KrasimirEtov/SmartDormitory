@@ -13,7 +13,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
     [Authorize(Roles = "Administrator")]
     public class SensorController : Controller
     {
-        private const int PageSize = 2;
+        private const int PageSize = 5;
 
         private readonly ISensorsService sensorsService;
         private readonly IMeasureTypeService measureTypeService;
@@ -52,7 +52,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         {
             try
             {
-                await this.sensorsService.ToggleDeleteSensor(sensorId);
+                await this.sensorsService.ToggleSoftDeleteSensor(sensorId);
             }
             catch (EntityDoesntExistException e)
             {

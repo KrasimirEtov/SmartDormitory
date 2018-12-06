@@ -5,33 +5,8 @@
     var nextDisabled = Model.CurrentPage == Model.TotalPages ? "disabled" : string.Empty;
 }
 
-<ul class="pagination">
-    <li class="page-item">
-        <a class="page-link @previousDisabled" id="prevPage" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-            <span class="sr-only">Previous</span>
-        </a>
-    </li>
-    @if (Model.TotalPages > 1)
-    {
-        @for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            <li class="page-item @(Model.CurrentPage == i ? "active" : string.Empty)">
-                <a onclick="goToPageNumber(this)" data-page-number="@i" class="page-link">
-                    @i
-                </a>
-            </li>
-        }
-    }
-    <li class="page-item">
-        <a class="page-link @nextDisabled" id="nextPage" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-            <span class="sr-only">Next</span>
-        </a>
-    </li>
-</ul>
 
-<table class="table table-hover">
+<table class="table table-hover table-striped" width="100">
     <thead class="thead-dark">
         <tr>
             <th class="h5">Sensor name</th>
@@ -43,6 +18,7 @@
         </tr>
     </thead>
     <tbody class="bg-white">
+
         @foreach (var sensor in Model.Sensors)
         {
             string privacyIcon = sensor.IsPublic ? "fas fa-globe-americas" : "fas fa-user - secret";
@@ -53,7 +29,8 @@
             <tr>
                 <td>
                     <a asp-area="" asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@(sensor.Id)">
-                        @sensor.Name
+                        <span class="badge badge-pill badge-primary"> <i class="fas fa-info"></i></span>
+                        <span class="h6">@sensor.Name</span>
                     </a>
                 </td>
                 <td>
@@ -62,8 +39,8 @@
                     </a>
                 </td>
                 <td class="text-danger">@sensor.SensorType</td>
-                <td class="h3 @privacyColor"><i class="@privacyIcon"></i></td>
-                <td class="h3 @alarmColor"><i class="@alarmIcon"></i></td>
+                <td class="h4 @privacyColor"><i class="@privacyIcon"></i></td>
+                <td class="h4 @alarmColor"><i class="@alarmIcon"></i></td>
                 <td>
                     @{
                         string buttonClass = !sensor.IsDeleted ? "btn-danger" : "btn-dark-green";
@@ -72,20 +49,21 @@
                     }
                     <form asp-area="Administration" asp-controller="Sensor" class="toggleDeleteForm"
                           asp-action="ToggleDelete" method="post" data-sensor-id="@sensor.Id">
-                        <button class="deleteToggleButton d-inline p-2 btn btn-sm waves-effect @buttonClass" type="submit">
-                            <i class="icon @glyph"></i> @buttonTitle
+                        <button class="deleteToggleButton d-inline p-2 btn btn waves-effect @buttonClass" type="submit">
+                            <i class="icon @glyph"></i> @*@buttonTitle*@
                         </button>
                     </form>
-                    <div class="d-inline p-2">
-                        <i class="fas fa-info"></i>
-
-                    </div>
                 </td>
             </tr>
-        }
 
+        }
     </tbody>
 </table>
+
+@if (!Model.Sensors.Any())
+{
+    <p class="display-4 text-primary">There are no sensors by choosen criteria</p>
+}
 
 <ul class="pagination">
     <li class="page-item">
@@ -116,20 +94,20 @@
 
 <script>
     $(function () {
-        movePage("#nextPage", @Model.NextPage);
-        movePage("#prevPage", @Model.PreviousPage);
-
-        function movePage(tagId, targetPage) {
+        const movePage = function (tagId, targetPage) {
             $(tagId).click(function () {
                 let typeId = $("#MeasureTypeId").val();
                 let isPublic = $("#IsPublic").val();
                 let alarmSet = $("#AlarmSet").val();
                 let url = "@Url.Action("LoadSensorsTable", "Sensor")?measureTypeId=" + typeId +
                   "&isPublic=" + isPublic + "&alarmSet=" + alarmSet + "&page=" + targetPage;
-                console.log(url)
+
                 $("#sensorsTable").load(url);
             })
         }
+
+        movePage("#nextPage", @Model.NextPage);
+        movePage("#prevPage", @Model.PreviousPage);
 
         $('button.deleteToggleButton').click(function () {
 
@@ -155,9 +133,8 @@
 
             const data = $toggleDeleteForm.serialize();
             const sensorId = $(this).data('sensorId');
-            console.log(sensorId)
             const url = $toggleDeleteForm.attr('action') + '?sensorId=' + sensorId;
-            console.log(url)
+
             $.post(url, { __RequestVerificationToken: data.__RequestVerificationToken }, function () {
             });
         });

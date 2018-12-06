@@ -36,7 +36,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Administration\Views\Shared\" />
-    <Folder Include="wwwroot\images\sensortypes\" />
   </ItemGroup>
 
 </Project>

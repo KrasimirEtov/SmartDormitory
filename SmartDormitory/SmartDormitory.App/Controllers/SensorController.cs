@@ -40,7 +40,7 @@ namespace SmartDormitory.App.Controllers
             {
                 MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
                 //TODO use automapper?
-                Sensors = sensors
+                Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList()
             };
 
             return View(model);
@@ -52,9 +52,11 @@ namespace SmartDormitory.App.Controllers
             try
             {
                 var userId = this.User.GetId();
-                var sensors = await this.sensorsService
-                                        .GetUserSensors(userId, searchTerm, measureTypeId,
-                                                                alarmOn, privacy);
+                var sensors = (await this.sensorsService
+                                         .GetUserSensors(userId, searchTerm, measureTypeId,
+                                                                alarmOn, privacy))
+                                        .Select(s => new MySensorListViewModel(s))
+                                        .ToList();
 
                 return PartialView("_MySensorsTable", sensors);
             }
@@ -152,9 +154,9 @@ namespace SmartDormitory.App.Controllers
         public async Task<IActionResult> Details(string sensorId)
         {
             var sensor = await sensorsService.GetSensorById(sensorId);
-			var model = new DetailsSensorViewModel()
-			{
-				userId = sensor.OwnerId,
+            var model = new DetailsSensorViewModel()
+            {
+                userId = sensor.OwnerId,
                 AlarmOn = sensor.AlarmOn,
                 Description = sensor.Description,
                 IsPublic = sensor.IsPublic,

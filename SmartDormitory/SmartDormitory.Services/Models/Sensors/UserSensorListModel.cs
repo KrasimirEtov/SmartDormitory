@@ -10,9 +10,15 @@ namespace SmartDormitory.Services.Models.Sensors
 
         public string SensorType { get; set; }
 
+        public string MeasureUnit { get; set; }
+
         public int PollingInterval { get; set; }
 
         public DateTime CreatedOn { get; set; }
+
+        public bool AlarmOn { get; set; }
+
+        public bool IsPublic { get; set; }
         //todo add more
     }
 }

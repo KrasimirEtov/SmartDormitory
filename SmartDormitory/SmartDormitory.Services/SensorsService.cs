@@ -219,8 +219,11 @@ namespace SmartDormitory.Services
                                  Id = s.Id,
                                  Name = s.Name,
                                  SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
+                                 MeasureUnit = s.IcbSensor.MeasureType.MeasureUnit,
                                  PollingInterval = s.UserPollingInterval,
-                                 CreatedOn = (DateTime)s.CreatedOn
+                                 CreatedOn = (DateTime)s.CreatedOn,
+                                 IsPublic = s.IsPublic,
+                                 AlarmOn = s.AlarmOn
                              })
                              .ToListAsync();
         }

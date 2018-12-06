@@ -14,6 +14,6 @@ namespace SmartDormitory.App.Models.Sensor
 
         public int AlarmOn { get; set; } = -1;
 
-        public IEnumerable<UserSensorListModel> Sensors { get; set; }
+        public IEnumerable<MySensorListViewModel> Sensors { get; set; }
     }
 }

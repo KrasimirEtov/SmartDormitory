@@ -271,17 +271,6 @@ namespace SmartDormitory.Services
                 throw new EntityDoesntExistException($"\nSensor is not present in the database.");
             }
 
-            if (sensor.Name == name)
-            {
-                throw new EntityAlreadyExistsException($"\nSensor {sensor.Name} is already present in the database");
-            }
-
-            if (sensor.Name.Length > 50 || sensor.Name.Length < 3
-                || name.Length > 50 || name.Length < 3)
-            {
-                throw new InvalidClientInputException("Sensor name should be between 3 and 50 characters");
-            }
-
             sensor.UserId = userId;
             sensor.IcbSensorId = icbSensorId;
             sensor.Name = name;

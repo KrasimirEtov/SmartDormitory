@@ -102,15 +102,33 @@ namespace SmartDormitory.App.Controllers
         }
 
 		[HttpGet]
-		[Authorize]
-		public async Task<IActionResult> Create(string sensorId)
+		public async Task<IActionResult> Create(string icbSensorId, string userId = "")
 		{
 			// TODO: Better implementation
-			var icbSensor = await this.icbSensorsService.GetSensorById(sensorId);
+			var icbSensor = await this.icbSensorsService.GetSensorById(icbSensorId);
+			if (icbSensor == null)
+			{
+				// TODO: Error
+				return this.NotFound();
+			}
+
+			if (!string.IsNullOrWhiteSpace(userId))
+			{
+				if (!this.User.IsInRole("Administration"))
+				{
+					return this.Forbid();
+				}
+			}
+			else
+			{
+				userId = this.User.GetId();
+			}
+
 			var model = new CreateUpdateSensorViewModel()
 			{
-				IcbSensorId = sensorId,
-				PollingInterval = icbSensor.PollingInterval
+				IcbSensorId = icbSensorId,
+				PollingInterval = icbSensor.PollingInterval,
+				UserId = userId
 			};
 
 			if (icbSensor.MeasureType.MeasureUnit == "(true/false)")
@@ -127,13 +145,11 @@ namespace SmartDormitory.App.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<IActionResult> Create(CreateUpdateSensorViewModel model)
 		{
 			if (!this.ModelState.IsValid)
 			{
-				throw new InvalidClientInputException("Register new sensor failed");
-				// TODO: Redirect to register index + temp data message
+				return this.RedirectToAction("Create", "Sensor", new { icbSensorId = model.IcbSensorId });
 			}
 			// TODO: Add validation for model, change user id to here, not from view
 			// TODO: Tests
@@ -166,7 +182,6 @@ namespace SmartDormitory.App.Controllers
         }
 
 		[HttpGet]
-		[Authorize]
 		public async Task<IActionResult> Details(string sensorId)
 		{
 			var sensor = await sensorsService.GetSensorById(sensorId);
@@ -191,7 +206,6 @@ namespace SmartDormitory.App.Controllers
 		}
 
 		[HttpGet]
-		[Authorize]
 		public async Task<JsonResult> GetGaudeData(string sensorId)
 		{
 			var data = await sensorsService.GetGaudeData(sensorId);
@@ -200,7 +214,6 @@ namespace SmartDormitory.App.Controllers
 		}
 
 		[HttpGet]
-		[Authorize]
 		public async Task<IActionResult> Update(string sensorId)
 		{
 			// TODO: Better implementation
@@ -233,7 +246,6 @@ namespace SmartDormitory.App.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
 		public async Task<IActionResult> Update(CreateUpdateSensorViewModel model)
 		{
 			if (!this.ModelState.IsValid)

@@ -1,11 +1,10 @@
 ﻿@model CreateUpdateSensorViewModel
 
-@inject UserManager<User> UserManager
 
-
-<form asp-area="" asp-controller="Sensor" asp-action="Create" id="registerSensorForm" method="post">
-    <input asp-for="IcbSensorId" hidden />
-    <input asp-for="UserId" hidden value="@((await UserManager.GetUserAsync(User)).Id)" />
+<form asp-area="" asp-controller="Sensor" asp-action="Create" method="post">
+    <input asp-for="IcbSensorId" hidden value="@Model.IcbSensorId"/>
+    @* TODO: inject use manager here *@
+    <input asp-for="UserId" hidden value="@Model.UserId" />
 
     <div class="form-row">
         <div class="col-6">

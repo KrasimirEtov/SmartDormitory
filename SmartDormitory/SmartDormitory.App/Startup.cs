@@ -44,10 +44,10 @@ namespace SmartDormitory.App
 				.AddEntityFrameworkStores<SmartDormitoryContext>()
 				.AddDefaultTokenProviders();
 
-            // IMPORTANT
-            // Comment this line if dropped db and update again
-   //         GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
-			//services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
+			// IMPORTANT
+			// Comment this line if dropped db and update again
+			GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
+			services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
 
 			// Dependency Injection
 			services.AddHttpClient<IcbHttpClient>();
@@ -63,7 +63,7 @@ namespace SmartDormitory.App
 			services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
 
 			// Comment this line if database is dropped for the first start of the program
-			//this.ActivatingHangfireJobs(services);
+			this.ActivatingHangfireJobs(services);
 
 			if (this.Environment.IsDevelopment())
 			{

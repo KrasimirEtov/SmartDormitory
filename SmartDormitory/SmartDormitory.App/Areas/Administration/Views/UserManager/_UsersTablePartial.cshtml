@@ -15,56 +15,61 @@
                     <th class="th-lg" scope="col" style="text-align:center">Role</th>
                     <th class="th-lg" scope="col" style="text-align:center">Action</th>
                     <th class="th-lg" scope="col" style="text-align:center">State</th>
+                    <th class="th-lg" scope="col" style="text-align:center">Create Sensor</th>
                 </tr>
             </thead>
             <tbody id="user-section">
                 @foreach (var user in Model.Users)
                 {
-                    <tr style="text-align:center">
-                        <td>@user.UserName</td>
-                        <td>@user.SensorsCount</td>
-                        <td>
-                            @if (user.UserName == User.Identity.Name || user.UserName == "admin")
-                            {
-                                <button class="btn btn-dark-green" disabled>Admin</button>
-                            }
-                            else
-                            {
-                                string buttonClass = user.IsAdmin ? "btn-danger" : "btn-dark-green";
-                                string buttonTitle = user.IsAdmin ? "Remove Admin" : "Make Admin";
+                <tr style="text-align:center">
+                    <td>@user.UserName</td>
+                    <td>@user.SensorsCount</td>
+                    <td>
+                        @if (user.UserName == User.Identity.Name || user.UserName == "admin")
+                        {
+                            <button class="btn btn-dark-green" disabled>Admin</button>
+                        }
+                        else
+                        {
+                            string buttonClass = user.IsAdmin ? "btn-danger" : "btn-dark-green";
+                            string buttonTitle = user.IsAdmin ? "Remove Admin" : "Make Admin";
 
-                                <form asp-area="Administration" asp-controller="UserManager"
-                                      asp-action="ToggleRole" data-user-id="@user.Id" method="post" class="roleForm">
-                                    <button class="roleBtn btn @buttonClass" type="submit">
-                                        @buttonTitle
-                                    </button>
-                                </form>
-                            }
-                        </td>
-                        <td>
-                            <a asp-area="Identity" asp-route-userId="@user.Id"
-                               asp-page="/Account/Manage/Index" class="btn btn-brown waves-effect">Profile</a>
-                        </td>
-                        <td>
-                            @if (user.UserName == User.Identity.Name || user.UserName == "admin")
-                            {
-                                <button class="btn btn-dark-green" disabled>Admin</button>
-                            }
-                            else
-                            {
-                                string buttonClass = user.IsDeleted ? "btn-danger" : "btn-dark-green";
-                                string buttonTitle = user.IsDeleted ? "Disable" : "Enable";
-                                <form asp-area="Administration" asp-controller="UserManager"
-                                      asp-action="Delete" data-user-id="@user.Id" method="post"
-                                      class="deleteUserForm">
-                                    <button class="userStateBtn btn @buttonClass" data-user-id="@user.Id" type="submit">
-                                        @buttonTitle
-                                    </button>
-                                </form>
+                            <form asp-area="Administration" asp-controller="UserManager"
+                                  asp-action="ToggleRole" data-user-id="@user.Id" method="post" class="roleForm">
+                                <button class="roleBtn btn @buttonClass" type="submit">
+                                    @buttonTitle
+                                </button>
+                            </form>
+                        }
+                    </td>
+                    <td>
+                        <a asp-area="Identity" asp-route-userId="@user.Id"
+                           asp-page="/Account/Manage/Index" class="btn btn-brown waves-effect">Profile</a>
+                    </td>
+                    <td>
+                        @if (user.UserName == User.Identity.Name || user.UserName == "admin")
+                        {
+                            <button class="btn btn-dark-green" disabled>Admin</button>
+                        }
+                        else
+                        {
+                            string buttonClass = user.IsDeleted ? "btn-danger" : "btn-dark-green";
+                            string buttonTitle = user.IsDeleted ? "Disable" : "Enable";
+                            <form asp-area="Administration" asp-controller="UserManager"
+                                  asp-action="Delete" data-user-id="@user.Id" method="post"
+                                  class="deleteUserForm">
+                                <button class="userStateBtn btn @buttonClass" data-user-id="@user.Id" type="submit">
+                                    @buttonTitle
+                                </button>
+                            </form>
 
-                            }
-                        </td>
-                    </tr>
+                        }
+                    </td>
+                    <td>
+                        <a asp-area="" asp-controller="Sensor" asp-action="RegisterIndex" asp-route-userId="@user.Id"
+                           class="btn btn-orange waves-effect">Register</a>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>

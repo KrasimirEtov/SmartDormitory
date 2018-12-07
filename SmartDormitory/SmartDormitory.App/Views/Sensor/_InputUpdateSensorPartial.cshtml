@@ -1,11 +1,10 @@
 ﻿@model CreateUpdateSensorViewModel
 
-@inject UserManager<User> UserManager
 
-
-<form asp-area="" asp-controller="Sensor" asp-action="Create" id="registerSensorForm" method="post">
-    <input asp-for="IcbSensorId" hidden />
-    <input asp-for="UserId" hidden value="@((await UserManager.GetUserAsync(User)).Id)" />
+<form asp-area="" asp-controller="Sensor" asp-action="Update" method="post">
+    <input asp-for="SensorId" hidden value="@Model.SensorId"/>
+    <input asp-for="IcbSensorId" hidden value="@Model.IcbSensorId"/>
+    <input asp-for="UserId" hidden value="@Model.UserId" />
 
     <div class="form-row">
         <div class="col-6">
@@ -119,7 +118,7 @@
     <div class="form-row">
         <div class="col">
             <label class="bs-switch">
-                <input asp-for="AlarmOn" type="checkbox" value="@Model.AlarmOn"
+                <input asp-for="AlarmOn" type="checkbox"
                        class="custom-control-input" id="alarmCheckbox" />
                 <span class="slider round"></span>
             </label>
@@ -129,7 +128,7 @@
         </div>
         <div class="col">
             <label class="bs-switch">
-                <input asp-for="IsPublic" type="checkbox" value="@Model.IsPublic"
+                <input asp-for="IsPublic" type="checkbox"
                        class="custom-control-input" id="privacyCheckbox" />
                 <span class="slider round"></span>
             </label>

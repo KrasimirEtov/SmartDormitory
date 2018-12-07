@@ -5,7 +5,8 @@
     string sensorPrivacyText = Model.IsPublic ? "Public" : "Private";
     string sensorAlarmIcon = Model.IsPublic ? "fa-bell" : "fas fa-times-circle";
     string sensorAlarmText = Model.AlarmOn ? "Alarm On" : "Alarm Off";
-    string url = $"/Identity/Account/Manage?userId={Model.userId}";
+    string url = $"/Identity/Account/Manage?userId={Model.UserId}";
+    string urlGetGauge = $"/Sensor/GetGaudeData?userId={Model.UserId}";
 }
 
 <div class="card">
@@ -13,6 +14,8 @@
         <div class="card">
             <div class="card-body">
                 <h2 class="card-title" style="text-align:center">Sensor name: @Model.Name</h2>
+                <a asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
+                   class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
             </div>
         </div>
         <br />
@@ -28,7 +31,7 @@
                 <div class="card">
                     <div class="card-body text-center">
                         <h2 class="card-title">Polling Interval:</h2>
-                        <h4><b>@Model.PollingInterval</b></h4>
+                        <h4><b>@Model.PollingInterval</b> seconds</h4>
                     </div>
                 </div>
                 <br />
@@ -36,7 +39,7 @@
                     <div class="card-body text text-center">
                         <h2 class="card-title">Sensor state:</h2>
                         <div class="form-row">
-                            <h4><i class="fas @sensorPrivacyIcon col-3"></i> @sensorPrivacyText</h4>
+                            <h4><i class="fas @sensorPrivacyIcon col-4"></i> @sensorPrivacyText</h4>
                             <h4><i class="fas @sensorPrivacyIcon col-3"></i> @sensorAlarmText</h4>
                         </div>
 
@@ -47,8 +50,8 @@
             <div class="col-md-6 col-sm-12">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h2 class="card-title">Real Time data:</h2>
-                        <div id="sensor" class="gauge"></div>
+                        <h2 class="card-title">Real time data:</h2>
+                        <div id="sensor" class="gauge" data-title="Measure unit: @Model.MeasureUnit"></div>
                     </div>
                 </div>
             </div>
@@ -66,13 +69,14 @@
 
 <script>
     $(function () {
+
         var gauge = new JustGage({
             id: "sensor",
-            value: getRandomInt(@Model.MinRangeValue, @Model.MaxRangeValue),
+            value: @Model.StartValue,
             min: @Model.MinRangeValue,
             max: @Model.MaxRangeValue,
             decimals: 2,
-            gaugeWidthScale: 0.6,
+            gaugeWidthScale: 0.2,
             customSectors: [{
                 color: "#00ff00",
                 lo: @Model.MinRangeValue + 100,
@@ -82,33 +86,27 @@
                 lo: @Model.MaxRangeValue + 200,
                 hi: @Model.MaxRangeValue - 100
             }],
-            counter: true,
-            relativeGaugeSize: true
-        });
-
-        $('#gauge_refresh').click(function () {
-            gauge.refresh(getRandomInt(@Model.MinRangeValue, @Model.MaxRangeValue));
-        });
-
-        $('#gauge_update').click(function () {
-            gauge.update({
-                value: getRandomInt(@Model.MinRangeValue, @Model.MaxRangeValue),
-                customSectors: [{
-                    color: "#00ff00",
-                    lo: @Model.MinRangeValue + 50,
-                    hi: @Model.MaxRangeValue - 80
-                }, {
-                    color: "#ff0000",
-                    lo: @Model.MinRangeValue + 25,
-                    hi: @Model.MaxRangeValue - 100
-                }]
-            });
+            relativeGaugeSize: true,
+            pointer: true,
+            counter: true
+            
         });
 
         setInterval(function () {
-            gauge.refresh(getRandomInt(@Model.MinRangeValue, @Model.MaxRangeValue));
-        }, 1500);
+            $.getJSON('/Sensor/GetGaudeData?sensorId=@Model.SensorId', function (data) {
+                gauge.refresh(data.userCurrentValue);
+            });
+        }, 1 * 1000);
 
+        function customValue(val) {
+            if (val < @Model.MinRangeValue) {
+                return '< MIN';
+            } else if (val > @Model.MaxRangeValue) {
+                return '> MAX';
+            } else {
+                return val;
+            }
+        }
     });
 </script>
 

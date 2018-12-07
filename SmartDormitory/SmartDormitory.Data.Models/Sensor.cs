@@ -7,8 +7,8 @@ namespace SmartDormitory.Data.Models
 {
     public class Sensor : BaseEntity
     {
-        public string OwnerId { get; set; }
-        public User Owner { get; set; }
+        public string UserId { get; set; }
+        public User User { get; set; }
 
         public string IcbSensorId { get; set; }
         public IcbSensor IcbSensor { get; set; }
@@ -19,16 +19,16 @@ namespace SmartDormitory.Data.Models
         [Required]
         public string Description { get; set; }
 
-        [Range(0, int.MaxValue, ErrorMessage = UserPollingIntervalErrorMessage)]
-        public int UserPollingInterval { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = PollingIntervalMessage)]
+        public int PollingInterval { get; set; }
 
         public bool IsPublic { get; set; } = false;
 
         public bool AlarmOn { get; set; } = false;
 
-        public float AlarmMinRangeValue { get; set; }
+        public float MinRangeValue { get; set; }
 
-        public float AlarmMaxRangeValue { get; set; }
+        public float MaxRangeValue { get; set; }
 
         public Coordinates Coordinates { get; set; }
     }

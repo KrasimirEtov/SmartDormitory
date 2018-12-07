@@ -36,8 +36,8 @@ namespace SmartDormitory.App.Data
         {
             builder.Entity<User>()
                 .HasMany(u => u.Sensors)
-                .WithOne(s => s.Owner)
-                .HasForeignKey(u => u.OwnerId);
+                .WithOne(s => s.User)
+                .HasForeignKey(u => u.UserId);
 
             builder.Entity<IcbSensor>()
                 .HasMany(x => x.Sensors)

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartDormitory.App.Data;
 
 namespace SmartDormitory.Data.Migrations
 {
     [DbContext(typeof(SmartDormitoryContext))]
-    partial class SmartDormitoryContextModelSnapshot : ModelSnapshot
+    [Migration("20181206133328_Renamed_Columns")]
+    partial class Renamed_Columns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

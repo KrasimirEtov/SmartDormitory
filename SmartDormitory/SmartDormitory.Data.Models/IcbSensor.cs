@@ -21,7 +21,7 @@ namespace SmartDormitory.Data.Models
         public string Description { get; set; }
 
         [Required]
-        [Range(0, int.MaxValue, ErrorMessage = UserPollingIntervalErrorMessage)]
+        [Range(0, int.MaxValue, ErrorMessage = PollingIntervalMessage)]
         public int PollingInterval { get; set; }
 
         public MeasureType MeasureType { get; set; }

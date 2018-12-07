@@ -1,0 +1,22 @@
+﻿@model CreateUpdateSensorViewModel
+
+@inject UserManager<User> UserManager
+
+<div class="row">
+    <div class="col-md-2">
+        <h4><span class="form-row badge badge-pill badge-light text-secondary"> Update sensor </span></h4>
+    </div>
+
+    <div class="col-md-4">
+        <h4><span class="h5 badge badge-pill badge-info"> Update sensor details </span></h4>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model.SensorId">
+            <h4><span class="h5 badge badge-pill badge-primary">Go Back</span></h4>
+        </a>
+    </div>
+</div>
+
+<hr />
+
+<partial name="_InputUpdateSensorPartial" model="Model" />

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
+using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.App.Infrastructure.Hangfire;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
@@ -43,6 +44,7 @@ namespace SmartDormitory.App
 				.AddEntityFrameworkStores<SmartDormitoryContext>()
 				.AddDefaultTokenProviders();
 
+			// Comment this if you drop the database
 			GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
 			services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
 
@@ -59,9 +61,8 @@ namespace SmartDormitory.App
 
 			services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
 
-			// IMPORTANT
-			// Comment this line after 1st start of the app in development 
-			this.ActivatingHangfireJobs(services);
+			// Comment this line if database is dropped for the first start of the program
+			//this.ActivatingHangfireJobs(services);
 
 			if (this.Environment.IsDevelopment())
 			{
@@ -105,7 +106,6 @@ namespace SmartDormitory.App
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
 		{
-			// app.UseDatabaseMigration();
 
 			if (env.IsDevelopment())
 			{
@@ -124,7 +124,7 @@ namespace SmartDormitory.App
 
 			app.UseAuthentication();
 
-			//app.SeedAdminAccount();
+			app.SeedAdminAccount();
 
 			//hangfire
 			var hangfireServerOptions = new BackgroundJobServerOptions

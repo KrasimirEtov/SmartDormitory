@@ -12,7 +12,8 @@ namespace SmartDormitory.App.Models.Sensor
 		{
 
 		}
-		public string userId { get; set; }
+		public string SensorId { get; set; }
+		public string UserId { get; set; }
 		[Required]
 		[StringLength(30, ErrorMessage = "Sensor name should be between 3 and 30 symbols.", MinimumLength = 3)]
 		public string Name { get; set; }
@@ -29,5 +30,7 @@ namespace SmartDormitory.App.Models.Sensor
 		public float MaxRangeValue { get; set; }
 		public double Longtitude { get; set; }
 		public double Latitude { get; set; }
+		public float StartValue { get; set; }
+		public string MeasureUnit { get; set; }
 	}
 }

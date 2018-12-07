@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Models.Sensor
 {
-	public class CreateSensorViewModel
+	public class CreateUpdateSensorViewModel
 	{
+		public string SensorId { get; set; }
 		[Required]
 		[StringLength(30, ErrorMessage = "Sensor name should be between 3 and 30 symbols.", MinimumLength = 3)]
 		public string Name { get; set; }
 
-		public string OwnerId { get; set; }
+		public string UserId { get; set; }
 		public string IcbSensorId { get; set; }
 		[Required]
 		[StringLength(100, ErrorMessage = "Sensor description should be between 3 and 30 symbols.", MinimumLength = 3)]

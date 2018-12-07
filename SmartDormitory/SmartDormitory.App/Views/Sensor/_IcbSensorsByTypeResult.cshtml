@@ -1,43 +1,35 @@
 ﻿@model List<IcbSensorsListViewModel>
 
-@for (int i = 0; i < Model.Count(); i += 3)
-{
-    <div class="row">
-        @{
-            int rowLimit = i + 3;
-            for (int c = i; c < (Model.Count() < rowLimit ? Model.Count() : rowLimit); c++)
-            {
-                <div class="col-lg-4">
-                    <!-- Card -->
-                    <div class="card">
 
-                        <!-- Card image -->
-                        <div class="view overlay">
-                            <img class="card-img-top" src="https://mdbootstrap.com/img/Mockups/Lightbox/Thumbnail/img%20(67).jpg" alt="Card image cap">
-                            <a href="#!">
-                                <div class="mask rgba-white-slight"></div>
-                            </a>
-                        </div>
-
-                        <!-- Card content -->
-                        <div class="card-body">
-
-                            <!-- Title -->
-                            <h4 class="card-title">@Model[c].Tag</h4>
-                            <!-- Text -->
-                            <p class="card-text">@Model[c].Description</p>
-                            <p class="card-text">@Model[c].PollingInterval</p>
-                            <!-- Button -->
-                            <a asp-controller="Sensor" asp-action="Create" asp-route-sensorId="@Model[c].Id"
-                               class="btn btn-primary">Register</a>
-                        </div>
-
-                    </div>
-                    <!-- Card -->
-                </div>
-            }
+<table class="table  ">
+    <thead class="thead-light">
+        <tr>
+            <th>Tag</th>
+            <th>Description</th>
+            <th>Refresh rate</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sensor in Model)
+        {
+            <tr>
+                <td>@sensor.Tag</td>
+                <td>@sensor.Description</td>
+                <td>
+                    <span class="h6 text-warning"><em>@sensor.PollingInterval</em></span>
+                    <small>seconds</small>
+                </td>
+                <td>
+                    <a asp-controller="Sensor" asp-action="Create" asp-route-sensorId="@sensor.Id"
+                       class="btn btn-primary">Continue</a>
+                </td>
+            </tr>
         }
-    </div>
-    <hr />
-}
+
+    </tbody>
+</table>
+
+
+
 

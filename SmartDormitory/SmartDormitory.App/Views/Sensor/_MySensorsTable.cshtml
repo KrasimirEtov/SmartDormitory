@@ -1,4 +1,4 @@
-﻿@model List<UserSensorListModel>
+﻿@model List<MySensorListViewModel>
 
 @for (int i = 0; i < Model.Count(); i += 3)
 {
@@ -7,19 +7,20 @@
             int rowLimit = i + 3;
             for (int c = i; c < (Model.Count() < rowLimit ? Model.Count() : rowLimit); c++)
             {
-                <div class="col-lg-4">
+                <div class="col-lg-4 col-md-4 col-sm-4">
                     <!-- Card -->
-                    <div class="card">
+                    <div class="card" width="100">
                         <!-- Card image -->
+
                         <div class="view overlay">
-                            <img class="card-img-top" src="https://mdbootstrap.com/img/Mockups/Lightbox/Thumbnail/img%20(67).jpg" alt="Card image cap">
+                            <img class="card-img-top img-fluid" src="@Model[c].ImagePath" alt="@Model[c].Name">
                             <a asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model[c].Id">
                                 <div class="mask rgba-white-slight"></div>
                             </a>
                         </div>
-
+                      
                         <!-- Card content -->
-                        <div class="card-body">
+                        <div class="card-body special-color-dark white-text rounded-bottom m-mb-4">
 
                             <!-- Title -->
                             <h4 class="card-title text-info">@Model[c].Name</h4>

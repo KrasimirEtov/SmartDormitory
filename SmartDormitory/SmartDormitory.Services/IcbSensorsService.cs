@@ -74,7 +74,7 @@ namespace SmartDormitory.Services
 
 
 
-        public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(string measureTypeId = "all")
+        public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "all")
         {
             var sensors = this.Context.IcbSensors.Where(s => !s.IsDeleted);
 
@@ -88,7 +88,10 @@ namespace SmartDormitory.Services
 
             return await sensors
                               .OrderBy(s => s.MeasureTypeId)
+                              .ThenBy(s => s.PollingInterval)
                               .ThenBy(s => s.Tag)
+                              .Skip((page - 1) * pageSize)
+                              .Take(pageSize)
                               .Select(s => new IcbSensorRegisterListServiceModel
                               {
                                   Description = s.Description,

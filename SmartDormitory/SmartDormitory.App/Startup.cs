@@ -44,8 +44,9 @@ namespace SmartDormitory.App
 				.AddEntityFrameworkStores<SmartDormitoryContext>()
 				.AddDefaultTokenProviders();
 
-			// Comment this if you drop the database
-			GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
+            // IMPORTANT
+            // Comment this line if dropped db and update again
+            GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
 			services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
 
 			// Dependency Injection
@@ -62,7 +63,7 @@ namespace SmartDormitory.App
 			services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
 
 			// Comment this line if database is dropped for the first start of the program
-			//this.ActivatingHangfireJobs(services);
+			this.ActivatingHangfireJobs(services);
 
 			if (this.Environment.IsDevelopment())
 			{
@@ -94,7 +95,7 @@ namespace SmartDormitory.App
 			  {
 				  options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
 			  })
-			  .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+			  .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
 			  .AddRazorPagesOptions(options =>
 			  {
 				  options.AllowAreas = true;

@@ -13,94 +13,93 @@ using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Controllers
 {
-	[Authorize]
-	public class SensorController : Controller
-	{
-		private readonly ISensorsService sensorsService;
-		private readonly IIcbSensorsService icbSensorsService;
-		private readonly IMeasureTypeService measureTypeService;
+    [Authorize]
+    public class SensorController : Controller
+    {
+        private const int PageSize = 10;
 
-		public SensorController(ISensorsService sensorsService, IIcbSensorsService icbSensorsService, IMeasureTypeService measureTypeService)
-		{
-			this.sensorsService = sensorsService;
-			this.icbSensorsService = icbSensorsService;
-			this.measureTypeService = measureTypeService;
-		}
+        private readonly ISensorsService sensorsService;
+        private readonly IIcbSensorsService icbSensorsService;
+        private readonly IMeasureTypeService measureTypeService;
 
-		// user sensors
-		[HttpGet]
-		public async Task<IActionResult> MySensors()
-		{
-			var userId = this.User.GetId();
-			var measureTypes = await this.measureTypeService.GetAll();
+        public SensorController(ISensorsService sensorsService, IIcbSensorsService icbSensorsService, IMeasureTypeService measureTypeService)
+        {
+            this.sensorsService = sensorsService;
+            this.icbSensorsService = icbSensorsService;
+            this.measureTypeService = measureTypeService;
+        }
 
-			var sensors = await this.sensorsService.GetUserSensors(userId);
+        // user sensors
+        [HttpGet]
+        public async Task<IActionResult> MySensors()
+        {
+            var userId = this.User.GetId();
+            var measureTypes = await this.measureTypeService.GetAll();
 
-			var model = new MySensorsViewModel
-			{
-				MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
-				//TODO use automapper?
-				Sensors = sensors
-			};
+            var sensors = await this.sensorsService.GetUserSensors(userId);
 
-			return View(model);
-		}
+            var model = new MySensorsViewModel
+            {
+                MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
+                //TODO use automapper?
+                Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList()
+            };
 
-		[HttpGet]
-		public async Task<IActionResult> ReloadMySensorsTable(string measureTypeId = "all", string searchTerm = "", int alarmOn = -1, int privacy = -1)
-		{
-			try
-			{
-				var userId = this.User.GetId();
-				var sensors = await this.sensorsService
-										.GetUserSensors(userId, searchTerm, measureTypeId,
-																alarmOn, privacy);
+            return View(model);
+        }
 
-				return PartialView("_MySensorsTable", sensors);
-			}
-			catch (EntityDoesntExistException e)
-			{
-				return NotFound(e.Message);
-			}
-		}
+        [HttpGet]
+        public async Task<IActionResult> ReloadMySensorsTable(string measureTypeId = "all", string searchTerm = "", int alarmOn = -1, int privacy = -1)
+        {
+            try
+            {
+                var userId = this.User.GetId();
+                var sensors = (await this.sensorsService
+                                         .GetUserSensors(userId, searchTerm, measureTypeId,
+                                                                alarmOn, privacy))
+                                        .Select(s => new MySensorListViewModel(s))
+                                        .ToList();
 
-		[HttpGet]
-		public async Task<IActionResult> RegisterIndex()
-		{
-			var sensorTypes = await this.measureTypeService.GetAll();
-			var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId();
+                return PartialView("_MySensorsTable", sensors);
+            }
+            catch (EntityDoesntExistException e)
+            {
+                return NotFound(e.Message);
+            }
+        }
 
-			var model = new IcbSensorTypesViewModel
-			{
-				MeasureTypes = new SelectList(sensorTypes, "Id", "SuitableSensorType"),
-				MeasureTypeId = string.Empty,
-				IcbSensors = this.MapSensorServiceModelToViewModel(sensors)
-			};
+        [HttpGet]
+        public async Task<IActionResult> RegisterIndex()
+        {
+            var sensorTypes = await this.measureTypeService.GetAll();
+            var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId();
 
-			return View(model);
-		}
+            var model = new IcbSensorTypesViewModel
+            {
+                MeasureTypes = new SelectList(sensorTypes, "Id", "SuitableSensorType"),
+                MeasureTypeId = string.Empty,
+                IcbSensors = this.MapSensorServiceModelToViewModel(sensors)
+            };
 
-		[HttpGet]
-		public async Task<IActionResult> LoadSensorsByType(string measureTypeId)
-		{
-			try
-			{
-				var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId(measureTypeId);
-				var model = this.MapSensorServiceModelToViewModel(sensors);
+            return View(model);
+        }
 
-				return PartialView("_IcbSensorsByTypeResult", model);
-			}
-			catch (EntityDoesntExistException e)
-			{
-				return NotFound(e.Message);
-			}
-		}
+        [HttpGet]
+        public async Task<IActionResult> LoadSensorsByType(string measureTypeId, int page = 1)
+        {
+            try
+            {
+                var sensors = await this.icbSensorsService
+                    .GetSensorsByMeasureTypeId(page, PageSize, measureTypeId);
+                var model = this.MapSensorServiceModelToViewModel(sensors);
 
-		[HttpGet]
-		public IActionResult GoogleMapChooseAdress()
-		{
-			return View();
-		}
+                return PartialView("_IcbSensorsByTypeResult", model);
+            }
+            catch (EntityDoesntExistException e)
+            {
+                return NotFound(e.Message);
+            }
+        }
 
 		[HttpGet]
 		[Authorize]
@@ -146,6 +145,25 @@ namespace SmartDormitory.App.Controllers
 			//this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
 			return this.RedirectToAction("Details", "Sensor", new { sensorId = createdSensorId });
 		}
+
+        [HttpGet]
+        public IActionResult GoogleMapChooseAdress()
+        {
+            return View();
+        }
+
+        private List<IcbSensorsListViewModel> MapSensorServiceModelToViewModel(
+            IEnumerable<IcbSensorRegisterListServiceModel> sensors)
+        {
+            return sensors.Select(s => new IcbSensorsListViewModel
+            {
+                Id = s.Id,
+                Description = s.Description,
+                PollingInterval = s.PollingInterval,
+                Tag = s.Tag.SplitTag(),
+                //set image url depends on tag
+            }).ToList();
+        }
 
 		[HttpGet]
 		[Authorize]
@@ -233,18 +251,5 @@ namespace SmartDormitory.App.Controllers
 
 			return this.RedirectToAction("Details", "Sensor", new { sensorId = updatedSensorId });
 		}
-
-		private List<IcbSensorsListViewModel> MapSensorServiceModelToViewModel(
-			IEnumerable<IcbSensorRegisterListServiceModel> sensors)
-		{
-			return sensors.Select(s => new IcbSensorsListViewModel
-			{
-				Id = s.Id,
-				Description = s.Description,
-				PollingInterval = "Minimum refresh time: " + s.PollingInterval,
-				Tag = s.Tag.SplitTag(),
-				//set image url depends on tag
-			}).ToList();
-		}
-	}
+    }
 }

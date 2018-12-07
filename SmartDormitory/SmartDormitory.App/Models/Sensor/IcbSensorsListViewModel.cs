@@ -6,7 +6,7 @@
 
         public string Description { get; set; }
 
-        public string PollingInterval { get; set; }
+        public int PollingInterval { get; set; }
 
         public string Tag { get; set; }
     }

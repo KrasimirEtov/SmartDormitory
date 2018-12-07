@@ -9,11 +9,11 @@
             {
                 <div class="col-lg-4 col-md-4 col-sm-4">
                     <!-- Card -->
-                    <div class="card">
+                    <div class="card" width="100">
                         <!-- Card image -->
 
                         <div class="view overlay">
-                            <img class="card-img-top" src="@Model[c].ImagePath" alt="@Model[c].Name">
+                            <img class="card-img-top img-fluid" src="@Model[c].ImagePath" alt="@Model[c].Name">
                             <a asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model[c].Id">
                                 <div class="mask rgba-white-slight"></div>
                             </a>

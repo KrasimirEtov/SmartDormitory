@@ -16,6 +16,8 @@ namespace SmartDormitory.App.Controllers
     [Authorize]
     public class SensorController : Controller
     {
+        private const int PageSize = 10;
+
         private readonly ISensorsService sensorsService;
         private readonly IIcbSensorsService icbSensorsService;
         private readonly IMeasureTypeService measureTypeService;
@@ -83,11 +85,12 @@ namespace SmartDormitory.App.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> LoadSensorsByType(string measureTypeId)
+        public async Task<IActionResult> LoadSensorsByType(string measureTypeId, int page = 1)
         {
             try
             {
-                var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId(measureTypeId);
+                var sensors = await this.icbSensorsService
+                    .GetSensorsByMeasureTypeId(page, PageSize, measureTypeId);
                 var model = this.MapSensorServiceModelToViewModel(sensors);
 
                 return PartialView("_IcbSensorsByTypeResult", model);
@@ -178,7 +181,7 @@ namespace SmartDormitory.App.Controllers
             {
                 Id = s.Id,
                 Description = s.Description,
-                PollingInterval = "Minimum refresh time: " + s.PollingInterval,
+                PollingInterval = s.PollingInterval,
                 Tag = s.Tag.SplitTag(),
                 //set image url depends on tag
             }).ToList();

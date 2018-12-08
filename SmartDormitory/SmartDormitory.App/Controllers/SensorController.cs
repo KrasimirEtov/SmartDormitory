@@ -1,5 +1,4 @@
-﻿using AlphaCinemaServices.Exceptions;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartDormitory.App.Infrastructure.Extensions;
@@ -101,66 +100,67 @@ namespace SmartDormitory.App.Controllers
             }
         }
 
-		[HttpGet]
-		public async Task<IActionResult> Create(string icbSensorId, string userId = "")
-		{
-			// TODO: Better implementation
-			var icbSensor = await this.icbSensorsService.GetSensorById(icbSensorId);
-			if (icbSensor == null)
-			{
-				// TODO: Error
-				return this.NotFound();
-			}
+        [HttpGet]
+        public async Task<IActionResult> Create(string icbSensorId, string userId = "")
+        {
+            // TODO: Better implementation
+            var icbSensor = await this.icbSensorsService.GetSensorById(icbSensorId);
+            if (icbSensor == null)
+            {
+                // TODO: Error
+                return this.NotFound();
+            }
 
-			if (!string.IsNullOrWhiteSpace(userId))
-			{
-				if (!this.User.IsInRole("Administration"))
-				{
-					return this.Forbid();
-				}
-			}
-			else
-			{
-				userId = this.User.GetId();
-			}
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                if (!this.User.IsInRole("Administration"))
+                {
+                    return this.Forbid();
+                }
+            }
+            else
+            {
+                userId = this.User.GetId();
+            }
 
-			var model = new CreateUpdateSensorViewModel()
-			{
-				IcbSensorId = icbSensorId,
-				PollingInterval = icbSensor.PollingInterval,
-				UserId = userId
-			};
+            var model = new CreateUpdateSensorViewModel()
+            {
+                IcbSensorId = icbSensorId,
+                PollingInterval = icbSensor.PollingInterval,
+                UserId = userId
+            };
 
-			if (icbSensor.MeasureType.MeasureUnit == "(true/false)")
-			{
-				// TODO: Попълване ако иска аларма да пита кога да се пуска - при false или true (отв, затв)
-				model.IsSwitch = true;
-			}
-			else
-			{
-				model.MinRangeValue = icbSensor.MinRangeValue;
-				model.MaxRangeValue = icbSensor.MaxRangeValue;
-			}
-			return View(model);
-		}
+            if (icbSensor.MeasureType.MeasureUnit == "(true/false)")
+            {
+                // TODO: Попълване ако иска аларма да пита кога да се пуска - при false или true (отв, затв)
+                model.IsSwitch = true;
+            }
+            else
+            {
+                model.MinRangeValue = icbSensor.MinRangeValue;
+                model.MaxRangeValue = icbSensor.MaxRangeValue;
+            }
+            return View(model);
+        }
 
-		[HttpPost]
-		public async Task<IActionResult> Create(CreateUpdateSensorViewModel model)
-		{
-			if (!this.ModelState.IsValid)
-			{
-				return this.RedirectToAction("Create", "Sensor", new { icbSensorId = model.IcbSensorId });
-			}
-			// TODO: Add validation for model, change user id to here, not from view
-			// TODO: Tests
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateUpdateSensorViewModel model)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                TempData["Error-Message"] = "Oops something went wrong! Try again..";
+                return this.RedirectToAction("Create", "Sensor", new { icbSensorId = model.IcbSensorId });
+            }
+            // TODO: Add validation for model, change user id to here, not from view
+            // TODO: Tests
 
-			var createdSensorId = await this.sensorsService.RegisterNewSensor(model.UserId, model.IcbSensorId, model.Name, model.Description,
-				model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
-				model.Longtitude, model.Latitude);
+            var createdSensorId = await this.sensorsService.RegisterNewSensor(model.UserId, model.IcbSensorId, model.Name, model.Description,
+                model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
+                model.Longtitude, model.Latitude);
 
-			//this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
-			return this.RedirectToAction("Details", "Sensor", new { sensorId = createdSensorId });
-		}
+            this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
+            return this.RedirectToAction("Details", "Sensor", new { sensorId = createdSensorId });
+        }
 
         [HttpGet]
         public IActionResult GoogleMapChooseAdress()
@@ -181,87 +181,87 @@ namespace SmartDormitory.App.Controllers
             }).ToList();
         }
 
-		[HttpGet]
-		public async Task<IActionResult> Details(string sensorId)
-		{
-			var sensor = await sensorsService.GetSensorById(sensorId);
-			var model = new DetailsSensorViewModel()
-			{
-				SensorId = sensorId,
-				UserId = sensor.UserId,
-				AlarmOn = sensor.AlarmOn,
-				Description = sensor.Description,
-				IsPublic = sensor.IsPublic,
-				Latitude = sensor.Coordinates.Latitude,
-				Longtitude = sensor.Coordinates.Longitude,
-				MaxRangeValue = sensor.MaxRangeValue,
-				MinRangeValue = sensor.MinRangeValue,
-				Name = sensor.Name,
-				PollingInterval = sensor.PollingInterval,
-				StartValue = sensor.IcbSensor.CurrentValue,
-				MeasureUnit = sensor.IcbSensor.MeasureType.MeasureUnit
-			};
+        [HttpGet]
+        public async Task<IActionResult> Details(string sensorId)
+        {
+            var sensor = await sensorsService.GetSensorById(sensorId);
+            var model = new DetailsSensorViewModel()
+            {
+                SensorId = sensorId,
+                UserId = sensor.UserId,
+                AlarmOn = sensor.AlarmOn,
+                Description = sensor.Description,
+                IsPublic = sensor.IsPublic,
+                Latitude = sensor.Coordinates.Latitude,
+                Longtitude = sensor.Coordinates.Longitude,
+                MaxRangeValue = sensor.MaxRangeValue,
+                MinRangeValue = sensor.MinRangeValue,
+                Name = sensor.Name,
+                PollingInterval = sensor.PollingInterval,
+                StartValue = sensor.IcbSensor.CurrentValue,
+                MeasureUnit = sensor.IcbSensor.MeasureType.MeasureUnit
+            };
 
-			return View(model);
-		}
+            return View(model);
+        }
 
-		[HttpGet]
-		public async Task<JsonResult> GetGaudeData(string sensorId)
-		{
-			var data = await sensorsService.GetGaudeData(sensorId);
+        [HttpGet]
+        public async Task<JsonResult> GetGaudeData(string sensorId)
+        {
+            var data = await sensorsService.GetGaudeData(sensorId);
 
-			return Json(data);
-		}
+            return Json(data);
+        }
 
-		[HttpGet]
-		public async Task<IActionResult> Update(string sensorId)
-		{
-			// TODO: Better implementation
-			var sensor = await this.sensorsService.GetSensorById(sensorId);
-			var model = new CreateUpdateSensorViewModel()
-			{
-				AlarmOn = sensor.AlarmOn,
-				Description = sensor.Description,
-				IcbSensorId = sensor.IcbSensorId,
-				IsPublic = sensor.IsPublic,
-				Latitude = sensor.Coordinates.Latitude,
-				Longtitude = sensor.Coordinates.Longitude,
-				Name = sensor.Name,
-				PollingInterval = sensor.PollingInterval,
-				SensorId = sensor.Id,
-				UserId = sensor.UserId
-			};
+        [HttpGet]
+        public async Task<IActionResult> Update(string sensorId)
+        {
+            // TODO: Better implementation
+            var sensor = await this.sensorsService.GetSensorById(sensorId);
+            var model = new CreateUpdateSensorViewModel()
+            {
+                AlarmOn = sensor.AlarmOn,
+                Description = sensor.Description,
+                IcbSensorId = sensor.IcbSensorId,
+                IsPublic = sensor.IsPublic,
+                Latitude = sensor.Coordinates.Latitude,
+                Longtitude = sensor.Coordinates.Longitude,
+                Name = sensor.Name,
+                PollingInterval = sensor.PollingInterval,
+                SensorId = sensor.Id,
+                UserId = sensor.UserId
+            };
 
-			if (sensor.IcbSensor.MeasureType.MeasureUnit == "(true/false)")
-			{
-				// TODO: Попълване ако иска аларма да пита кога да се пуска - при false или true (отв, затв)
-				model.IsSwitch = true;
-			}
-			else
-			{
-				model.MinRangeValue = sensor.MinRangeValue;
-				model.MaxRangeValue = sensor.MaxRangeValue;
-			}
-			return View(model);
-		}
+            if (sensor.IcbSensor.MeasureType.MeasureUnit == "(true/false)")
+            {
+                // TODO: Попълване ако иска аларма да пита кога да се пуска - при false или true (отв, затв)
+                model.IsSwitch = true;
+            }
+            else
+            {
+                model.MinRangeValue = sensor.MinRangeValue;
+                model.MaxRangeValue = sensor.MaxRangeValue;
+            }
+            return View(model);
+        }
 
-		[HttpPost]
-		public async Task<IActionResult> Update(CreateUpdateSensorViewModel model)
-		{
-			if (!this.ModelState.IsValid)
-			{
-				
-				// TODO: Redirect to register index + temp data message
-				return this.RedirectToAction("Details", "Sensor", new { sensorId = model.SensorId});
-			}
-			// TODO: Add validation for model, change user id to here, not from view
-			// TODO: Tests
+        [HttpPost]
+        public async Task<IActionResult> Update(CreateUpdateSensorViewModel model)
+        {
+            if (!this.ModelState.IsValid)
+            {
 
-			var updatedSensorId = await this.sensorsService.Update(model.SensorId, model.UserId, model.IcbSensorId, model.Name, model.Description,
-				model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
-				model.Longtitude, model.Latitude);
+                // TODO: Redirect to register index + temp data message
+                return this.RedirectToAction("Details", "Sensor", new { sensorId = model.SensorId });
+            }
+            // TODO: Add validation for model, change user id to here, not from view
+            // TODO: Tests
 
-			return this.RedirectToAction("Details", "Sensor", new { sensorId = updatedSensorId });
-		}
+            var updatedSensorId = await this.sensorsService.Update(model.SensorId, model.UserId, model.IcbSensorId, model.Name, model.Description,
+                model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
+                model.Longtitude, model.Latitude);
+
+            return this.RedirectToAction("Details", "Sensor", new { sensorId = updatedSensorId });
+        }
     }
 }

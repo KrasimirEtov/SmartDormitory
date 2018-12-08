@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Models.Sensor
 {
-	public class CreateUpdateSensorViewModel
-	{
+	public class CreateUpdateSensorViewModel : IValidatableObject
+    {
 		public string SensorId { get; set; }
 
 		[Required]
@@ -41,5 +41,15 @@ namespace SmartDormitory.App.Models.Sensor
 
 		public bool IsSwitch { get; set; }
 
-	}
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var results = new List<ValidationResult>();
+            if (this.MinRangeValue >= this.MaxRangeValue)
+            {
+                results.Add(new ValidationResult("Max range should be bigger than min range value!"));
+            }
+
+            return results;
+        }
+    }
 }

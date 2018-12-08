@@ -118,12 +118,12 @@ namespace SmartDormitory.App
 				app.UseExceptionHandler("/Home/Error");
 				app.UseHsts();
 			}
+			app.UseAuthentication();
 
 			app.UseHttpsRedirection();
+
 			app.UseStaticFiles();
 			app.UseCookiePolicy();
-
-			app.UseAuthentication();
 
 			app.SeedAdminAccount();
 

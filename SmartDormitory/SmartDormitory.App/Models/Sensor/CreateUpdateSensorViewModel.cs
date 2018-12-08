@@ -41,5 +41,13 @@ namespace SmartDormitory.App.Models.Sensor
 
 		public bool IsSwitch { get; set; }
 
+		public float ApiMinRangeValue { get; set; }
+
+		public float ApiMaxRangeValue { get; set; }
+
+		public int ApiPollingInterval { get; set; }
+
+		public bool SwitchOn { get; set; }
+
 	}
 }

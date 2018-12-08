@@ -32,5 +32,6 @@ namespace SmartDormitory.App.Models.Sensor
 		public double Latitude { get; set; }
 		public float StartValue { get; set; }
 		public string MeasureUnit { get; set; }
+		public bool SwitchOn { get; set; }
 	}
 }

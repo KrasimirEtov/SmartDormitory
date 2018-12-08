@@ -15,7 +15,7 @@ namespace SmartDormitory.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -189,12 +189,46 @@ namespace SmartDormitory.Data.Migrations
                     b.ToTable("MeasureTypes");
 
                     b.HasData(
-                        new { Id = "6fb4e583-ec91-4a9f-bf72-8c4ad3b992a3", CreatedOn = new DateTime(2018, 12, 6, 15, 33, 27, 860, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "°C", SuitableSensorType = "Temperature" },
-                        new { Id = "15c82309-746f-4972-a224-1e9a8df08296", CreatedOn = new DateTime(2018, 12, 6, 15, 33, 27, 863, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "%", SuitableSensorType = "Humidity" },
-                        new { Id = "e2eb0dd9-4f91-46f6-9be4-d53c302c7327", CreatedOn = new DateTime(2018, 12, 6, 15, 33, 27, 863, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "W", SuitableSensorType = "Electric power consumtion" },
-                        new { Id = "cf66908e-39b0-421e-9806-ecfd5e2ca1e3", CreatedOn = new DateTime(2018, 12, 6, 15, 33, 27, 863, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "(true/false)", SuitableSensorType = "Boolean switch (door/occupancy/etc)" },
-                        new { Id = "674f9f64-12c6-4abc-bb8c-cecbf440c2ce", CreatedOn = new DateTime(2018, 12, 6, 15, 33, 27, 863, DateTimeKind.Local), IsDeleted = false, MeasureUnit = "dB", SuitableSensorType = "Noise" }
-                    );
+                        new
+                        {
+                            Id = "62e85dbc-39d1-458b-813b-4c98cf0eefd3",
+                            CreatedOn = new DateTime(2018, 12, 8, 6, 3, 36, 79, DateTimeKind.Local).AddTicks(7452),
+                            IsDeleted = false,
+                            MeasureUnit = "°C",
+                            SuitableSensorType = "Temperature"
+                        },
+                        new
+                        {
+                            Id = "adc385ea-29cf-48b5-bfa6-e0c226a69de8",
+                            CreatedOn = new DateTime(2018, 12, 8, 6, 3, 36, 83, DateTimeKind.Local).AddTicks(826),
+                            IsDeleted = false,
+                            MeasureUnit = "%",
+                            SuitableSensorType = "Humidity"
+                        },
+                        new
+                        {
+                            Id = "36afaec6-efcc-4a34-acf9-906d35468a7f",
+                            CreatedOn = new DateTime(2018, 12, 8, 6, 3, 36, 83, DateTimeKind.Local).AddTicks(847),
+                            IsDeleted = false,
+                            MeasureUnit = "W",
+                            SuitableSensorType = "Electric power consumtion"
+                        },
+                        new
+                        {
+                            Id = "0bb1474d-31c0-42c1-9c6f-a06f335bea34",
+                            CreatedOn = new DateTime(2018, 12, 8, 6, 3, 36, 83, DateTimeKind.Local).AddTicks(911),
+                            IsDeleted = false,
+                            MeasureUnit = "(true/false)",
+                            SuitableSensorType = "Boolean switch (door/occupancy/etc)"
+                        },
+                        new
+                        {
+                            Id = "d77f06d4-587e-4e40-a240-1c1ab5e1ba1a",
+                            CreatedOn = new DateTime(2018, 12, 8, 6, 3, 36, 83, DateTimeKind.Local).AddTicks(920),
+                            IsDeleted = false,
+                            MeasureUnit = "dB",
+                            SuitableSensorType = "Noise"
+                        });
                 });
 
             modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>
@@ -227,6 +261,8 @@ namespace SmartDormitory.Data.Migrations
                         .IsRequired();
 
                     b.Property<int>("PollingInterval");
+
+                    b.Property<bool>("SwitchOn");
 
                     b.Property<string>("UserId");
 
@@ -373,6 +409,8 @@ namespace SmartDormitory.Data.Migrations
 
                             b1.Property<double>("Longitude")
                                 .HasColumnName("Longitude");
+
+                            b1.HasKey("SensorId");
 
                             b1.ToTable("Sensors");
 

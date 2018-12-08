@@ -214,15 +214,16 @@ namespace SmartDormitory.Data.Migrations
                     DeletedOn = table.Column<DateTime>(nullable: true),
                     CreatedOn = table.Column<DateTime>(nullable: true),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
-                    OwnerId = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(nullable: true),
                     IcbSensorId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: false),
-                    UserPollingInterval = table.Column<int>(nullable: false),
+                    PollingInterval = table.Column<int>(nullable: false),
                     IsPublic = table.Column<bool>(nullable: false),
                     AlarmOn = table.Column<bool>(nullable: false),
-                    AlarmMinRangeValue = table.Column<float>(nullable: false),
-                    AlarmMaxRangeValue = table.Column<float>(nullable: false),
+                    SwitchOn = table.Column<bool>(nullable: false),
+                    MinRangeValue = table.Column<float>(nullable: false),
+                    MaxRangeValue = table.Column<float>(nullable: false),
                     Longitude = table.Column<double>(nullable: false),
                     Latitude = table.Column<double>(nullable: false)
                 },
@@ -236,8 +237,8 @@ namespace SmartDormitory.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Sensors_AspNetUsers_OwnerId",
-                        column: x => x.OwnerId,
+                        name: "FK_Sensors_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -248,11 +249,11 @@ namespace SmartDormitory.Data.Migrations
                 columns: new[] { "Id", "CreatedOn", "DeletedOn", "IsDeleted", "MeasureUnit", "ModifiedOn", "SuitableSensorType" },
                 values: new object[,]
                 {
-                    { "d27a77b3-1d45-4f40-8871-bc6aa4054686", new DateTime(2018, 11, 25, 23, 51, 1, 659, DateTimeKind.Local), null, false, "°C", null, "Temperature" },
-                    { "7df3c119-a73f-4cd8-b044-86d0b261e65a", new DateTime(2018, 11, 25, 23, 51, 1, 661, DateTimeKind.Local), null, false, "%", null, "Humidity" },
-                    { "2524f6f3-5291-404b-b5e4-b24db2c0254a", new DateTime(2018, 11, 25, 23, 51, 1, 661, DateTimeKind.Local), null, false, "W", null, "Electric power consumtion" },
-                    { "29d56a9e-ce59-4055-926c-f354621e7086", new DateTime(2018, 11, 25, 23, 51, 1, 661, DateTimeKind.Local), null, false, "(true/false)", null, "Boolean switch (door/occupancy/etc)" },
-                    { "697d3892-43be-4ab3-9ad9-57a3b2b168ea", new DateTime(2018, 11, 25, 23, 51, 1, 661, DateTimeKind.Local), null, false, "dB", null, "Noise" }
+                    { "62e85dbc-39d1-458b-813b-4c98cf0eefd3", new DateTime(2018, 12, 8, 6, 3, 36, 79, DateTimeKind.Local).AddTicks(7452), null, false, "°C", null, "Temperature" },
+                    { "adc385ea-29cf-48b5-bfa6-e0c226a69de8", new DateTime(2018, 12, 8, 6, 3, 36, 83, DateTimeKind.Local).AddTicks(826), null, false, "%", null, "Humidity" },
+                    { "36afaec6-efcc-4a34-acf9-906d35468a7f", new DateTime(2018, 12, 8, 6, 3, 36, 83, DateTimeKind.Local).AddTicks(847), null, false, "W", null, "Electric power consumtion" },
+                    { "0bb1474d-31c0-42c1-9c6f-a06f335bea34", new DateTime(2018, 12, 8, 6, 3, 36, 83, DateTimeKind.Local).AddTicks(911), null, false, "(true/false)", null, "Boolean switch (door/occupancy/etc)" },
+                    { "d77f06d4-587e-4e40-a240-1c1ab5e1ba1a", new DateTime(2018, 12, 8, 6, 3, 36, 83, DateTimeKind.Local).AddTicks(920), null, false, "dB", null, "Noise" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -305,9 +306,9 @@ namespace SmartDormitory.Data.Migrations
                 column: "IcbSensorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sensors_OwnerId",
+                name: "IX_Sensors_UserId",
                 table: "Sensors",
-                column: "OwnerId");
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

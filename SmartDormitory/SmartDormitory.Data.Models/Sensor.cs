@@ -26,12 +26,14 @@ namespace SmartDormitory.Data.Models
 
         public bool AlarmOn { get; set; } = false;
 
-        public float MinRangeValue { get; set; }
+		public bool SwitchOn { get; set; }
+
+		public float MinRangeValue { get; set; }
 
         public float MaxRangeValue { get; set; }
 
         public Coordinates Coordinates { get; set; }
-    }
+	}
 
     // EF Core allows you to model entity types that can only ever appear on navigation properties of other entity types. These are called owned entity types. The entity containing an owned entity type is its owner.
     [Owned]

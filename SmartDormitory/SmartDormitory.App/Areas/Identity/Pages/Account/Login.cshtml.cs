@@ -96,10 +96,6 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
                         return RedirectToAction("Index", "Home", new { Area = "" });
                     }
                 }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
                 if (result.IsLockedOut)
                 {
                     logger.LogWarning("User account locked out.");

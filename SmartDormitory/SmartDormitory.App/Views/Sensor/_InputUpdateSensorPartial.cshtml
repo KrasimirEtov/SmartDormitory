@@ -1,5 +1,13 @@
 ﻿@model CreateUpdateSensorViewModel
 
+@{
+    string alarmText = Model.AlarmOn ? "Alarm is on" : "Alarm is off";
+
+    string privacyText = Model.IsPublic ? "Sensor is public" : "Sensor is private";
+
+    string switchText = Model.SwitchOn ? "Door/Window is open" : "Door/Window is closed";
+
+}
 
 <form asp-area="" asp-controller="Sensor" asp-action="Update" method="post">
     <input asp-for="SensorId" hidden value="@Model.SensorId"/>
@@ -20,8 +28,8 @@
         <div class="col-6">
             <label asp-for="PollingInterval" class="control-label"><b>Custom polling interval (seconds)</b></label>
             <input asp-for="PollingInterval" class="form-control"
-                   min="@Model.PollingInterval"
-                   data-val-range="The field PollingInterval must be at least @Model.PollingInterval"
+                   min="@Model.ApiPollingInterval"
+                   data-val-range="The field PollingInterval must be at least @Model.ApiPollingInterval"
                    data-val-number="The field Polling Interval Value must be a number.">
             <span asp-validation-for="PollingInterval" class="text-danger"></span>
             <br />
@@ -32,8 +40,8 @@
                     <div class="col-6">
                         <label asp-for="MinRangeValue" class="control-label"><b>Minimum range value</b></label>
                         <input asp-for="MinRangeValue" class="form-control" data-val="true"
-                               data-val-range-min="@Model.MinRangeValue" data-val-range-max="@Model.MaxRangeValue"
-                               data-val-range="The field Min Range Value must be between @Model.MinRangeValue and @Model.MaxRangeValue."
+                               data-val-range-min="@Model.ApiMinRangeValue" data-val-range-max="@Model.ApiMaxRangeValue"
+                               data-val-range="The field Min Range Value must be between @Model.ApiMinRangeValue and @Model.ApiMaxRangeValue."
                                data-val-number="The field Min Range Value must be a number."
                                data-val-required="The MinRangeValue field is required." />
 
@@ -44,8 +52,8 @@
                     <div class="col-6">
                         <label asp-for="MaxRangeValue" class="control-label"><b>Maximum range value</b></label>
                         <input asp-for="MaxRangeValue" class="form-control" data-val="true"
-                               data-val-range-min="@Model.MinRangeValue" data-val-range-max="@Model.MaxRangeValue"
-                               data-val-range="The field MinRangeValue must be between @Model.MinRangeValue and @Model.MaxRangeValue."
+                               data-val-range-min="@Model.ApiMinRangeValue" data-val-range-max="@Model.ApiMaxRangeValue"
+                               data-val-range="The field MinRangeValue must be between @Model.ApiMinRangeValue and @Model.ApiMaxRangeValue."
                                data-val-number="The field Max Range Value must be a number."
                                data-val-required="The MaxRangeValue field is required." />
                         <span asp-validation-for="MaxRangeValue" class="text-danger"></span>
@@ -53,6 +61,16 @@
                 }
                 else
                 {
+                    <div class="col">
+                        <label class="bs-switch">
+                            <input asp-for="SwitchOn" type="checkbox" class="custom-control-input" id="switchCheckbox" />
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="col">
+                        <h4 id="switchOnText">@switchText</h4>
+                    </div>
+
                     <input asp-for="MinRangeValue" value="0" class="form-control" data-val="true" hidden
                            data-val-range-min="0" data-val-range-max="0"
                            data-val-range="The field must be 0."
@@ -124,7 +142,7 @@
             </label>
         </div>
         <div class="col">
-            <h4 id="alarmSwitchText">Alarm is off</h4>
+            <h4 id="alarmSwitchText">@alarmText</h4>
         </div>
         <div class="col">
             <label class="bs-switch">
@@ -134,7 +152,7 @@
             </label>
         </div>
         <div class="col">
-            <h4 id="privacySwitchText">Sensor is private</h4>
+            <h4 id="privacySwitchText">@privacyText</h4>
 
         </div>
     </div>

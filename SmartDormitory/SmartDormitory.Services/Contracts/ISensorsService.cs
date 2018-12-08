@@ -26,10 +26,10 @@ namespace SmartDormitory.Services.Contracts
 
 		Task<string> Update(string sensorId, string userId, string icbSensorId, string name, string description,
 			int pollingInterval, bool isPublic, bool alarmOn, float minRange,
-			float maxRange, double longtitude, double latitude);
+			float maxRange, double longtitude, double latitude, bool switchOn);
 		Task<string> RegisterNewSensor(string userId, string icbSensorId, string name, string description,
 			int pollingInterval, bool isPublic, bool alarmOn, float minRange,
-			float maxRange, double longtitude, double latitude);
+			float maxRange, double longtitude, double latitude, bool switchOn);
 
 	}
 }

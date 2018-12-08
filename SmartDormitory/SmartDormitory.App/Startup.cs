@@ -17,143 +17,179 @@ using System;
 
 namespace SmartDormitory.App
 {
-	public class Startup
-	{
-		public Startup(IConfiguration configuration, IHostingEnvironment env)
-		{
-			this.Configuration = configuration;
-			this.Environment = env;
-		}
+    public class Startup
+    {
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        {
+            this.Configuration = configuration;
+            this.HostingEnvironment = environment;
+        }
 
-		public IConfiguration Configuration { get; }
-		public IHostingEnvironment Environment { get; }
+        public IConfiguration Configuration { get; }
+        public IHostingEnvironment HostingEnvironment { get; }
 
-		// This method gets called by the runtime. Use this method to add services to the container.
-		public void ConfigureServices(IServiceCollection services)
-		{
-			//services.Configure<CookiePolicyOptions>(options =>
-			//{
-			//    options.CheckConsentNeeded = context => true;
-			//    options.MinimumSameSitePolicy = SameSiteMode.None;
-			//});
-			var connectionString = System.Environment
-								.GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            this.RegisterData(services);
+            this.RegisterAuthentication(services);
+            //this.RegisterAuthorizations(services);
+            this.RegisterServices(services);
+            this.RegisterInfrastructure(services);
 
-			services.AddDbContext<SmartDormitoryContext>(options => options.UseSqlServer(connectionString));
-			services.AddIdentity<User, IdentityRole>()
-				.AddEntityFrameworkStores<SmartDormitoryContext>()
-				.AddDefaultTokenProviders();
+            // IMPORTANT
+            // Comment this line if dropped db and update again
+            this.RegisterHangfireDbTables(services);
 
-			// IMPORTANT
-			// Comment this line if dropped db and update again
-			GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
-			services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
+            // Comment this line if database is dropped for the first start of the program
+            this.ActivatingHangfireJobs(services);
+        }
 
-			// Dependency Injection
-			services.AddHttpClient<IcbHttpClient>();
-			services.AddScoped<UserManager<User>>();
-			services.AddScoped<RoleManager<IdentityRole>>();
+        //todo use later?
+        private void RegisterAuthorizations(IServiceCollection services)
+        {
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Administrator");
+                });
+            });
+        }
 
-			services.AddScoped<IUserService, UserService>();
-			services.AddTransient<IIcbApiService, IcbApiService>();
-			services.AddTransient<IIcbSensorsService, IcbSensorsService>();
-			services.AddTransient<ISensorsService, SensorsService>();
-			services.AddTransient<IMeasureTypeService, MeasureTypeService>();
+        private void RegisterHangfireDbTables(IServiceCollection services)
+        {
+            var connectionString = System.Environment
+                                            .GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
 
-			services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
+            GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
+            services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
+        }
 
-			// Comment this line if database is dropped for the first start of the program
-			this.ActivatingHangfireJobs(services);
+        private void RegisterServices(IServiceCollection services)
+        {
+            services.AddHttpClient<IcbHttpClient>();
+            services.AddScoped<UserManager<User>>();
+            services.AddScoped<RoleManager<IdentityRole>>();
 
-			if (this.Environment.IsDevelopment())
-			{
-				services.Configure<IdentityOptions>(options =>
-				{
-					// Password settings
-					options.Password.RequireDigit = false;
-					options.Password.RequiredLength = 3;
-					options.Password.RequireNonAlphanumeric = false;
-					options.Password.RequireUppercase = false;
-					options.Password.RequireLowercase = false;
-					options.Password.RequiredUniqueChars = 0;
+            services.AddScoped<IUserService, UserService>();
+            services.AddTransient<IIcbApiService, IcbApiService>();
+            services.AddTransient<IIcbSensorsService, IcbSensorsService>();
+            services.AddTransient<ISensorsService, SensorsService>();
+            services.AddTransient<IMeasureTypeService, MeasureTypeService>();
 
-					// Lockout settings
-					options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(1);
-					options.Lockout.MaxFailedAccessAttempts = 999;
-				});
-			}
+            services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
+        }
 
-			services.ConfigureApplicationCookie(options =>
-			{
-				options.LoginPath = $"/Identity/Account/Login";
-				options.LogoutPath = $"/Identity/Account/Logout";
-				options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-			});
+        private void RegisterAuthentication(IServiceCollection services)
+        {
+            services.AddIdentity<User, IdentityRole>()
+                    .AddEntityFrameworkStores<SmartDormitoryContext>()
+                    .AddDefaultTokenProviders();
 
-			services
-			  .AddMvc(options =>
-			  {
-				  options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
-			  })
-			  .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-			  .AddRazorPagesOptions(options =>
-			  {
-				  options.AllowAreas = true;
-				  options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
-				  options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
-			  });
-		}
+            if (this.HostingEnvironment.IsDevelopment())
+            {
+                services.Configure<IdentityOptions>(options =>
+                {
+                    // Password settings
+                    options.Password.RequireDigit = false;
+                    options.Password.RequiredLength = 3;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequiredUniqueChars = 0;
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
-		{
+                    // Lockout settings
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(1);
+                    options.Lockout.MaxFailedAccessAttempts = 999;
+                });
+            }
+        }
 
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-				app.UseDatabaseErrorPage();
-			}
-			else
-			{
-				app.UseExceptionHandler("/Home/Error");
-				app.UseHsts();
-			}
-			app.UseAuthentication();
+        private void RegisterInfrastructure(IServiceCollection services)
+        {
+            //services.AddMemoryCache();
 
-			app.UseHttpsRedirection();
+            services
+              .AddMvc(options =>
+              {
+                  options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+              })
+              .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+              .AddRazorPagesOptions(options =>
+              {
+                  options.AllowAreas = true;
+                  options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+                  options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+              });
+        }
 
-			app.UseStaticFiles();
-			app.UseCookiePolicy();
+        private void RegisterData(IServiceCollection services)
+        {
+            string connectionString = string.Empty;
+            if (HostingEnvironment.IsDevelopment())
+            {
+                connectionString = Environment
+                                    .GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
+            }
+            else
+            {
+                //TODO: add azure connection string
+                //connectionString = azure connection string
+            }
 
-			app.SeedAdminAccount();
+            services.AddDbContext<SmartDormitoryContext>(options => options.UseSqlServer(connectionString));
+        }
 
-			//hangfire
-			var hangfireServerOptions = new BackgroundJobServerOptions
-			{
-				SchedulePollingInterval = TimeSpan.FromSeconds(1)
-			};
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+       
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
 
-			app.UseHangfireDashboard();
-			app.UseHangfireServer(hangfireServerOptions);
+            app.UseAuthentication();
+            app.SeedAdminAccount();
 
-			app.UseMvc(routes =>
-			{
-				routes.MapRoute(
-					name: "Administration",
-					template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+            //hangfire
+            var hangfireServerOptions = new BackgroundJobServerOptions
+            {
+                SchedulePollingInterval = TimeSpan.FromSeconds(1)
+            };
 
-				routes.MapRoute(
-					name: "default",
-					template: "{controller=Home}/{action=Index}/{id?}");
-			});
-		}
+            app.UseHangfireDashboard();
+            app.UseHangfireServer(hangfireServerOptions);
 
-		private void ActivatingHangfireJobs(IServiceCollection services)
-		{
-			var sp = services.BuildServiceProvider();
-			var hangFireServices = sp.GetService<IHangfireJobsScheduler>();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "areas",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-			hangFireServices.StartingJobsQueue();
-		}
-	}
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
+        }
+
+        private void ActivatingHangfireJobs(IServiceCollection services)
+        {
+            var sp = services.BuildServiceProvider();
+            var hangFireServices = sp.GetService<IHangfireJobsScheduler>();
+
+            hangFireServices.StartingJobsQueue();
+        }
+    }
 }

@@ -53,7 +53,10 @@ namespace SmartDormitory.App.Models.Sensor
             {
                 results.Add(new ValidationResult("Max range should be bigger than min range value!"));
             }
-
+            if (this.MinRangeValue >= this.MaxRangeValue)
+            {
+                results.Add(new ValidationResult("Max range should be bigger than min range value!"));
+            }
             return results;
         }
     }

@@ -93,7 +93,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                 }
 
                 //create and send alarm notifications
-                await notificationService.BuildNotifications(alarmsActivatedSensors);
+                await notificationService.BulkAddRange(alarmsActivatedSensors);
 
                 //update all user sensors data at once
                 await sensorsService.UpdateRange(sensorsToUpdate);

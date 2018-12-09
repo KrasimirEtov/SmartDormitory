@@ -32,6 +32,6 @@ namespace SmartDormitory.Services.Contracts
             float maxRange, double longtitude, double latitude, bool switchOn);
 
         Task<IEnumerable<Sensor>> GetAll();
-        Task UpdateRange(IEnumerable<Sensor> sensorsToUpdate);
+        Task UpdateRange(IList<Sensor> sensorsToUpdate);
     }
 }

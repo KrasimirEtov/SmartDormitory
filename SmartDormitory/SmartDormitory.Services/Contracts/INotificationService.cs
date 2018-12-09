@@ -6,6 +6,6 @@ namespace SmartDormitory.Services.Contracts
 {
     public interface INotificationService
     {
-        Task BuildNotifications(IEnumerable<Sensor> sensors);
+        Task CreateAlarmNotifications(IEnumerable<Sensor> sensors);
     }
 }

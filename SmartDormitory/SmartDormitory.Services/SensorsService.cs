@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EFCore.BulkExtensions;
 
 namespace SmartDormitory.Services
 {
@@ -302,9 +303,9 @@ namespace SmartDormitory.Services
                          .OrderBy(s => s.IcbSensorId)
                          .ToListAsync();
 
-        public async Task UpdateRange(IEnumerable<Sensor> sensorsToUpdate)
+        public async Task UpdateRange(IList<Sensor> sensorsToUpdate)
         {
-            this.Context.UpdateRange(sensorsToUpdate);
+            await this.Context.BulkUpdateAsync(sensorsToUpdate);
             await this.Context.SaveChangesAsync();
         }
     }

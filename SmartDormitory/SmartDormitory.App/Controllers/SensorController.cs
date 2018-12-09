@@ -28,7 +28,6 @@ namespace SmartDormitory.App.Controllers
 			this.measureTypeService = measureTypeService;
 		}
 
-		// user sensors
 		[HttpGet]
 		public async Task<IActionResult> MySensors()
 		{
@@ -40,26 +39,33 @@ namespace SmartDormitory.App.Controllers
 			var model = new MySensorsViewModel
 			{
 				MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
-				//TODO use automapper?
-				Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList()
-			};
 
+				MySensorsPartialViewModel = new MySensorsPartialViewModel
+				{
+					Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList()
+				}
+			};
 			return View(model);
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> ReloadMySensorsTable(string measureTypeId = "all", string searchTerm = "", int alarmOn = -1, int privacy = -1)
+		public async Task<IActionResult> ReloadMySensorsTable(string measureTypeId = "all", string searchTerm = "",
+			int alarmOn = -1, int privacy = -1)
 		{
 			try
 			{
 				var userId = this.User.GetId();
-				var sensors = (await this.sensorsService
+
+				var model = new MySensorsPartialViewModel
+				{
+					Sensors = (await this.sensorsService
 										 .GetUserSensors(userId, searchTerm, measureTypeId,
 																alarmOn, privacy))
 										.Select(s => new MySensorListViewModel(s))
-										.ToList();
+										.ToList()
+				};
 
-				return PartialView("_MySensorsTable", sensors);
+				return PartialView("_MySensorsTable", model);
 			}
 			catch (EntityDoesntExistException e)
 			{
@@ -68,29 +74,35 @@ namespace SmartDormitory.App.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> RegisterIndex()
+		public async Task<IActionResult> RegisterIndex(string userId)
 		{
 			var sensorTypes = await this.measureTypeService.GetAll();
 			var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId();
 
+			if (!UserHasAccess(userId))
+			{
+				TempData["Error-Message"] = "Access denied!";
+				return this.RedirectToAction("Index", "Home");
+			}
 			var model = new IcbSensorTypesViewModel
 			{
 				MeasureTypes = new SelectList(sensorTypes, "Id", "SuitableSensorType"),
 				MeasureTypeId = string.Empty,
-				IcbSensors = this.MapSensorServiceModelToViewModel(sensors)
+				IcbSensors = this.MapSensorServiceModelToViewModel(sensors, userId),
+				UserId = userId
 			};
 
 			return View(model);
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> LoadSensorsByType(string measureTypeId, int page = 1)
+		public async Task<IActionResult> LoadSensorsByType(string measureTypeId, string userId, int page = 1)
 		{
 			try
 			{
 				var sensors = await this.icbSensorsService
 					.GetSensorsByMeasureTypeId(page, PageSize, measureTypeId);
-				var model = this.MapSensorServiceModelToViewModel(sensors);
+				var model = this.MapSensorServiceModelToViewModel(sensors, userId);
 
 				return PartialView("_IcbSensorsByTypeResult", model);
 			}
@@ -99,6 +111,33 @@ namespace SmartDormitory.App.Controllers
 				return NotFound(e.Message);
 			}
 		}
+
+		//[HttpGet]
+		//public async Task<IActionResult> GetSensorsValue(string measureTypeId = "all", string searchTerm = "",
+		//	int alarmOn = -1, int privacy = -1)
+		//{
+		//	try
+		//	{
+		//		//var userId = this.User.GetId();
+		//		//var sensors = (await this.sensorsService
+		//		//						 .GetUserSensors(userId, searchTerm, measureTypeId,
+		//		//												alarmOn, privacy))
+		//		//						.Select(s => new MySensorListViewModel(s))
+		//		//						.ToList();
+		//		var userId = User.GetId();
+		//		var sensors = (await sensorsService
+		//			.GetUserSensors(userId, searchTerm, measureTypeId, alarmOn, privacy))
+		//			.Select(s => new MySensorListViewModel(s))
+		//			.ToList();
+
+		//		//return Json(data);
+		//	}
+		//	catch (EntityDoesntExistException e)
+		//	{
+		//		TempData["Error-Message"] = e.Message;
+		//		return this.RedirectToAction("Index", "Home");
+		//	}
+		//}
 
 		[HttpGet]
 		public async Task<IActionResult> Create(string icbSensorId, string userId = "")
@@ -113,9 +152,10 @@ namespace SmartDormitory.App.Controllers
 
 			if (!string.IsNullOrWhiteSpace(userId))
 			{
-				if (!this.User.IsInRole("Administration"))
+				if (!UserHasAccess(userId))
 				{
-					return this.Forbid();
+					TempData["Error-Message"] = "Access denied!";
+					return this.RedirectToAction("Index", "Home");
 				}
 			}
 			else
@@ -133,7 +173,6 @@ namespace SmartDormitory.App.Controllers
 
 			if (icbSensor.MeasureType.MeasureUnit == "(true/false)")
 			{
-				// TODO: Попълване ако иска аларма да пита кога да се пуска - при false или true (отв, затв)
 				model.IsSwitch = true;
 			}
 			else
@@ -151,19 +190,13 @@ namespace SmartDormitory.App.Controllers
 		{
 			if (!this.ModelState.IsValid)
 			{
-                TempData["Error-Message"] = "Oops something went wrong! Try again..";
-                return this.RedirectToAction("Create", "Sensor", new
+				TempData["Error-Message"] = "Error while trying to create a new sensor";
+				return this.RedirectToAction("Create", "Sensor", new
 				{
 					icbSensorId = model.IcbSensorId,
 					userId = model.UserId
 				});
 			}
-			//if (model.IsSwitch)
-			//{
-
-			//}
-			// TODO: Add validation for model, change user id to here, not from view
-			// TODO: Tests
 
 			var createdSensorId = await this.sensorsService.RegisterNewSensor(model.UserId, model.IcbSensorId, model.Name,
 				model.Description, model.PollingInterval, model.IsPublic,
@@ -181,7 +214,7 @@ namespace SmartDormitory.App.Controllers
 		}
 
 		private List<IcbSensorsListViewModel> MapSensorServiceModelToViewModel(
-			IEnumerable<IcbSensorRegisterListServiceModel> sensors)
+			IEnumerable<IcbSensorRegisterListServiceModel> sensors, string userId)
 		{
 			return sensors.Select(s => new IcbSensorsListViewModel
 			{
@@ -189,6 +222,7 @@ namespace SmartDormitory.App.Controllers
 				Description = s.Description,
 				PollingInterval = s.PollingInterval,
 				Tag = s.Tag.SplitTag(),
+				UserId = userId
 				//set image url depends on tag
 			}).ToList();
 		}
@@ -199,7 +233,11 @@ namespace SmartDormitory.App.Controllers
 			try
 			{
 				var sensor = await sensorsService.GetSensorById(sensorId);
-
+				if (!UserHasAccess(sensor.UserId))
+				{
+					TempData["Error-Message"] = "Access denied!";
+					return this.RedirectToAction("Index", "Home");
+				}
 				var model = new DetailsSensorViewModel()
 				{
 					SensorId = sensorId,
@@ -215,15 +253,16 @@ namespace SmartDormitory.App.Controllers
 					PollingInterval = sensor.PollingInterval,
 					StartValue = sensor.IcbSensor.CurrentValue,
 					MeasureUnit = sensor.IcbSensor.MeasureType.MeasureUnit,
-					SwitchOn = sensor.SwitchOn
+					SwitchOn = sensor.SwitchOn,
+					IsSwitch = sensor.IcbSensor.MeasureType.MeasureUnit == "(true/false)" ? true : false
+
 				};
-				TempData["Success-Message"] = "Succesfully created a sensor with name - " + model.Name;
 				return View(model);
 			}
 			catch (EntityDoesntExistException e)
 			{
 				TempData["Error-Message"] = e.Message;
-				return this.NotFound();
+				return this.RedirectToAction("Index", "Home");
 			}
 		}
 
@@ -238,17 +277,22 @@ namespace SmartDormitory.App.Controllers
 			catch (EntityDoesntExistException e)
 			{
 				TempData["Error-Message"] = e.Message;
-				return this.NotFound();
+				return this.RedirectToAction("Index", "Home");
 			}
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> Update(string sensorId)
 		{
-			// TODO: Better implementation
 			try
 			{
 				var sensor = await this.sensorsService.GetSensorById(sensorId);
+
+				if (!UserHasAccess(sensor.UserId))
+				{
+					TempData["Error-Message"] = "Access denied!";
+					return this.RedirectToAction("Index", "Home");
+				}
 				var model = new CreateUpdateSensorViewModel()
 				{
 					AlarmOn = sensor.AlarmOn,
@@ -267,7 +311,6 @@ namespace SmartDormitory.App.Controllers
 
 				if (sensor.IcbSensor.MeasureType.MeasureUnit == "(true/false)")
 				{
-					// TODO: Попълване ако иска аларма да пита кога да се пуска - при false или true (отв, затв)
 					model.IsSwitch = true;
 				}
 				else
@@ -278,11 +321,12 @@ namespace SmartDormitory.App.Controllers
 					model.ApiMinRangeValue = sensor.IcbSensor.MinRangeValue;
 				}
 				return View(model);
+
 			}
 			catch (EntityDoesntExistException e)
 			{
 				TempData["Error-Message"] = e.Message;
-				return this.NotFound();
+				return this.RedirectToAction("Index", "Home");
 			}
 		}
 
@@ -293,16 +337,27 @@ namespace SmartDormitory.App.Controllers
 			{
 
 				// TODO: Redirect to register index + temp data message
-				return this.RedirectToAction("Details", "Sensor", new { sensorId = model.SensorId });
+				TempData["Error-Message"] = "Oops something went wrong! Try again..";
+				return this.RedirectToAction("Update", "Sensor", new { sensorId = model.SensorId });
 			}
-			// TODO: Add validation for model, change user id to here, not from view
-			// TODO: Tests
 
 			var updatedSensorId = await this.sensorsService.Update(model.SensorId, model.UserId, model.IcbSensorId, model.Name, model.Description,
 				model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
 				model.Longtitude, model.Latitude, model.SwitchOn);
+			this.TempData["Success-Message"] = $"You successfully updated your sensor!";
 
 			return this.RedirectToAction("Details", "Sensor", new { sensorId = updatedSensorId });
+		}
+
+		private bool UserHasAccess(string userId)
+		{
+			string roleName = "Administrator";
+			if (User.GetId() == userId || User.IsInRole(roleName))
+			{
+				return true;
+			}
+			return false;
+
 		}
 	}
 }

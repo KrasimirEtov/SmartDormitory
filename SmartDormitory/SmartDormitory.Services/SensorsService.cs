@@ -1,5 +1,4 @@
-﻿using AlphaCinemaServices.Exceptions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Abstract;
@@ -43,6 +42,7 @@ namespace SmartDormitory.Services
         {
             return await this.Context
                 .Sensors
+				.Where(s => s.IsPublic && !s.IsDeleted)
                 .Select(s => new MapSensorServiceModel
                 {
                     Id = s.Id,
@@ -57,7 +57,27 @@ namespace SmartDormitory.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10)
+		public async Task<ICollection<MapSensorServiceModel>> GetAllUserSensorCoordinates(string userId)
+		{
+			var sensors = await this.Context
+				.Sensors
+				.Where(s => !s.IsDeleted && s.UserId == userId)
+				.Select(s => new MapSensorServiceModel
+				{
+					Id = s.Id,
+					Name = s.Name,
+					Description = s.Description,
+					Coordinates = new Coordinates
+					{
+						Latitude = s.Coordinates.Latitude,
+						Longitude = s.Coordinates.Longitude
+					},
+				})
+				.ToListAsync();
+			return sensors;
+		}
+
+		public async Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10)
         {
             var sensors = this.Context.Sensors.AsQueryable();
 
@@ -114,6 +134,7 @@ namespace SmartDormitory.Services
                 sensor.IsDeleted = false;
             }
 
+			this.Context.Sensors.Update(sensor);
             await this.Context.SaveChangesAsync();
         }
 
@@ -200,7 +221,11 @@ namespace SmartDormitory.Services
                 throw new EntityDoesntExistException("User does not exist");
             }
 
-            var sensors = this.Context.Sensors.Where(s => s.UserId == userId && !s.IsDeleted);
+            var sensors = this.Context.Sensors
+				.Where(s => s.UserId == userId && !s.IsDeleted)
+				.Include(s => s.IcbSensor)
+				.ThenInclude(mt => mt.MeasureType)
+				.AsQueryable();
 
             if (measureTypeId != "all")
             {
@@ -225,21 +250,44 @@ namespace SmartDormitory.Services
                 sensors = sensors.Where(s => s.AlarmOn == alarmSetValue);
             }
 
-            return await sensors
-                             .OrderByDescending(s => s.CreatedOn)
-                             .Select(s => new UserSensorListModel
-                             {
-                                 Id = s.Id,
-                                 Name = s.Name,
-                                 SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
-                                 MeasureUnit = s.IcbSensor.MeasureType.MeasureUnit,
-                                 PollingInterval = s.PollingInterval,
-                                 CreatedOn = (DateTime)s.CreatedOn,
-                                 IsPublic = s.IsPublic,
-                                 AlarmOn = s.AlarmOn
-                             })
+			return await sensors
+							 .OrderByDescending(s => s.CreatedOn)
+							 .Select(s => new UserSensorListModel
+							 {
+								 Id = s.Id,
+								 Name = s.Name,
+								 SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
+								 MeasureUnit = s.IcbSensor.MeasureType.MeasureUnit,
+								 PollingInterval = s.PollingInterval,
+								 CreatedOn = (DateTime)s.CreatedOn,
+								 IsPublic = s.IsPublic,
+								 AlarmOn = s.AlarmOn,
+								 Value = ExtractValue(s)
+							 })
                              .ToListAsync();
+
         }
+
+		private string ExtractValue(Sensor sensor)
+		{
+			string result = "";
+			if (sensor.IcbSensor.MeasureType.SuitableSensorType == "Boolean switch (door/occupancy/etc)")
+			{
+				if (sensor.IcbSensor.CurrentValue == 1)
+				{
+					result = "true";
+				}
+				else if (sensor.IcbSensor.CurrentValue == 0)
+				{
+					result = "false";
+				}
+			}
+			else
+			{
+				result = sensor.IcbSensor.CurrentValue.ToString();
+			}
+			return result;
+		}
 
         public async Task<GaugeDataServiceModel> GetGaudeData(string sensorId)
         {

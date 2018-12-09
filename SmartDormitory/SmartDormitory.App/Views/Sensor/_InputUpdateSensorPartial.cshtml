@@ -24,7 +24,7 @@
             <textarea asp-for="Description" class="form-control rounded-0" rows="3"
                       placeholder="Type a description">@Model.Description</textarea>
         </div>
-
+        @*<a href="~/Views/Sensor/_InputUpdateSensorPartial.cshtml">~/Views/Sensor/_InputUpdateSensorPartial.cshtml</a>*@
         <div class="col-6">
             <label asp-for="PollingInterval" class="control-label"><b>Custom polling interval (seconds)</b></label>
             <input asp-for="PollingInterval" class="form-control"

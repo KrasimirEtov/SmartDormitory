@@ -34,7 +34,7 @@ namespace SmartDormitory.Services
 
 		public async Task<IEnumerable<UserListServiceModel>> GetAllUsers(int page = 1, int pageSize = 4)
 		{
-			return await this.Context.Users
+			var users =  await this.Context.Users
 				.OrderByDescending(u => u.CreatedOn)
 				.Skip((page - 1) * pageSize)
 				.Take(pageSize)
@@ -48,6 +48,7 @@ namespace SmartDormitory.Services
 					SensorsCount = u.Sensors.Count // check if it works, otherwise include sensors
 				})
 				.ToListAsync();
+			return users;
 		}
 
 		public async Task<bool> IsAdmin(string userId)
@@ -95,13 +96,12 @@ namespace SmartDormitory.Services
 			{
 				user.IsDeleted = true;
 			}
-			// TODO: This does not set IsDeleted flag, it directly deletes the entity
-			// TODO: user.IsDeleted = true;
+
 			this.Context.Users.Update(user);
 			await this.Context.SaveChangesAsync();
 		}
 
 		public async Task<int> TotalUsers()
-			=> await this.Context.Users.CountAsync(u => u.IsDeleted == false);
+		=> await this.Context.Users.CountAsync(u => u.IsDeleted == false);
 	}
 }

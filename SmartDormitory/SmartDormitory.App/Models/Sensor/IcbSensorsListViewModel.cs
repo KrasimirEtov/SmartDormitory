@@ -9,5 +9,7 @@
         public int PollingInterval { get; set; }
 
         public string Tag { get; set; }
-    }
+
+		public string UserId { get; set; }
+	}
 }

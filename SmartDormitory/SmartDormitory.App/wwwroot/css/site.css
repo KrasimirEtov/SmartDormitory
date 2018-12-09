@@ -93,22 +93,17 @@ body {
     *zoom: 1;
 }
 
-.sensorWrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    margin: 30px;
-    border: 1px solid #cccccc;
-}
-
 .gauge {
     display: block;
     float: left;
 }
 
-#sensor {
+.sensor-size-isSwitch {
+    width: 58%;
+    margin: auto;
+}
+
+.sensor-size-isNotSwitch {
     width: 100%;
 }
 
@@ -117,4 +112,3 @@ body {
     height: 15vw;
     object-fit: cover;
 }
-

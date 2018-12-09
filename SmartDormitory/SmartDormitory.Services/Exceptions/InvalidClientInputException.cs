@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AlphaCinemaServices.Exceptions
+namespace SmartDormitory.Services.Exceptions
 {
 	public class InvalidClientInputException : Exception
 	{

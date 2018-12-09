@@ -22,6 +22,7 @@ namespace SmartDormitory.App.Models.Sensor
             this.AlarmOn = model.AlarmOn;
             this.ImagePath = model.MeasureUnit.GetImagePathByMeasureUnit();
             this.PollingInterval = model.PollingInterval;
+			this.Value = model.Value;
         }
 
         public string Id { get; set; }
@@ -41,5 +42,7 @@ namespace SmartDormitory.App.Models.Sensor
         public bool AlarmOn { get; set; }
 
         public bool IsPublic { get; set; }
-    }
+
+		public string Value { get; set; }
+	}
 }

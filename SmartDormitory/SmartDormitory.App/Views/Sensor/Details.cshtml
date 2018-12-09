@@ -47,14 +47,36 @@
                 </div>
             </div>
             <br />
-            <div class="col-md-6 col-sm-12">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h2 class="card-title">Real time data:</h2>
-                        <div id="sensor" class="gauge" data-title="Measure unit: @Model.MeasureUnit"></div>
+            @if (Model.IsSwitch)
+            {
+                <div class="col-md-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h2 class="card-title">Real time data:</h2>
+                            <h4>Measure type: @Model.MeasureUnit</h4>
+                            <br />
+                            <div class="d-flex justify-content-center">
+                                <div id="sensorIsSwitch" class="gauge sensor-size-isSwitch"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="col-md-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h2 class="card-title">Real time data:</h2>
+                            <h4>Measure type: @Model.MeasureUnit</h4>
+                            <br />
+                            <div class="d-flex justify-content-center">
+                                <div id="sensorIsNotSwitch" class="gauge sensor-size-isNotSwitch"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
         <br />
         <div class="card">
@@ -66,52 +88,92 @@
     </div>
 </div>
 
+<script src="~/lib/justgage/raphael-2.1.4.min.js"></script>
+<script src="~/lib/justgage/justgage.js"></script>
 
 <script>
     $(function () {
+        var isSwitch = @Json.Serialize(Model.IsSwitch);
+        var isSwitchGauge, isNotSwitchGauge;
 
-        var gauge = new JustGage({
-            id: "sensor",
-            value: @Model.StartValue,
-            min: @Model.MinRangeValue,
-            max: @Model.MaxRangeValue,
-            decimals: 2,
-            gaugeWidthScale: 0.2,
-            customSectors: [{
-                color: "#00ff00",
-                lo: @Model.MinRangeValue + 100,
-                hi: @Model.MaxRangeValue - 200
-            }, {
-                color: "#ff0000",
-                lo: @Model.MaxRangeValue + 200,
-                hi: @Model.MaxRangeValue - 100
-            }],
-            relativeGaugeSize: true,
-            pointer: true,
-            counter: true
-            
-        });
-
-        setInterval(function () {
-            $.getJSON('/Sensor/GetGaudeData?sensorId=@Model.SensorId', function (data) {
-                gauge.refresh(data.userCurrentValue);
-            });
-        }, 1 * 1000);
-
-        function customValue(val) {
-            if (val < @Model.MinRangeValue) {
-                return '< MIN';
-            } else if (val > @Model.MaxRangeValue) {
-                return '> MAX';
-            } else {
-                return val;
+        if (isSwitch) {
+            var isSwitchDefaults = {
+                value: @Model.StartValue,
+                gaugeWidthScale: 0.5,
+                donut: true,
+                min: 0,
+                max: 1,
+                relativeGaugeSize: true,
+                gaugeColor: "#FF0000", // false
+                levelColors: ["#00b200"], // true
+                textRenderer: function (val) {
+                    if (val == 0) {
+                        return 'Closed';
+                    } else if (val == 1) {
+                        return 'Opened';
+                    }
+                }
             }
+            // instance of switch gauge
+            isSwitchGauge = new JustGage({
+                id: "sensorIsSwitch",
+                defaults: isSwitchDefaults
+            });
+
+            setInterval(function () {
+                $.getJSON('/Sensor/GetGaudeData?sensorId=@Model.SensorId', function (data) {
+                    isSwitchGauge.refresh(data.userCurrentValue);
+                }, @Model.PollingInterval * 1000);
+            });
+        }
+        else {
+            var isNotSwitchDefaults = {
+                value: @Model.StartValue,
+                min: @Model.MinRangeValue,
+                max: @Model.MaxRangeValue,
+                decimals: 2,
+                gaugeWidthScale: 0.3,
+                pointer: true,
+                pointerOptions: {
+                    toplength: 15,
+                    bottomlength: 10,
+                    bottomwidth: 2
+                },
+                levelColors: [
+                    "#FF0000",
+                    "#00b200",
+                    "#FF0000"
+                ],
+                textRenderer: function (val) {
+
+                    if (val < @Model.MinRangeValue) {
+                        return 'Min range limit';
+                    } else if (val > @Model.MaxRangeValue) {
+                        return 'Max range limit';
+                    } else if (val > @Model.MinRangeValue && val < @Model.MaxRangeValue) {
+                        return val;
+                    }
+                },
+                counter: true,
+                relativeGaugeSize: true
+            }
+
+             // instance of not switch gauge
+            isNotSwitchGauge = new JustGage({
+            id: "sensorIsNotSwitch",
+            defaults: isNotSwitchDefaults
+            });
+
+            setInterval(function () {
+                $.getJSON('/Sensor/GetGaudeData?sensorId=@Model.SensorId', function (data) {
+                    isNotSwitchGauge.refresh(data.userCurrentValue);
+                });
+            }, @Model.PollingInterval * 1000);
         }
     });
 </script>
 
-<script src="~/js/raphael-2.1.4.min.js"></script>
-<script src="~/js/justgage.js"></script>
+
 
 <script>
         function initMap() {

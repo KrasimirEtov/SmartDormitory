@@ -19,6 +19,7 @@ namespace SmartDormitory.Services.Models.Sensors
         public bool AlarmOn { get; set; }
 
         public bool IsPublic { get; set; }
-        //todo add more
-    }
+
+		public string Value { get; set; }
+	}
 }

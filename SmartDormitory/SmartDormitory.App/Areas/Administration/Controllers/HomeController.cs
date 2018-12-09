@@ -23,6 +23,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 		{
 			var users = await userService.TotalUsers();
 			var sensors = await sensorsService.TotalSensors();
+
 			var model = new DashboardViewModel()
 			{
 				UsersCount = users,

@@ -2,8 +2,7 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
-          method="post" id="logoutForm">
+    <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
         <ul class="navbar-nav nav-flex-icons">
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle waves-effect" id="userDropdown"

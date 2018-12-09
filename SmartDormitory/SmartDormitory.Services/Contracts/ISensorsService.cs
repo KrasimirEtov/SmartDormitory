@@ -12,6 +12,8 @@ namespace SmartDormitory.Services.Contracts
 
 		Task<IEnumerable<MapSensorServiceModel>> GetAllPublicSensorsCoordinates();
 
+		Task<ICollection<MapSensorServiceModel>> GetAllUserSensorCoordinates(string userId);
+
 		Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10);
 
 		Task ToggleSoftDeleteSensor(string sensorId);

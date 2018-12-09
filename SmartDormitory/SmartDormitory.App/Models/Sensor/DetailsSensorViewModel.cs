@@ -33,5 +33,6 @@ namespace SmartDormitory.App.Models.Sensor
 		public float StartValue { get; set; }
 		public string MeasureUnit { get; set; }
 		public bool SwitchOn { get; set; }
+		public bool IsSwitch { get; set; }
 	}
 }

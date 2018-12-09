@@ -14,6 +14,8 @@ namespace SmartDormitory.App.Models.Sensor
 
         public int AlarmOn { get; set; } = -1;
 
-        public IEnumerable<MySensorListViewModel> Sensors { get; set; }
-    }
+		public MySensorsPartialViewModel MySensorsPartialViewModel { get; set; }
+
+		public int TotalPollingInterval { get; set; }
+	}
 }

@@ -11,7 +11,6 @@
 
 <form asp-area="" asp-controller="Sensor" asp-action="Create" method="post">
     <input asp-for="IcbSensorId" hidden value="@Model.IcbSensorId" />
-    @* TODO: inject use manager here *@
     <input asp-for="UserId" hidden value="@Model.UserId" />
 
     <div class="form-row">

@@ -113,8 +113,8 @@
 
             const deleteBtn = 'btn-danger';
             const restoreBtn = 'btn-dark-green';
-            const deleteBtnText = '<i class="far fa-trash-alt"></i> Delete';
-            const restoreBtnText = '<i class="fas fa-redo"></i> Restore';
+            const deleteBtnText = '<i class="far fa-trash-alt"></i>';
+            const restoreBtnText = '<i class="fas fa-redo"></i>';
 
             if ($(this).hasClass(deleteBtn)) {
                 $(this).removeClass(deleteBtn).addClass(restoreBtn);
@@ -124,17 +124,14 @@
                 $(this).removeClass(restoreBtn).addClass(deleteBtn);
                 $(this).html(deleteBtnText);
             }
-        });
+        });     
 
         const $toggleDeleteForm = $('.toggleDeleteForm');
-
         $toggleDeleteForm.on('submit', function (event) {
             event.preventDefault();
-
             const data = $toggleDeleteForm.serialize();
             const sensorId = $(this).data('sensorId');
             const url = $toggleDeleteForm.attr('action') + '?sensorId=' + sensorId;
-
             $.post(url, { __RequestVerificationToken: data.__RequestVerificationToken }, function () {
             });
         });

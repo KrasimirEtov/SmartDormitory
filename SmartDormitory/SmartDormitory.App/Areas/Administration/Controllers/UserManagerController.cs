@@ -25,18 +25,32 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
-			var model = await UpdateAllUsersPage();
+			try
+			{
+				var model = await UpdateAllUsersPage();
+				return View(model);
 
-			return View(model);
-
+			}
+			catch (RedirectException e)
+			{
+				this.TempData["Error-Message"] = e.Message;
+				return this.RedirectToAction("Index", "UserManager");
+			}
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> Users(int page = 1)
 		{
-			var model = await UpdateAllUsersPage(page);
-
-			return PartialView("_UsersTablePartial", model);
+			try
+			{
+				var model = await UpdateAllUsersPage(page);
+				return PartialView("_UsersTablePartial", model);
+			}
+			catch (RedirectException e)
+			{
+				this.TempData["Error-Message"] = e.Message;
+				return RedirectToAction("Index", "UserManager");
+			}
 		}
 
 		[HttpPost]
@@ -49,19 +63,23 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 				this.TempData["Error-Message"] = $"User does not exist!";
 				return this.NotFound();
 			}
-
-			if (await userService.IsAdmin(user.Id))
+			try
 			{
-				// try catch ? 
-				await this.userService.RemoveRole(user.Id, "Administrator");
-				this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
+				if (await userService.IsAdmin(user.Id))
+				{
+					await this.userService.RemoveRole(user.Id, "Administrator");
+					this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
+				}
+				else
+				{
+					await this.userService.SetRole(user.Id, "Administrator");
+					this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
+				}
 			}
-			else
+			catch (EntityDoesntExistException e)
 			{
-				await this.userService.SetRole(user.Id, "Administrator");
-				this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
+				TempData["Error-Message"] = e.Message;
 			}
-
 			return this.Ok();
 		}
 
@@ -75,7 +93,6 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 			catch (EntityDoesntExistException e)
 			{
 				this.TempData["Error-Message"] = e.Message;
-				// TODO: Talk about exception handling
 				return this.NotFound(e.Message);
 			}
 			this.TempData["Success-Message"] = $"User was successfully deleted!";
@@ -85,23 +102,30 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 
 		private async Task<UsersPagingViewModel> UpdateAllUsersPage(int page = 1)
 		{
-			var users = await userService.GetAllUsers(page);
-			var userViewModels = users.Select(u => new UserViewModel(u)).ToList();
-			var totalUsers = await userService.TotalUsers();
-
-			foreach (var user in userViewModels)
+			try
 			{
-				user.IsAdmin = await userService.IsAdmin(user.Id);
+				var users = await userService.GetAllUsers(page);
+				var userViewModels = users.Select(u => new UserViewModel(u)).ToList();
+				var totalUsers = await userService.TotalUsers();
+
+				foreach (var user in userViewModels)
+				{
+					user.IsAdmin = await userService.IsAdmin(user.Id);
+				}
+
+				var model = new UsersPagingViewModel
+				{
+					Users = userViewModels,
+					CurrentPage = page,
+					TotalPages = (int)Math.Ceiling(totalUsers / (double)PageSize)
+				};
+
+				return model;
 			}
-
-			var model = new UsersPagingViewModel
+			catch (EntityDoesntExistException e)
 			{
-				Users = userViewModels,
-				CurrentPage = page,
-				TotalPages = (int)Math.Ceiling(totalUsers / (double)PageSize)
-			};
-
-			return model;
+				throw new RedirectException(e.Message);
+			}		
 		}
 	}
 }

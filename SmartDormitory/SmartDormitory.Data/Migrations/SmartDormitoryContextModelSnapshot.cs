@@ -136,16 +136,12 @@ namespace SmartDormitory.Data.Migrations
 
                     b.Property<DateTime?>("CreatedOn");
 
-                    b.Property<float>("CurrentValue");
-
                     b.Property<DateTime?>("DeletedOn");
 
                     b.Property<string>("Description")
                         .IsRequired();
 
                     b.Property<bool>("IsDeleted");
-
-                    b.Property<DateTime>("LastUpdateOn");
 
                     b.Property<float>("MaxRangeValue");
 
@@ -191,40 +187,40 @@ namespace SmartDormitory.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "022219d6-3cec-473f-8b77-99c454da45d4",
-                            CreatedOn = new DateTime(2018, 12, 8, 19, 57, 31, 971, DateTimeKind.Local).AddTicks(1335),
+                            Id = "50aea4f6-31a6-4727-9ff6-1590b1577e50",
+                            CreatedOn = new DateTime(2018, 12, 9, 13, 30, 24, 78, DateTimeKind.Local).AddTicks(3398),
                             IsDeleted = false,
                             MeasureUnit = "°C",
                             SuitableSensorType = "Temperature"
                         },
                         new
                         {
-                            Id = "d9d7d76c-ec0a-47d3-a01f-d230e656b461",
-                            CreatedOn = new DateTime(2018, 12, 8, 19, 57, 31, 973, DateTimeKind.Local).AddTicks(1436),
+                            Id = "8a06a1ff-a97f-4a29-9a64-71fb7261c0be",
+                            CreatedOn = new DateTime(2018, 12, 9, 13, 30, 24, 80, DateTimeKind.Local).AddTicks(8923),
                             IsDeleted = false,
                             MeasureUnit = "%",
                             SuitableSensorType = "Humidity"
                         },
                         new
                         {
-                            Id = "8824cfc9-6dc5-45c9-a902-8f7307852c0c",
-                            CreatedOn = new DateTime(2018, 12, 8, 19, 57, 31, 973, DateTimeKind.Local).AddTicks(1460),
+                            Id = "e2fdf77e-2973-4a1c-b49f-886de4681cbc",
+                            CreatedOn = new DateTime(2018, 12, 9, 13, 30, 24, 80, DateTimeKind.Local).AddTicks(8951),
                             IsDeleted = false,
                             MeasureUnit = "W",
                             SuitableSensorType = "Electric power consumtion"
                         },
                         new
                         {
-                            Id = "011d139f-7b86-4fc3-b97f-ae859b1f9422",
-                            CreatedOn = new DateTime(2018, 12, 8, 19, 57, 31, 973, DateTimeKind.Local).AddTicks(1468),
+                            Id = "ee6ff716-1670-4363-bc00-66a798e27631",
+                            CreatedOn = new DateTime(2018, 12, 9, 13, 30, 24, 80, DateTimeKind.Local).AddTicks(8955),
                             IsDeleted = false,
                             MeasureUnit = "(true/false)",
                             SuitableSensorType = "Boolean switch (door/occupancy/etc)"
                         },
                         new
                         {
-                            Id = "4b4a42c5-f227-4b85-991e-83eb68bbeccd",
-                            CreatedOn = new DateTime(2018, 12, 8, 19, 57, 31, 973, DateTimeKind.Local).AddTicks(1472),
+                            Id = "b104b845-2dc4-469d-af4d-d8943b0b0282",
+                            CreatedOn = new DateTime(2018, 12, 9, 13, 30, 24, 80, DateTimeKind.Local).AddTicks(8959),
                             IsDeleted = false,
                             MeasureUnit = "dB",
                             SuitableSensorType = "Noise"
@@ -254,7 +250,7 @@ namespace SmartDormitory.Data.Migrations
 
                     b.HasIndex("ReceiverId");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>

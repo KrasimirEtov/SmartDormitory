@@ -213,7 +213,7 @@ namespace SmartDormitory.App.Controllers
 					MinRangeValue = sensor.MinRangeValue,
 					Name = sensor.Name,
 					PollingInterval = sensor.PollingInterval,
-					StartValue = sensor.IcbSensor.CurrentValue,
+					StartValue = sensor.CurrentValue,
 					MeasureUnit = sensor.IcbSensor.MeasureType.MeasureUnit,
 					SwitchOn = sensor.SwitchOn
 				};

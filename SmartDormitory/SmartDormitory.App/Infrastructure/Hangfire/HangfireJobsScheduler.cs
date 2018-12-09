@@ -38,21 +38,15 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
 
                 // 
                 await icbSensorsService.AddSensorsAsync();
-
-                // setup recurring job for every new IcbSensor inserted in Db
-                //foreach (var (Id, PollingInterval) in addedSensorsData)
-                //{
-                //    await SetupSensorUpdateReccuringJob(Id, PollingInterval);
-                //}
             }
         }
 
+        //[DisableConcurrentExecution(timeoutInSeconds: 10 * 60)]
         public async Task UpdateSensorsData()
         {
             using (var scope = this.serviceProvider.CreateScope())
             {
-                var icbApiService = scope.ServiceProvider.GetService<IIcbApiService>();
-                var icbSensorsService = scope.ServiceProvider.GetService<IIcbSensorsService>();
+                var icbApi = scope.ServiceProvider.GetService<IIcbApiService>();
                 var sensorsService = scope.ServiceProvider.GetService<ISensorsService>();
                 var notificationService = scope.ServiceProvider.GetService<INotificationService>();
 
@@ -67,7 +61,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                     // caching all 13? api sensors data for current BackgroundJob
                     if (!newDataCache.ContainsKey(userSensor.IcbSensorId))
                     {
-                        var newApiData = await icbApiService
+                        var newApiData = await icbApi
                                                   .GetIcbSensorValueById(userSensor.IcbSensorId);
 
                         newDataCache[userSensor.IcbSensorId] = newApiData;
@@ -88,8 +82,8 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                         sensorsToUpdate.Add(userSensor);
 
                         if (userSensor.AlarmOn &&
-                            (newValue <= userSensor.MinRangeValue ||
-                                newValue >= userSensor.MaxRangeValue))
+                                (newValue <= userSensor.MinRangeValue ||
+                                 newValue >= userSensor.MaxRangeValue))
                         {
                             // populate list of sensors with activated alarms
                             alarmsActivatedSensors.Add(userSensor);
@@ -98,34 +92,17 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                     }
                 }
 
-                //check if should send alarm notifications
+                //create and send alarm notifications
                 await notificationService.BuildNotifications(alarmsActivatedSensors);
 
                 //update all user sensors data at once
                 await sensorsService.UpdateRange(sensorsToUpdate);
                 //this.Context.SavechagenesAsync();  --- save everything at once
 
-
                 BackgroundJob.Schedule(() => UpdateSensorsData(), TimeSpan.FromSeconds(5));
             }
         }
 
-        //[DisableConcurrentExecution(timeoutInSeconds: 10 * 60)]
-        public async Task SetupSensorUpdateReccuringJob(string id, int pollingInterval)
-        {
-            using (var scope = this.serviceProvider.CreateScope())
-            {
-                var icbApiService = scope.ServiceProvider.GetService<IIcbApiService>();
-                var icbSensorsService = scope.ServiceProvider.GetService<IIcbSensorsService>();
 
-                var data = await icbApiService.GetIcbSensorValueById(id);
-
-                await icbSensorsService
-                        .UpdateSensorValueAsync(id, data.TimeStamp, data.LastValue, data.MeasurementUnit);
-
-                BackgroundJob.Schedule(() => SetupSensorUpdateReccuringJob(id, pollingInterval),
-                                             TimeSpan.FromSeconds(pollingInterval));
-            }
-        }
     }
 }

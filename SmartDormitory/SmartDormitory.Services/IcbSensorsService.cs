@@ -104,25 +104,25 @@ namespace SmartDormitory.Services
                               .ToListAsync();
         }
 
-        public async Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measureUnit)
-        {
-            var icbSensor = await this.Context
-                                      .IcbSensors
-                                      .Include(s => s.MeasureType)
-                                      .FirstOrDefaultAsync(s => s.Id == id);
+        //public async Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measureUnit)
+        //{
+        //    var icbSensor = await this.Context
+        //                              .IcbSensors
+        //                              .Include(s => s.MeasureType)
+        //                              .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (icbSensor != null)
-            {
-                if (icbSensor.MeasureType.MeasureUnit == measureUnit)
-                {
-                    icbSensor.LastUpdateOn = timeStamp;
-                    icbSensor.CurrentValue = ApiDataExtractorHelper.GetLastValue(lastValue);
+        //    if (icbSensor != null)
+        //    {
+        //        if (icbSensor.MeasureType.MeasureUnit == measureUnit)
+        //        {
+        //            icbSensor.LastUpdateOn = timeStamp;
+        //            icbSensor.CurrentValue = ApiDataExtractorHelper.GetLastValue(lastValue);
 
-                    await this.Context.SaveChangesAsync();
-                }
-            }
-            // return sensor?
-        }
+        //            await this.Context.SaveChangesAsync();
+        //        }
+        //    }
+        //    // return sensor?
+        //}
 
         public async Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId)
         {

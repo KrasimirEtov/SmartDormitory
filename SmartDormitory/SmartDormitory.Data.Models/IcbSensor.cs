@@ -28,12 +28,5 @@ namespace SmartDormitory.Data.Models
         public string MeasureTypeId { get; set; }
 
         public ICollection<Sensor> Sensors { get; set; } = new HashSet<Sensor>();
-
-
-        //remove both down
-        [DataType(DataType.DateTime)]
-        public DateTime LastUpdateOn { get; set; }
-
-        public float CurrentValue { get; set; }
     }
 }

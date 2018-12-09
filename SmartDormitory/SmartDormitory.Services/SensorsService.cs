@@ -250,12 +250,12 @@ namespace SmartDormitory.Services
 
             var model = new GaugeDataServiceModel()
             {
-                ApiCurrentValue = sensor.IcbSensor.CurrentValue,
-                ApiLastUpdateOn = sensor.IcbSensor.LastUpdateOn,
+                ApiCurrentValue = sensor.CurrentValue, // remove?
+                ApiLastUpdateOn = sensor.LastUpdateOn,
                 ApiMaxRangeValue = sensor.IcbSensor.MaxRangeValue,
                 ApiMinRangeValue = sensor.IcbSensor.MinRangeValue,
                 ApiPollingInterval = sensor.IcbSensor.PollingInterval,
-                UserCurrentValue = sensor.IcbSensor.CurrentValue,
+                UserCurrentValue = sensor.CurrentValue,
                 UserLastUpdateOn = DateTime.Now,
                 UserPollingInterval = sensor.PollingInterval,
                 UserMaxRangeValue = sensor.MaxRangeValue,

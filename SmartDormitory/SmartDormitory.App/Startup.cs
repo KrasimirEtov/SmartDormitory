@@ -38,10 +38,8 @@ namespace SmartDormitory.App
             this.RegisterInfrastructure(services);
 
             // IMPORTANT
-            // Comment this line if dropped db and update again
+            // Comment this lines if dropped db and update-database
             this.RegisterHangfireDbTables(services);
-
-            // Comment this line if database is dropped for the first start of the program
             this.ActivatingHangfireJobs(services);
         }
 
@@ -78,6 +76,7 @@ namespace SmartDormitory.App
             services.AddTransient<IIcbSensorsService, IcbSensorsService>();
             services.AddTransient<ISensorsService, SensorsService>();
             services.AddTransient<IMeasureTypeService, MeasureTypeService>();
+            services.AddTransient<INotificationService, NotificationService>();
 
             services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
         }

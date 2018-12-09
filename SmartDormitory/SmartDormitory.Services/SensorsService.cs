@@ -1,5 +1,4 @@
-﻿using AlphaCinemaServices.Exceptions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Abstract;
@@ -121,47 +120,47 @@ namespace SmartDormitory.Services
             int pollingInterval, bool isPublic, bool alarmOn, float minRange,
             float maxRange, double longtitude, double latitude, bool switchOn)
         {
-			string returnSensorId = "";
+            string returnSensorId = "";
             if (await this.Context.IcbSensors.AnyAsync(s => s.Id == icbSensorId))
             {
-				var sensor = new Sensor()
-				{
-					MaxRangeValue = maxRange,
-					MinRangeValue = minRange,
-					AlarmOn = alarmOn,
-					Description = description,
-					Name = name,
-					UserId = userId,
-					IsPublic = isPublic,
-					PollingInterval = pollingInterval,
-					IcbSensorId = icbSensorId,
-					Coordinates = new Coordinates
-					{
-						Latitude = latitude,
-						Longitude = longtitude
-					},
-					CreatedOn = DateTime.Now,
-					SwitchOn = switchOn
+                var sensor = new Sensor()
+                {
+                    MaxRangeValue = maxRange,
+                    MinRangeValue = minRange,
+                    AlarmOn = alarmOn,
+                    Description = description,
+                    Name = name,
+                    UserId = userId,
+                    IsPublic = isPublic,
+                    PollingInterval = pollingInterval,
+                    IcbSensorId = icbSensorId,
+                    Coordinates = new Coordinates
+                    {
+                        Latitude = latitude,
+                        Longitude = longtitude
+                    },
+                    CreatedOn = DateTime.Now,
+                    SwitchOn = switchOn
                 };
                 await this.Context.Sensors.AddAsync(sensor);
                 await this.Context.SaveChangesAsync();
-				returnSensorId = sensor.Id;
+                returnSensorId = sensor.Id;
             }
-			return returnSensorId;
+            return returnSensorId;
         }
 
         public async Task<Sensor> GetSensorById(string sensorId)
         {
-            var sensor =  await this.Context.Sensors
+            var sensor = await this.Context.Sensors
                 .Where(s => s.Id == sensorId)
                 .Include(icb => icb.IcbSensor)
                 .ThenInclude(mt => mt.MeasureType)
                 .FirstOrDefaultAsync();
-			if (sensor == null || sensor.IsDeleted)
-			{
-				throw new EntityDoesntExistException("Sensor is no present in database!");
-			}
-			return sensor;
+            if (sensor == null || sensor.IsDeleted)
+            {
+                throw new EntityDoesntExistException("Sensor is no present in database!");
+            }
+            return sensor;
         }
 
         public async Task<int> TotalSensorsByCriteria(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1)
@@ -288,12 +287,25 @@ namespace SmartDormitory.Services
             sensor.MaxRangeValue = maxRange;
             sensor.Coordinates.Longitude = longtitude;
             sensor.Coordinates.Latitude = latitude;
-			sensor.ModifiedOn = DateTime.Now;
-			sensor.SwitchOn = switchOn;
+            sensor.ModifiedOn = DateTime.Now;
+            sensor.SwitchOn = switchOn;
 
             this.Context.Sensors.Update(sensor);
             await this.Context.SaveChangesAsync();
             return sensor.Id;
+        }
+
+        public async Task<IEnumerable<Sensor>> GetAll()
+            => await this.Context
+                         .Sensors
+                         .Where(s => !s.IsDeleted)
+                         .OrderBy(s => s.IcbSensorId)
+                         .ToListAsync();
+
+        public async Task UpdateRange(IEnumerable<Sensor> sensorsToUpdate)
+        {
+            this.Context.UpdateRange(sensorsToUpdate);
+            await this.Context.SaveChangesAsync();
         }
     }
 }

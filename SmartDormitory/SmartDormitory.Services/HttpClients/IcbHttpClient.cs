@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using static SmartDormitory.Services.Utils.Constants.IcbApi;
+using static SmartDormitory.Services.Utils.Constants;
 
 namespace SmartDormitory.Services.HttpClients
 {
@@ -12,17 +12,17 @@ namespace SmartDormitory.Services.HttpClients
         public IcbHttpClient(HttpClient client)
         {
             this.client = client ?? throw new ArgumentNullException(nameof(client));
-            this.client.BaseAddress = new Uri(BaseUrl);
+            this.client.BaseAddress = new Uri(IcbApi.BaseUrl);
             this.client.DefaultRequestHeaders.Accept.Clear();
-            this.client.DefaultRequestHeaders.Add(AcceptHeaderKey, AcceptHeaderValue);
-            this.client.DefaultRequestHeaders.Add(AuthorizationHeaderKey, AuthorizationHeaderValue);
+            this.client.DefaultRequestHeaders.Add(IcbApi.AcceptHeaderKey, IcbApi.AcceptHeaderValue);
+            this.client.DefaultRequestHeaders.Add(IcbApi.AuthorizationHeaderKey, IcbApi.AuthorizationHeaderValue);
         }
 
         public async Task<string> FetchAllSensors()
-                => await this.FetchData(IcbSensorPostfix + AllSensorsPostfix);
+                => await this.FetchData(IcbApi.IcbSensorPostfix + IcbApi.AllSensorsPostfix);
 
         public async Task<string> FetchSensorById(string id)
-                => await this.FetchData(IcbSensorPostfix + id);
+                => await this.FetchData(IcbApi.IcbSensorPostfix + id);
 
         private async Task<string> FetchData(string requestUri)
         {

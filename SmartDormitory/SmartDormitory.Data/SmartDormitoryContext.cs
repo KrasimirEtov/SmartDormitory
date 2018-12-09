@@ -24,6 +24,8 @@ namespace SmartDormitory.App.Data
 
         public DbSet<MeasureType> MeasureTypes { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             this.SetupEntitiesRelations(builder);
@@ -38,6 +40,11 @@ namespace SmartDormitory.App.Data
                 .HasMany(u => u.Sensors)
                 .WithOne(s => s.User)
                 .HasForeignKey(u => u.UserId);
+
+            builder.Entity<User>()
+                .HasMany(u => u.Notifications)
+                .WithOne(n => n.Receiver)
+                .HasForeignKey(n => n.ReceiverId);
 
             builder.Entity<IcbSensor>()
                 .HasMany(x => x.Sensors)

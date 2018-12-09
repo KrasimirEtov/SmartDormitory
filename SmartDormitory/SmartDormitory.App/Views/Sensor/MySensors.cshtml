@@ -61,15 +61,15 @@
 
 <script>
     $(function () {
-        let typeId = $("#MeasureTypeId").val();
-        let searchTerm = $("#searchTerm").val();
-        let alarm = $("#AlarmOn").val();
-        let privacy = $("#Privacy").val();
-
-        let url = "@Url.Action("ReloadMySensorsTable", "Sensor")?measureTypeId=" + typeId
-            + '&searchTerm=' + searchTerm + '&alarmOn=' + alarm + '&privacy=' + privacy;
-
         const reloadTable = function () {
+            let typeId = $("#MeasureTypeId").val();
+            let searchTerm = $("#searchTerm").val();
+            let alarm = $("#AlarmOn").val();
+            let privacy = $("#Privacy").val();
+
+            let url = "@Url.Action("ReloadMySensorsTable", "Sensor")?measureTypeId=" + typeId
+                + '&searchTerm=' + searchTerm + '&alarmOn=' + alarm + '&privacy=' + privacy;
+
            $("#mySensors").load(url);
         }
         $("#MeasureTypeId").change(reloadTable);
@@ -78,7 +78,7 @@
         $("#searchBtn").click(reloadTable);
 
         setInterval(function () {
-            $("#mySensors").load(url);
+            reloadTable;
         }, 60 * 1000);
 
         $("#searchTerm").keyup(function (event) {

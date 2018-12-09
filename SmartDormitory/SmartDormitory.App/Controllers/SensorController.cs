@@ -112,33 +112,6 @@ namespace SmartDormitory.App.Controllers
 			}
 		}
 
-		//[HttpGet]
-		//public async Task<IActionResult> GetSensorsValue(string measureTypeId = "all", string searchTerm = "",
-		//	int alarmOn = -1, int privacy = -1)
-		//{
-		//	try
-		//	{
-		//		//var userId = this.User.GetId();
-		//		//var sensors = (await this.sensorsService
-		//		//						 .GetUserSensors(userId, searchTerm, measureTypeId,
-		//		//												alarmOn, privacy))
-		//		//						.Select(s => new MySensorListViewModel(s))
-		//		//						.ToList();
-		//		var userId = User.GetId();
-		//		var sensors = (await sensorsService
-		//			.GetUserSensors(userId, searchTerm, measureTypeId, alarmOn, privacy))
-		//			.Select(s => new MySensorListViewModel(s))
-		//			.ToList();
-
-		//		//return Json(data);
-		//	}
-		//	catch (EntityDoesntExistException e)
-		//	{
-		//		TempData["Error-Message"] = e.Message;
-		//		return this.RedirectToAction("Index", "Home");
-		//	}
-		//}
-
 		[HttpGet]
 		public async Task<IActionResult> Create(string icbSensorId, string userId = "")
 		{

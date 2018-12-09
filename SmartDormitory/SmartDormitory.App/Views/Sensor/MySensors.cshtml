@@ -61,30 +61,30 @@
 
 <script>
     $(function () {
-
-    const reloadTable = function () {
         let typeId = $("#MeasureTypeId").val();
         let searchTerm = $("#searchTerm").val();
         let alarm = $("#AlarmOn").val();
         let privacy = $("#Privacy").val();
+
         let url = "@Url.Action("ReloadMySensorsTable", "Sensor")?measureTypeId=" + typeId
-            + '&searchTerm=' + searchTerm + '&alarmOn='+ alarm + '&privacy='+ privacy;
+            + '&searchTerm=' + searchTerm + '&alarmOn=' + alarm + '&privacy=' + privacy;
 
-        console.log(url)
-        $("#mySensors").load(url);
-    }
-
-    $("#MeasureTypeId").change(reloadTable);
-    $("#AlarmOn").change(reloadTable);
-    $("#Privacy").change(reloadTable);
-
-    $("#searchBtn").click(reloadTable);
-
-    // search with enter
-    $("#searchTerm").keyup(function (event) {
-        if (event.keyCode === 13) {
-            reloadTable();
+        const reloadTable = function () {
+           $("#mySensors").load(url);
         }
+        $("#MeasureTypeId").change(reloadTable);
+        $("#AlarmOn").change(reloadTable);
+        $("#Privacy").change(reloadTable);
+        $("#searchBtn").click(reloadTable);
+
+        setInterval(function () {
+            $("#mySensors").load(url);
+        }, 60 * 1000);
+
+        $("#searchTerm").keyup(function (event) {
+            if (event.keyCode === 13) {
+                reloadTable();
+            }
+        });
     });
-});
 </script>

@@ -33,13 +33,13 @@
 
 <script>
     $(function () {
-         $("#MeasureTypeId").change(function () {
-         let typeId = $("#MeasureTypeId").val();
-         let url = "@Url.Action("LoadSensorsByType", "Sensor")?measureTypeId=" + typeId;
+        $("#MeasureTypeId").change(function () {
 
-         $("#icbSensorsResults").load(url);
-     });
+            let typeId = $("#MeasureTypeId").val();
+            let url = "@Url.Action("LoadSensorsByType", "Sensor")?measureTypeId=" + typeId + '&userId=@Model.UserId';
+
+            $("#icbSensorsResults").load(url);
+        });
     })
-
 </script>
 

@@ -17,6 +17,7 @@ namespace SmartDormitory.App.Controllers
 
         public IActionResult Index()
         {
+
             // seed some fake sensonrs
             //this.sensorsService.SeedSomeSensorsForMaps();
             //var sensorsCoordinates = await this.sensorsService.GetAllPublicSensorsCoordinates();

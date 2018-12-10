@@ -48,7 +48,7 @@ namespace SmartDormitory.Services
 
                     if (measureType != null)
                     {
-                        var (MinRange, MaxRange) = ApiDataExtractorHelper
+                        var (MinRange, MaxRange) = ApiDataHelper
                                                         .GetMinAndMaxRange(icbSensor.Description);
 
                         var icbSensorToAdd = new IcbSensor

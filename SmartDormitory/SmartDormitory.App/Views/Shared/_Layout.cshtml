@@ -71,6 +71,9 @@
                         <a asp-area="" asp-controller="Sensor" asp-action="MySensors"
                            class="nav-link waves-effect">My sensors</a>
                     </li>
+                    <li class="nav-item">
+                        <vc:inbox></vc:inbox>
+                    </li>
                 }
                 @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
                 {
@@ -78,6 +81,10 @@
                     <li class="nav-item">
                         <a asp-area="Administration" asp-controller="Sensor" asp-action="Index"
                            class="nav-link waves-effect">Admin view sensors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/hangfire"
+                           class="nav-link waves-effect">Hangfire dashboard</a>
                     </li>
                 }
             </ul>
@@ -93,7 +100,7 @@
         </div>
         @RenderBody()
         <hr />
-        <footer>
+        <footer class="page-footer dark-grey-text fixed-bottom">
             <p>&copy; @DateTime.Now.Year - SmartDormitory.Team 2</p>
         </footer>
     </div>

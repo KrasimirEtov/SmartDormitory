@@ -1,11 +1,14 @@
 ﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Models.JsonDtoModels;
 using SmartDormitory.Services.Utils.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Infrastructure.Hangfire
@@ -19,11 +22,35 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
             this.serviceProvider = serviceProvider;
         }
 
+        [Queue("sensordata")]
         public void StartingJobsQueue()
         {
-            RecurringJob.AddOrUpdate(() => this.UpdateIcbSensors(), Cron.Hourly());
+            //RecurringJob.AddOrUpdate(() => this.UpdateIcbSensors(), Cron.Hourly());
 
-            BackgroundJob.Enqueue(() => UpdateSensorsData());
+            //delete all in queue
+            var mon = JobStorage.Current.GetMonitoringApi();
+            var scheduled = mon.ScheduledJobs(int.MinValue, int.MaxValue);
+            var scheduledCount = mon.ScheduledCount();
+            var queues = mon.Queues();
+            var processingCount = mon.ProcessingCount();
+            var processingJobs = mon.ProcessingJobs(int.MinValue, int.MaxValue);
+            var FetchedCount = mon.FetchedCount("sensordata");
+            var EnqueuedCount = mon.EnqueuedCount("sensordata");
+            var jobs = mon.EnqueuedJobs("sensordata", 0, 99999999);
+            jobs.ForEach(x =>
+            {
+                BackgroundJob.Delete(x.Key);
+            });
+            var afterEnqueuedCount = mon.EnqueuedCount("sensordata");
+
+            scheduled.ForEach(x =>
+            {
+                BackgroundJob.Delete(x.Key);
+            });
+            //save jobId in db and then check?
+
+            //add new to queue
+            var jobId = BackgroundJob.Enqueue(() => UpdateSensorsData());
         }
 
         // seed icb sensors and check for new ones
@@ -36,11 +63,11 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                 //add inexisting icb sample sensor to db
                 //var addedSensorsData = await icbSensorsService.AddSensorsAsync();
 
-                // 
                 await icbSensorsService.AddSensorsAsync();
             }
         }
 
+        [Queue("sensordata")]
         //[DisableConcurrentExecution(timeoutInSeconds: 10 * 60)]
         public async Task UpdateSensorsData()
         {
@@ -49,60 +76,63 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                 var icbApi = scope.ServiceProvider.GetService<IIcbApiService>();
                 var sensorsService = scope.ServiceProvider.GetService<ISensorsService>();
                 var notificationService = scope.ServiceProvider.GetService<INotificationService>();
+                var dbContext = scope.ServiceProvider.GetService<SmartDormitoryContext>();
 
-                // get all registered sensors by users and then update them value if needed
-                var existingUserSensors = await sensorsService.GetAll();
-                var newDataCache = new Dictionary<string, ApiSensorValueDTO>();
+                var userSensorsForUpdate = await dbContext
+                        .Sensors
+                        .Where(s => DateTime.Now.Subtract(s.LastUpdateOn).TotalSeconds >= s.PollingInterval)
+                        .ToListAsync();
+
+                                                 // icbSensorId   
+                var liveDataCache = new Dictionary<string, ApiSensorValueDTO>();
                 var sensorsToUpdate = new List<Sensor>();
                 var alarmsActivatedSensors = new List<Sensor>();
 
-                foreach (var userSensor in existingUserSensors)
+                foreach (var userSensor in userSensorsForUpdate)
                 {
                     // caching all 13? api sensors data for current BackgroundJob
-                    if (!newDataCache.ContainsKey(userSensor.IcbSensorId))
+                    if (!liveDataCache.ContainsKey(userSensor.IcbSensorId))
                     {
                         var newApiData = await icbApi
                                                   .GetIcbSensorValueById(userSensor.IcbSensorId);
 
-                        newDataCache[userSensor.IcbSensorId] = newApiData;
+                        liveDataCache[userSensor.IcbSensorId] = newApiData;
                     }
 
-                    var newData = newDataCache[userSensor.IcbSensorId];
+                    var liveSensorData = liveDataCache[userSensor.IcbSensorId];
 
-                    var passedTime = DateTime.Now.Subtract(userSensor.LastUpdateOn);
+                    float newValue = ApiDataHelper.GetLastValue(liveSensorData.LastValue);
 
-                    if (passedTime.TotalSeconds >= userSensor.PollingInterval)
+                    userSensor.CurrentValue = newValue;
+                    userSensor.LastUpdateOn = liveSensorData.TimeStamp;
+
+                    // populate list of sensors which data should be updated
+                    sensorsToUpdate.Add(userSensor);
+
+                    if (userSensor.AlarmOn &&
+                            (newValue <= userSensor.MinRangeValue ||
+                             newValue >= userSensor.MaxRangeValue))
                     {
-                        float newValue = ApiDataExtractorHelper
-                                                     .GetLastValue(newData.LastValue);
-                        userSensor.CurrentValue = newValue;
-                        userSensor.LastUpdateOn = newData.TimeStamp;
-
-                        // populate list of sensors which data should be updated
-                        sensorsToUpdate.Add(userSensor);
-
-                        if (userSensor.AlarmOn &&
-                                (newValue <= userSensor.MinRangeValue ||
-                                 newValue >= userSensor.MaxRangeValue))
-                        {
-                            // populate list of sensors with activated alarms
-                            alarmsActivatedSensors.Add(userSensor);
-                        }
-                        // SaveChanges at once
+                        // populate list of sensors with activated alarms
+                        alarmsActivatedSensors.Add(userSensor);
                     }
+
                 }
 
                 //create and send alarm notifications
-                await notificationService.BulkAddRange(alarmsActivatedSensors);
+                await notificationService.CreateAlarmNotifications(alarmsActivatedSensors);
 
                 //update all user sensors data at once
-                await sensorsService.UpdateRange(sensorsToUpdate);
-                //this.Context.SavechagenesAsync();  --- save everything at once
+                //await sensorsService.UpdateRange(sensorsToUpdate);
 
+                //--- save everything at once
+                dbContext.UpdateRange(sensorsToUpdate);
+                await dbContext.SaveChangesAsync();
+
+                //await Task.Delay(TimeSpan.FromSeconds(5));
                 BackgroundJob.Schedule(() => UpdateSensorsData(), TimeSpan.FromSeconds(5));
+                //BackgroundJob.Enqueue(() => StartingJobsQueue());
             }
         }
-
-
     }
 }

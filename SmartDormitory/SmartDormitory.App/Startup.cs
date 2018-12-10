@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
 using SmartDormitory.App.Infrastructure.Extensions;
+using SmartDormitory.App.Infrastructure.Filters;
 using SmartDormitory.App.Infrastructure.Hangfire;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
@@ -38,9 +39,8 @@ namespace SmartDormitory.App
             this.RegisterInfrastructure(services);
 
             // IMPORTANT
-            // Comment this lines if dropped db and update-database
+            // Comment this line if dropped db and update-database       
             this.RegisterHangfireDbTables(services);
-            this.ActivatingHangfireJobs(services);
         }
 
         //todo use later?
@@ -58,7 +58,7 @@ namespace SmartDormitory.App
 
         private void RegisterHangfireDbTables(IServiceCollection services)
         {
-            var connectionString = System.Environment
+            var connectionString = Environment
                                             .GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
 
             GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
@@ -154,7 +154,7 @@ namespace SmartDormitory.App
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-       
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -162,15 +162,30 @@ namespace SmartDormitory.App
             app.UseAuthentication();
             app.SeedAdminAccount();
 
-            //hangfire
             var hangfireServerOptions = new BackgroundJobServerOptions
             {
-                SchedulePollingInterval = TimeSpan.FromSeconds(1)
+                SchedulePollingInterval = TimeSpan.FromSeconds(5),
+                Queues = new[] { "sensordata", "default" }
             };
 
-            app.UseHangfireDashboard();
+            //TODO add app extension method
+            var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetService<SmartDormitoryContext>();
+            context.Database.Migrate();
+
+            //make dashboard visible only for Admins
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireAuthorizeFilter() } 
+            });
             app.UseHangfireServer(hangfireServerOptions);
 
+            RecurringJob.AddOrUpdate<IIcbSensorsService>(job => job.AddSensorsAsync(), Cron.Hourly());
+            //IMPORTANT
+            //comment after 1st start in dev or u will have +1 of the same job
+            var jobId = BackgroundJob.Enqueue<IHangfireJobsScheduler>(s => s.UpdateSensorsData());
+            //BackgroundJob.Enqueue<IHangfireJobsScheduler>(s => s.StartingJobsQueue());
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -183,12 +198,12 @@ namespace SmartDormitory.App
             });
         }
 
-        private void ActivatingHangfireJobs(IServiceCollection services)
-        {
-            var sp = services.BuildServiceProvider();
-            var hangFireServices = sp.GetService<IHangfireJobsScheduler>();
+        //private void ActivatingHangfireJobs(IServiceCollection services)
+        //{
+        //    var sp = services.BuildServiceProvider();
+        //    var hangFireServices = sp.GetService<IHangfireJobsScheduler>();
 
-            hangFireServices.StartingJobsQueue();
-        }
+        //    hangFireServices.StartingJobsQueue();
+        //}
     }
 }

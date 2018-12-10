@@ -185,9 +185,12 @@ namespace SmartDormitory.Data.Migrations
                     DeletedOn = table.Column<DateTime>(nullable: true),
                     CreatedOn = table.Column<DateTime>(nullable: true),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
+                    Title = table.Column<string>(nullable: true),
                     Message = table.Column<string>(nullable: true),
                     ReceiverId = table.Column<string>(nullable: true),
-                    Seen = table.Column<bool>(nullable: false)
+                    Seen = table.Column<bool>(nullable: false),
+                    SensorId = table.Column<string>(nullable: true),
+                    AlarmValue = table.Column<float>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -273,11 +276,11 @@ namespace SmartDormitory.Data.Migrations
                 columns: new[] { "Id", "CreatedOn", "DeletedOn", "IsDeleted", "MeasureUnit", "ModifiedOn", "SuitableSensorType" },
                 values: new object[,]
                 {
-                    { "50aea4f6-31a6-4727-9ff6-1590b1577e50", new DateTime(2018, 12, 9, 13, 30, 24, 78, DateTimeKind.Local).AddTicks(3398), null, false, "°C", null, "Temperature" },
-                    { "8a06a1ff-a97f-4a29-9a64-71fb7261c0be", new DateTime(2018, 12, 9, 13, 30, 24, 80, DateTimeKind.Local).AddTicks(8923), null, false, "%", null, "Humidity" },
-                    { "e2fdf77e-2973-4a1c-b49f-886de4681cbc", new DateTime(2018, 12, 9, 13, 30, 24, 80, DateTimeKind.Local).AddTicks(8951), null, false, "W", null, "Electric power consumtion" },
-                    { "ee6ff716-1670-4363-bc00-66a798e27631", new DateTime(2018, 12, 9, 13, 30, 24, 80, DateTimeKind.Local).AddTicks(8955), null, false, "(true/false)", null, "Boolean switch (door/occupancy/etc)" },
-                    { "b104b845-2dc4-469d-af4d-d8943b0b0282", new DateTime(2018, 12, 9, 13, 30, 24, 80, DateTimeKind.Local).AddTicks(8959), null, false, "dB", null, "Noise" }
+                    { "591570a9-eb3a-46af-9356-a01a676db093", new DateTime(2018, 12, 9, 17, 31, 21, 522, DateTimeKind.Local).AddTicks(8846), null, false, "°C", null, "Temperature" },
+                    { "44f7e7be-85aa-4aa5-baf1-fb6ad8f75887", new DateTime(2018, 12, 9, 17, 31, 21, 524, DateTimeKind.Local).AddTicks(5660), null, false, "%", null, "Humidity" },
+                    { "88650c69-1855-4e84-9892-6ba28bbcf3cd", new DateTime(2018, 12, 9, 17, 31, 21, 524, DateTimeKind.Local).AddTicks(5680), null, false, "W", null, "Electric power consumtion" },
+                    { "6b87bbf1-48ba-4bda-bda5-e58f8d98e4eb", new DateTime(2018, 12, 9, 17, 31, 21, 524, DateTimeKind.Local).AddTicks(5687), null, false, "(true/false)", null, "Boolean switch (door/occupancy/etc)" },
+                    { "8038f35c-77b1-4db8-ba01-efa26a58691b", new DateTime(2018, 12, 9, 17, 31, 21, 524, DateTimeKind.Local).AddTicks(5691), null, false, "dB", null, "Noise" }
                 });
 
             migrationBuilder.CreateIndex(

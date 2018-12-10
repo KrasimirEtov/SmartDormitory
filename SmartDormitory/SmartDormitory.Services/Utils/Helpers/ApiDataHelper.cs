@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace SmartDormitory.Services.Utils.Helpers
 {
-    public static class ApiDataExtractorHelper
+    public static class ApiDataHelper
     {
         public static (int MinRange, int MaxRange) GetMinAndMaxRange(string description)
         {

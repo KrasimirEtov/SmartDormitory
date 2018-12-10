@@ -1,0 +1,33 @@
+﻿@model InboxViewComponentModel
+
+<li class="dropdown nav-item">
+    <p class="dropdown-toggle nav-link ml-5" data-toggle="dropdown">
+        <i class="far fa-envelope"></i>Notifications
+        <span class="badge badge-pill badge-primary">@Model.UnseenCount</span>
+    </p>
+    <ul class="dropdown-menu dropdown-menu-right dropdown-navbar">
+        <li class="nav-link text-info text-center">
+            <nav-item dropdown-item><span><small>Last 5 alarms</small></span></nav-item>
+            <div class="dropdown-divider"></div>
+        </li>
+        @foreach (var notification in Model.Notifications)
+        {
+            <li class="nav-link">
+                <nav-item dropdown-item>
+                    <a asp-area="" asp-controller="Notification" asp-action="Inbox" @*asp-route-type="received" *@>
+                        <span>@notification.Title</span>
+                        <small class="text-danger">@notification.CreatedOn.ToShortDateString()</small>
+                    </a>
+                </nav-item>
+                <div class="dropdown-divider"></div>
+            </li>
+
+        }
+        <li class="nav-link">
+            <a asp-area="" asp-controller="Notification" asp-action="Inbox" @*asp-route-type="received" *@>
+                <span class="badge badge-warning badge-pill"> ...View all</span>
+            </a>
+        </li>
+
+    </ul>
+</li>

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace SmartDormitory.App.Areas.Administration.Controllers
 {
 	[Area("Administration")]
-	[Authorize(Roles = "Administrator")]
+	[Authorize(Policy = "Admin")]
 	public class UserManagerController : Controller
 	{
 		private const int PageSize = 4;

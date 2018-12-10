@@ -1,0 +1,168 @@
+﻿@model CreateUpdateSensorViewModel
+
+@{
+    string alarmText = Model.AlarmOn ? "Alarm is on" : "Alarm is off";
+
+    string privacyText = Model.IsPublic ? "Sensor is public" : "Sensor is private";
+
+    string switchText = Model.SwitchOn ? "Door/Window is open" : "Door/Window is closed";
+
+}
+
+<form asp-area="Administration" asp-controller="Sensor" asp-action="Update" method="post">
+    <input asp-for="SensorId" hidden value="@Model.SensorId"/>
+    <input asp-for="IcbSensorId" hidden value="@Model.IcbSensorId"/>
+    <input asp-for="UserId" hidden value="@Model.UserId" />
+
+    <div class="form-row">
+        <div class="col-6">
+            <label asp-for="Name" class="control-label"><b>Name</b></label>
+            <input asp-for="Name" class="form-control" placeholder="Type a sensor name" value="@Model.Name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+            <br />
+            <label asp-for="Description" class="control-label"><b>Description</b></label>
+            <textarea asp-for="Description" class="form-control rounded-0" rows="3"
+                      placeholder="Type a description">@Model.Description</textarea>
+        </div>
+        @*<a href="~/Views/Sensor/_InputUpdateSensorPartial.cshtml">~/Views/Sensor/_InputUpdateSensorPartial.cshtml</a>*@
+        <div class="col-6">
+            <label asp-for="PollingInterval" class="control-label"><b>Custom polling interval (seconds)</b></label>
+            <input asp-for="PollingInterval" class="form-control"
+                   min="@Model.ApiPollingInterval"
+                   data-val-range="The field PollingInterval must be at least @Model.ApiPollingInterval"
+                   data-val-number="The field Polling Interval Value must be a number.">
+            <span asp-validation-for="PollingInterval" class="text-danger"></span>
+            <br />
+            <br />
+            <div class="form-row">
+                @if (!Model.IsSwitch)
+                {
+                    <div class="col-6">
+                        <label asp-for="MinRangeValue" class="control-label"><b>Minimum range value</b></label>
+                        <input asp-for="MinRangeValue" class="form-control" data-val="true"
+                               data-val-range-min="@Model.ApiMinRangeValue" data-val-range-max="@Model.ApiMaxRangeValue"
+                               data-val-range="The field Min Range Value must be between @Model.ApiMinRangeValue and @Model.ApiMaxRangeValue."
+                               data-val-number="The field Min Range Value must be a number."
+                               data-val-required="The MinRangeValue field is required." />
+
+                        <span asp-validation-for="MinRangeValue" class="text-danger"></span>
+                    </div>
+                    <br />
+
+                    <div class="col-6">
+                        <label asp-for="MaxRangeValue" class="control-label"><b>Maximum range value</b></label>
+                        <input asp-for="MaxRangeValue" class="form-control" data-val="true"
+                               data-val-range-min="@Model.ApiMinRangeValue" data-val-range-max="@Model.ApiMaxRangeValue"
+                               data-val-range="The field MinRangeValue must be between @Model.ApiMinRangeValue and @Model.ApiMaxRangeValue."
+                               data-val-number="The field Max Range Value must be a number."
+                               data-val-required="The MaxRangeValue field is required." />
+                        <span asp-validation-for="MaxRangeValue" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <div class="col">
+                        <label class="bs-switch">
+                            <input asp-for="SwitchOn" type="checkbox" class="custom-control-input" id="switchCheckbox" />
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="col">
+                        <h4 id="switchOnText">@switchText</h4>
+                    </div>
+
+                    <input asp-for="MinRangeValue" value="0" class="form-control" data-val="true" hidden
+                           data-val-range-min="0" data-val-range-max="0"
+                           data-val-range="The field must be 0."
+                           data-val-number="The field Min Range Value must be a number." />
+                    <input asp-for="MaxRangeValue" value="1" class="form-control" data-val="true" hidden
+                           data-val-range-min="1" data-val-range-max="1"
+                           data-val-range="The field must be 1."
+                           data-val-number="The field Min Range Value must be a number." />
+                    <input asp-for="IsSwitch" value="true" hidden />
+                }
+            </div>
+        </div>
+    </div>
+    <br />
+    @* MAP START *@
+    <div class="form-row">
+        <div class="col-6">
+            <div class="input-group mb-4">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="lat1">Latitude</span>
+                </div>
+                <input asp-for="Latitude" type="text" id="lat" class="form-control" aria-describedby="lat1"
+                       value="@Model.Latitude" readonly />
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group mb-4">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="lon1">Longitude</span>
+                </div>
+                <input asp-for="Longtitude" type="text" id="lon" class="form-control" aria-describedby="lon1"
+                       value="@Model.Longtitude" readonly />
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <button type="button" class="btn btn-light btn-block" data-toggle="modal" data-target="#mapsModal">
+            Choose coordinates
+        </button>
+    </div>
+
+    <div class="modal fade" id="mapsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body mb-0 p-0">
+                    <div class="row">
+                        <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+                    </div>
+                    <div id="mapModal"></div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button"
+                            class="btn btn-light" data-dismiss="modal">
+                        Close <i class="fa fa-times ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* MAP END *@
+    <br />
+    <div class="form-row">
+        <div class="col">
+            <label class="bs-switch">
+                <input asp-for="AlarmOn" type="checkbox"
+                       class="custom-control-input" id="alarmCheckbox" />
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="col">
+            <h4 id="alarmSwitchText">@alarmText</h4>
+        </div>
+        <div class="col">
+            <label class="bs-switch">
+                <input asp-for="IsPublic" type="checkbox"
+                       class="custom-control-input" id="privacyCheckbox" />
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="col">
+            <h4 id="privacySwitchText">@privacyText</h4>
+
+        </div>
+    </div>
+    <div class="form-row">
+        <button class="btn btn-outline-secondary waves-effect my-sm-0 btn-block" type="submit"><b>Update</b></button>
+    </div>
+</form>
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&libraries=places&callback=initMap"
+        async defer></script>
+<script src="~/js/mapsModal.js"></script>
+<script src="~/js/registerSensor.js"></script>

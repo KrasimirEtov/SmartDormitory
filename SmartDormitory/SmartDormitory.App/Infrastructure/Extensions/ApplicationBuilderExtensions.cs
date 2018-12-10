@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
+using SmartDormitory.App.Infrastructure.Middleware;
 using SmartDormitory.Data.Models;
 using System.Threading.Tasks;
 
@@ -49,6 +50,11 @@ namespace SmartDormitory.App.Infrastructure.Extensions
 				 .Wait();
 			}
 			return app;
+		}
+
+		public static void UseWrongRouteHandler(this IApplicationBuilder builder)
+		{
+			builder.UseMiddleware<WrongRouteMiddleware>();
 		}
 	}
 }

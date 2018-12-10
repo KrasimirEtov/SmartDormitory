@@ -9,12 +9,13 @@
 <table class="table table-hover table-striped" width="100">
     <thead class="thead-dark">
         <tr>
-            <th class="h5">Sensor name</th>
-            <th class="h5">Owner</th>
-            <th class="h5">Sensor type</th>
-            <th class="h5">Privacy</th>
-            <th class="h5">Alarm</th>
-            <th class="h5">Actions</th>
+            <th class="h5 text-center">Sensor name</th>
+            <th class="h5 text-center">Owner</th>
+            <th class="h5 text-center">Sensor type</th>
+            <th class="h5 text-center">Privacy</th>
+            <th class="h5 text-center">Alarm</th>
+            <th class="h5 text-center">State</th>
+            <th class="h5 text-center">Details</th>
         </tr>
     </thead>
     <tbody class="bg-white">
@@ -38,10 +39,10 @@
                         @sensor.OwnerUsername
                     </a>
                 </td>
-                <td class="text-danger">@sensor.SensorType</td>
-                <td class="h4 @privacyColor"><i class="@privacyIcon"></i></td>
-                <td class="h4 @alarmColor"><i class="@alarmIcon"></i></td>
-                <td>
+                <td class="text-danger text-center">@sensor.SensorType</td>
+                <td class="h4 @privacyColor text-center"><i class="@privacyIcon"></i></td>
+                <td class="h4 @alarmColor text-center"><i class="@alarmIcon"></i></td>
+                <td class="text-center">
                     @{
                         string buttonClass = !sensor.IsDeleted ? "btn-danger" : "btn-dark-green";
                         string buttonTitle = sensor.IsDeleted ? "Restore" : "Delete";
@@ -49,10 +50,17 @@
                     }
                     <form asp-area="Administration" asp-controller="Sensor"
                           asp-action="ToggleDelete" method="post" data-sensor-id="@sensor.Id">
-                        <button class="deleteToggleButton d-inline p-2 btn btn waves-effect @buttonClass" type="submit">
-                            <i class="icon @glyph"></i> @*@buttonTitle*@
+                        <button class="deleteToggleButton btn btn waves-effect @buttonClass" type="submit">
+                            <i class="icon @glyph"></i>
                         </button>
                     </form>
+                </td>
+                <td class="text-center">
+                    <a asp-area="Administration" asp-controller="Sensor"
+                       asp-action="Update" asp-route-sensorId="@sensor.Id"
+                       class=" btn btn-secondary waves-effect">
+                        <i class="far fa-edit"></i>
+                    </a>
                 </td>
             </tr>
 
@@ -133,7 +141,7 @@
                 $(this).removeClass(restoreBtn).addClass(deleteBtn);
                 $(this).html(deleteBtnText);
             }
-        });            
+        });
     });
 
 </script>

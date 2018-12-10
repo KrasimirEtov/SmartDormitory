@@ -33,7 +33,7 @@ namespace SmartDormitory.App
         {
             this.RegisterData(services);
             this.RegisterAuthentication(services);
-            //this.RegisterAuthorizations(services);
+            this.RegisterAuthorizations(services);
             this.RegisterServices(services);
             this.RegisterInfrastructure(services);
 
@@ -153,11 +153,13 @@ namespace SmartDormitory.App
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
+				app.UseHsts(); // TODO: What is this?
             }
        
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+			app.UseWrongRouteHandler();
+
+			app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseAuthentication();
@@ -174,7 +176,12 @@ namespace SmartDormitory.App
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
+				routes.MapRoute(
+					name: "notfound",
+					template: "404",
+					defaults: new { controller = "Error", action = "PageNotFound" });
+
+				routes.MapRoute(
                     name: "areas",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 

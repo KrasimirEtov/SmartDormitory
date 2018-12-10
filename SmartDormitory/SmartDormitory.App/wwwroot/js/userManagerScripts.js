@@ -3,7 +3,7 @@
     const isDisabledBtn = 'btn-dark-green';
 
     // Form START
-    $("form").on('submit', function (event) {
+    $("form[id!='logoutForm']").on('submit', function (event) {
         event.preventDefault();
         const tokenValue = $('input[name="__RequestVerificationToken"]').val();
         const userId = $(this).data('userId');

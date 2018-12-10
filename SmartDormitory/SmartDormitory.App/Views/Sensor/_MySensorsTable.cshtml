@@ -1,14 +1,14 @@
-﻿@model MySensorsPartialViewModel
+﻿@model List<MySensorListViewModel>
 
-@for (int i = 0; i < Model.Sensors.Count(); i += 3)
+@for (int i = 0; i < Model.Count(); i += 3)
 {
 
-    string privacyText = Model.Sensors[i].IsPublic ? "public" : "private";
+    string privacyText = Model[i].IsPublic ? "public" : "private";
 
     <div class="row">
         @{
             int rowLimit = i + 3;
-            for (int c = i; c < (Model.Sensors.Count() < rowLimit ? Model.Sensors.Count() : rowLimit); c++)
+            for (int c = i; c < (Model.Count() < rowLimit ? Model.Count() : rowLimit); c++)
             {
                 <div class="col-lg-4 col-md-4 col-sm-4">
                     <!-- Card -->
@@ -16,8 +16,8 @@
                         <!-- Card image -->
 
                         <div class="view overlay">
-                            <img class="card-img-top img-fluid" src="@Model.Sensors[c].ImagePath" alt="@Model.Sensors[c].Name">
-                            <a asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model.Sensors[c].Id">
+                            <img class="card-img-top img-fluid" src="@Model[c].ImagePath" alt="@Model[c].Name">
+                            <a asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model[c].Id">
                                 <div class="mask rgba-white-slight"></div>
                             </a>
                         </div>
@@ -26,14 +26,14 @@
                         <div class="card-body special-color-dark white-text rounded-bottom m-mb-4">
 
                             <!-- Title -->
-                            <h4 class="card-title text-info text-center">@Model.Sensors[c].Name</h4>
+                            <h4 class="card-title text-info text-center">@Model[c].Name</h4>
                             <!-- Text -->
-                            <p class="card-text text-warning text-center">(@Model.Sensors[c].SensorType)</p>
-                            <p class="card-text text-white">Refresh rate: @Model.Sensors[c].PollingInterval <small>seconds</small></p>
+                            <p class="card-text text-warning text-center">(@Model[c].SensorType)</p>
+                            <p class="card-text text-white">Refresh rate: @Model[c].PollingInterval <small>seconds</small></p>
                             <p class="card-text text-white">Sensor is: @privacyText</p>
-                            <p class="card-text text-white">Current value: @Model.Sensors[c].Value</p>
+                            <p class="card-text text-white">Current value: @Model[c].Value</p>
                         </div>
-                        <a asp-area="" asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model.Sensors[c].Id"
+                        <a asp-area="" asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@Model[c].Id"
                            class="card-footer special-color-dark border-white text-center">
                             <span class="pull-left text-white">Details</span>
                             <span class="pull-right text-white"><i class="fa fa-arrow-circle-right"></i></span>

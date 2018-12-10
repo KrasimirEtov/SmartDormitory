@@ -48,7 +48,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ToggleDelete(string sensorId)
+        public async Task<IActionResult> ToggleDelete([FromForm]string sensorId)
         {
             try
             {

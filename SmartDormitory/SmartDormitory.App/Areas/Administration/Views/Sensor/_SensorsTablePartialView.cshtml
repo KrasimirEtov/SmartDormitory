@@ -47,7 +47,7 @@
                         string buttonTitle = sensor.IsDeleted ? "Restore" : "Delete";
                         string glyph = sensor.IsDeleted ? "fas fa-redo" : "far fa-trash-alt";
                     }
-                    <form asp-area="Administration" asp-controller="Sensor" class="toggleDeleteForm"
+                    <form asp-area="Administration" asp-controller="Sensor"
                           asp-action="ToggleDelete" method="post" data-sensor-id="@sensor.Id">
                         <button class="deleteToggleButton d-inline p-2 btn btn waves-effect @buttonClass" type="submit">
                             <i class="icon @glyph"></i> @*@buttonTitle*@
@@ -109,6 +109,15 @@
         movePage("#nextPage", @Model.NextPage);
         movePage("#prevPage", @Model.PreviousPage);
 
+        $("form[id!='logoutForm']").on('submit', function (event) {
+            event.preventDefault();
+            const tokenValue = $('input[name="__RequestVerificationToken"]').val();
+            const sensorId = $(this).data('sensorId');
+
+            $.post($(this).attr('action'), { sensorId: sensorId, __RequestVerificationToken: tokenValue }, function () {
+            });
+        });
+
         $('button.deleteToggleButton').click(function () {
 
             const deleteBtn = 'btn-danger';
@@ -124,17 +133,7 @@
                 $(this).removeClass(restoreBtn).addClass(deleteBtn);
                 $(this).html(deleteBtnText);
             }
-        });     
-
-        const $toggleDeleteForm = $('.toggleDeleteForm');
-        $toggleDeleteForm.on('submit', function (event) {
-            event.preventDefault();
-            const data = $toggleDeleteForm.serialize();
-            const sensorId = $(this).data('sensorId');
-            const url = $toggleDeleteForm.attr('action') + '?sensorId=' + sensorId;
-            $.post(url, { __RequestVerificationToken: data.__RequestVerificationToken }, function () {
-            });
-        });
+        });            
     });
 
 </script>

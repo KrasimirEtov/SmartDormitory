@@ -40,10 +40,7 @@ namespace SmartDormitory.App.Controllers
 			{
 				MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
 
-				MySensorsPartialViewModel = new MySensorsPartialViewModel
-				{
-					Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList()
-				}
+				Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList()
 			};
 			return View(model);
 		}
@@ -56,16 +53,13 @@ namespace SmartDormitory.App.Controllers
 			{
 				var userId = this.User.GetId();
 
-				var model = new MySensorsPartialViewModel
-				{
-					Sensors = (await this.sensorsService
+				var sensors = (await this.sensorsService
 										 .GetUserSensors(userId, searchTerm, measureTypeId,
 																alarmOn, privacy))
 										.Select(s => new MySensorListViewModel(s))
-										.ToList()
-				};
+										.ToList();
 
-				return PartialView("_MySensorsTable", model);
+				return PartialView("_MySensorsTable", sensors);
 			}
 			catch (EntityDoesntExistException e)
 			{

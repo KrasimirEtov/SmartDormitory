@@ -27,16 +27,16 @@
         <label class="text-center text-black-50">Privacy</label>
         <select asp-for="@Model.Privacy" class="form-control text-warning text-monospace">
             <option value="-1" class="grey_color">-- All --</option>
-            <option value="0">Public</option>
-            <option value="1">Private</option>
+            <option value="1">Public</option>
+            <option value="0">Private</option>
         </select>
     </div>
     <div class="col-lg-2 form-group">
         <label class="text-center text-black-50">Notifications</label>
         <select asp-for="@Model.AlarmOn" class="form-control text-warning text-monospace">
             <option value="-1" class="grey_color">-- All --</option>
-            <option value="0">Active</option>
-            <option value="1">Inactive</option>
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
         </select>
     </div>
     @*TODO: add sort by creation day or alarms history count*@

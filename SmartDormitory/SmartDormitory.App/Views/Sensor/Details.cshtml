@@ -147,9 +147,9 @@
                 textRenderer: function (val) {
 
                     if (val < @Model.MinRangeValue) {
-                        return 'Min range limit';
+                        return 'Alarm! ' + val;
                     } else if (val > @Model.MaxRangeValue) {
-                        return 'Max range limit';
+                        return 'Alarm! ' + val;
                     } else if (val > @Model.MinRangeValue && val < @Model.MaxRangeValue) {
                         return val;
                     }

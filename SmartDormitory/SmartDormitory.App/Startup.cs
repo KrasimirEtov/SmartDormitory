@@ -181,8 +181,6 @@ namespace SmartDormitory.App
 
             RecurringJob.AddOrUpdate<IIcbSensorsService>(job => job.AddSensorsAsync(), Cron.Hourly());
             RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(j => j.Magic(), Cron.Minutely());
-            //IMPORTANT
-            //comment after 1st start in dev or u will have +1 of the same job
 
             //ar jobId = BackgroundJob.Enqueue<IHangfireJobsScheduler>(s => s.UpdateSensorsData());
             //BackgroundJob.Enqueue<IHangfireJobsScheduler>(s => s.StartingJobsQueue());

@@ -164,8 +164,7 @@ namespace SmartDormitory.App
 
             var hangfireServerOptions = new BackgroundJobServerOptions
             {
-                SchedulePollingInterval = TimeSpan.FromSeconds(5),
-                Queues = new[] { "sensordata", "default" }
+                SchedulePollingInterval = TimeSpan.FromSeconds(5)               
             };
 
             //TODO add app extension method
@@ -176,16 +175,18 @@ namespace SmartDormitory.App
             //make dashboard visible only for Admins
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                Authorization = new[] { new HangfireAuthorizeFilter() } 
+                Authorization = new[] { new HangfireAuthorizeFilter() }
             });
             app.UseHangfireServer(hangfireServerOptions);
 
             RecurringJob.AddOrUpdate<IIcbSensorsService>(job => job.AddSensorsAsync(), Cron.Hourly());
+            RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(j => j.Magic(), Cron.Minutely());
             //IMPORTANT
             //comment after 1st start in dev or u will have +1 of the same job
-            var jobId = BackgroundJob.Enqueue<IHangfireJobsScheduler>(s => s.UpdateSensorsData());
+
+            //ar jobId = BackgroundJob.Enqueue<IHangfireJobsScheduler>(s => s.UpdateSensorsData());
             //BackgroundJob.Enqueue<IHangfireJobsScheduler>(s => s.StartingJobsQueue());
-            
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

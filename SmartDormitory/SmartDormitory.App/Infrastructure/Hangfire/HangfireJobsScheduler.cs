@@ -22,7 +22,6 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
             this.serviceProvider = serviceProvider;
         }
 
-        [Queue("sensordata")]
         public void StartingJobsQueue()
         {
             //RecurringJob.AddOrUpdate(() => this.UpdateIcbSensors(), Cron.Hourly());
@@ -67,8 +66,23 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
             }
         }
 
-        [Queue("sensordata")]
-        //[DisableConcurrentExecution(timeoutInSeconds: 10 * 60)]
+        public async Task Magic()
+        {
+            // hard 10 seconds interval
+            await this.UpdateSensorsData();
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            await this.UpdateSensorsData();
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            await this.UpdateSensorsData();
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            await this.UpdateSensorsData();
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            await this.UpdateSensorsData();
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            await this.UpdateSensorsData();
+        }
+
+        [DisableConcurrentExecution(timeoutInSeconds: 10 * 60)]
         public async Task UpdateSensorsData()
         {
             using (var scope = this.serviceProvider.CreateScope())
@@ -83,7 +97,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                         .Where(s => DateTime.Now.Subtract(s.LastUpdateOn).TotalSeconds >= s.PollingInterval)
                         .ToListAsync();
 
-                                                 // icbSensorId   
+                // icbSensorId   
                 var liveDataCache = new Dictionary<string, ApiSensorValueDTO>();
                 var sensorsToUpdate = new List<Sensor>();
                 var alarmsActivatedSensors = new List<Sensor>();
@@ -130,7 +144,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                 await dbContext.SaveChangesAsync();
 
                 //await Task.Delay(TimeSpan.FromSeconds(5));
-                BackgroundJob.Schedule(() => UpdateSensorsData(), TimeSpan.FromSeconds(5));
+                //BackgroundJob.Schedule(() => UpdateSensorsData(), TimeSpan.FromSeconds(5));
                 //BackgroundJob.Enqueue(() => StartingJobsQueue());
             }
         }

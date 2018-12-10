@@ -6,5 +6,6 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
     {
         void StartingJobsQueue();
         Task UpdateSensorsData();
+        Task Magic();
     }
 }

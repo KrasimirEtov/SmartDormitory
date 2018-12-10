@@ -19,6 +19,7 @@ namespace SmartDormitory.App.Controllers
         public async Task<IActionResult> Inbox()
         {
             var userId = this.User.GetId();
+
             var allNotifications = await this.notificationService.GetAllByUserId(userId);
 
             return View(allNotifications);

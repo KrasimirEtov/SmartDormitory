@@ -121,7 +121,7 @@
             });
 
             setInterval(function () {
-                $.getJSON('/Sensor/GetGaudeData?sensorId=@Model.SensorId', function (data) {
+                $.getJSON('/Sensor/GetGaugeData?sensorId=@Model.SensorId', function (data) {
                     isSwitchGauge.refresh(data.userCurrentValue);
                 }, @Model.PollingInterval * 1000);
             });
@@ -165,7 +165,7 @@
             });
 
             setInterval(function () {
-                $.getJSON('/Sensor/GetGaudeData?sensorId=@Model.SensorId', function (data) {
+                $.getJSON('/Sensor/GetGaugeData?sensorId=@Model.SensorId', function (data) {
                     isNotSwitchGauge.refresh(data.userCurrentValue);
                 });
             }, @Model.PollingInterval * 1000);

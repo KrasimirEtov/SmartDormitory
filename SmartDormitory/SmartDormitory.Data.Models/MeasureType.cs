@@ -7,7 +7,6 @@ namespace SmartDormitory.Data.Models
     {
         public string MeasureUnit { get; set; }
 
-        // description for ui: "Temperature", "Noise"... etc
         public string SuitableSensorType { get; set; }
 
         public ICollection<IcbSensor> IcbSensors { get; set; } = new HashSet<IcbSensor>();

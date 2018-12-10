@@ -4,6 +4,8 @@ using SmartDormitory.Data.Models;
 using SmartDormitory.Data.Models.Contracts;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Data
 {
@@ -24,10 +26,11 @@ namespace SmartDormitory.App.Data
 
         public DbSet<MeasureType> MeasureTypes { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             this.SetupEntitiesRelations(builder);
-            this.SeedMeasureTypes(builder);
 
             base.OnModelCreating(builder);
         }
@@ -38,6 +41,11 @@ namespace SmartDormitory.App.Data
                 .HasMany(u => u.Sensors)
                 .WithOne(s => s.User)
                 .HasForeignKey(u => u.UserId);
+
+            builder.Entity<User>()
+                .HasMany(u => u.Notifications)
+                .WithOne(n => n.Receiver)
+                .HasForeignKey(n => n.ReceiverId);
 
             builder.Entity<IcbSensor>()
                 .HasMany(x => x.Sensors)
@@ -58,51 +66,31 @@ namespace SmartDormitory.App.Data
                             });
         }
 
-        private void SeedMeasureTypes(ModelBuilder builder)
-        {
-            builder.Entity<MeasureType>()
-                   .HasData(
-                            new MeasureType
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                MeasureUnit = "°C",
-                                SuitableSensorType = "Temperature",
-                                CreatedOn = DateTime.Now
-                            },
-                           new MeasureType
-                           {
-                               Id = Guid.NewGuid().ToString(),
-                               MeasureUnit = "%",
-                               SuitableSensorType = "Humidity",
-                               CreatedOn = DateTime.Now
-                           },
-                           new MeasureType
-                           {
-                               Id = Guid.NewGuid().ToString(),
-                               MeasureUnit = "W",
-                               SuitableSensorType = "Electric power consumtion",
-                               CreatedOn = DateTime.Now
-                           },
-                           new MeasureType
-                           {
-                               Id = Guid.NewGuid().ToString(),
-                               MeasureUnit = "(true/false)",
-                               SuitableSensorType = "Boolean switch (door/occupancy/etc)",
-                               CreatedOn = DateTime.Now
-                           },
-                           new MeasureType
-                           {
-                               Id = Guid.NewGuid().ToString(),
-                               MeasureUnit = "dB",
-                               SuitableSensorType = "Noise",
-                               CreatedOn = DateTime.Now
-                           });
-        }
-
         public override int SaveChanges()
         {
             this.ApplyAuditInfoRules();
             return base.SaveChanges();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            this.ApplyAuditInfoRules();
+            this.ApplyDeletionRules();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void ApplyDeletionRules()
+        {
+            var entitiesForDeletion = this.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted && e.Entity is IDeletable);
+
+            foreach (var entry in entitiesForDeletion)
+            {
+                var entity = (IDeletable)entry.Entity;
+                entity.DeletedOn = DateTime.Now;
+                entity.IsDeleted = true;
+                entry.State = EntityState.Modified;
+            }
         }
 
         private void ApplyAuditInfoRules()

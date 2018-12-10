@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using static SmartDormitory.Data.Models.Utils.Constants.DomainConstants;
+using static SmartDormitory.Data.Models.Utils.Constants;
 
 namespace SmartDormitory.Data.Models
 {
@@ -21,17 +21,12 @@ namespace SmartDormitory.Data.Models
         public string Description { get; set; }
 
         [Required]
-        [Range(0, int.MaxValue, ErrorMessage = PollingIntervalMessage)]
+        [Range(0, int.MaxValue, ErrorMessage = DomainConstants.PollingIntervalMessage)]
         public int PollingInterval { get; set; }
 
         public MeasureType MeasureType { get; set; }
         public string MeasureTypeId { get; set; }
 
         public ICollection<Sensor> Sensors { get; set; } = new HashSet<Sensor>();
-
-        [DataType(DataType.DateTime)]
-        public DateTime LastUpdateOn { get; set; }
-
-        public float CurrentValue { get; set; }
     }
 }

@@ -10,8 +10,8 @@
 }
 
 <form asp-area="" asp-controller="Sensor" asp-action="Update" method="post">
-    <input asp-for="SensorId" hidden value="@Model.SensorId"/>
-    <input asp-for="IcbSensorId" hidden value="@Model.IcbSensorId"/>
+    <input asp-for="SensorId" hidden value="@Model.SensorId" />
+    <input asp-for="IcbSensorId" hidden value="@Model.IcbSensorId" />
     <input asp-for="UserId" hidden value="@Model.UserId" />
 
     <div class="form-row">
@@ -23,6 +23,7 @@
             <label asp-for="Description" class="control-label"><b>Description</b></label>
             <textarea asp-for="Description" class="form-control rounded-0" rows="3"
                       placeholder="Type a description">@Model.Description</textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         @*<a href="~/Views/Sensor/_InputUpdateSensorPartial.cshtml">~/Views/Sensor/_InputUpdateSensorPartial.cshtml</a>*@
         <div class="col-6">

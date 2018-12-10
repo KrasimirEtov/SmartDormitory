@@ -4,10 +4,10 @@ using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Models.IcbSensors;
+using SmartDormitory.Services.Utils.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Services
@@ -28,6 +28,7 @@ namespace SmartDormitory.Services
         // return newly created icb sensors Guid Ids and PollingInterval so we can add new RecurringJob for each of them
         public async Task<IEnumerable<(string Id, int PollingInterval)>> AddSensorsAsync()
         {
+            // todo dont return them later
             var createdSensorsJobData = new List<(string Id, int PollingInterval)>();
             var icbSensors = await this.icbApiService.GetAllIcbSensors();
 
@@ -47,7 +48,8 @@ namespace SmartDormitory.Services
 
                     if (measureType != null)
                     {
-                        var (MinRange, MaxRange) = ExtractMinAndMaxRange(icbSensor.Description);
+                        var (MinRange, MaxRange) = ApiDataHelper
+                                                        .GetMinAndMaxRange(icbSensor.Description);
 
                         var icbSensorToAdd = new IcbSensor
                         {
@@ -102,26 +104,25 @@ namespace SmartDormitory.Services
                               .ToListAsync();
         }
 
-        public async Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measureUnit)
-        {
-            var icbSensor = await this.Context
-                                      .IcbSensors
-                                      .Include(s => s.MeasureType)
-                                      .FirstOrDefaultAsync(s => s.Id == id);
+        //public async Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measureUnit)
+        //{
+        //    var icbSensor = await this.Context
+        //                              .IcbSensors
+        //                              .Include(s => s.MeasureType)
+        //                              .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (icbSensor != null)
-            {
-                if (icbSensor.MeasureType.MeasureUnit == measureUnit)
-                {
-                    icbSensor.ModifiedOn = timeStamp;
-                    icbSensor.LastUpdateOn = timeStamp;
-                    icbSensor.CurrentValue = this.ExtractLastValue(lastValue);
+        //    if (icbSensor != null)
+        //    {
+        //        if (icbSensor.MeasureType.MeasureUnit == measureUnit)
+        //        {
+        //            icbSensor.LastUpdateOn = timeStamp;
+        //            icbSensor.CurrentValue = ApiDataExtractorHelper.GetLastValue(lastValue);
 
-                    await this.Context.SaveChangesAsync();
-                }
-            }
-            // return sensor?
-        }
+        //            await this.Context.SaveChangesAsync();
+        //        }
+        //    }
+        //    // return sensor?
+        //}
 
         public async Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId)
         {
@@ -138,33 +139,6 @@ namespace SmartDormitory.Services
                 .FirstOrDefaultAsync();
 
             return sensor;
-        }
-
-        private float ExtractLastValue(string lastValue)
-        {
-            bool isParsable = float.TryParse(lastValue, out float value);
-
-            if (!isParsable)
-            {
-                return lastValue.Equals("true") ? 1 : lastValue.Equals("false") ? 0 : throw new InvalidOperationException("Invalid last value response");
-            }
-
-            return value;
-        }
-
-        private (int MinRange, int MaxRange) ExtractMinAndMaxRange(string description)
-        {
-            if (description.Any(char.IsDigit))
-            {
-                var numbers = Regex.Matches(description, @"\d+");
-
-                int minRange = int.Parse(numbers[0].Value);
-                int maxRange = int.Parse(numbers[1].Value);
-
-                return (MinRange: minRange, MaxRange: maxRange);
-            }
-            //              false    true
-            return (MinRange: 0, MaxRange: 1);
         }
     }
 }

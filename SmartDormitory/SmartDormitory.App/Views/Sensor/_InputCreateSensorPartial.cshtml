@@ -21,6 +21,7 @@
             <br />
             <label asp-for="Description" class="control-label"><b>Description</b></label>
             <textarea asp-for="Description" class="form-control rounded-0" rows="3" placeholder="Type a description"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="col-6">

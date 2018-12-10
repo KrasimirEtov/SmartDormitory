@@ -21,6 +21,7 @@ namespace SmartDormitory.App.Controllers
 
         public IActionResult Index()
         {
+
             // seed some fake sensonrs
             //this.sensorsService.SeedSomeSensorsForMaps();
             //var sensorsCoordinates = await this.sensorsService.GetAllPublicSensorsCoordinates();
@@ -31,15 +32,14 @@ namespace SmartDormitory.App.Controllers
         [HttpGet]
         public async Task<JsonResult> GetSensorsCoordinates()
         {
-
-			// seed some fake sensonrs
-			//this.sensorsService.SeedSomeSensorsForMaps();
 			if (User.Identity.IsAuthenticated)
 			{
-				var userSensorCoordinates = await sensorsService.GetAllUserSensorCoordinates(User.GetId());
+				var userSensorCoordinates = await sensorsService
+                                                    .GetAllUserSensorCoordinates(User.GetId());
 				var sensorsCoordinates = await this.sensorsService.GetAllPublicSensorsCoordinates();
-				userSensorCoordinates.Add(sensorsCoordinates.Select(sc => sc).FirstOrDefault());
-				return this.Json(userSensorCoordinates.Distinct());
+
+				userSensorCoordinates.ToList().AddRange(sensorsCoordinates);
+				return this.Json(userSensorCoordinates);
 			}
 			else
 			{

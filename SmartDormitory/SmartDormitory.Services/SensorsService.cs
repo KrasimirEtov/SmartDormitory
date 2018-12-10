@@ -24,25 +24,10 @@ namespace SmartDormitory.Services
             this.measureTypeService = measureTypeService;
         }
 
-        // for test purposes google map
-        public void SeedSomeSensorsForMaps()
-        {
-            var sensor1 = new Sensor { Name = "Gerena sensors", Description = "suhata reka bla bla", Coordinates = new Coordinates { Latitude = 42.7034, Longitude = 23.36614 } };
-            var sensor2 = new Sensor { Name = "Telerik academy", Description = "steven temp sensor", Coordinates = new Coordinates { Latitude = 42.6522, Longitude = 23.37397 } };
-            var sensor3 = new Sensor { Name = "Letishte sofia", Description = "noise sensor terminal 1", Coordinates = new Coordinates { Latitude = 42.687333, Longitude = 23.405452 } };
-            var sensor4 = new Sensor { Name = "Borisova gr", Description = "some sensor test 123", Coordinates = new Coordinates { Latitude = 42.679320, Longitude = 23.339460 } };
-            this.Context.Sensors.Add(sensor1);
-            this.Context.Sensors.Add(sensor2);
-            this.Context.Sensors.Add(sensor3);
-            this.Context.Sensors.Add(sensor4);
-            this.Context.SaveChanges();
-        }
-
         public async Task<IEnumerable<MapSensorServiceModel>> GetAllPublicSensorsCoordinates()
-        {
-            return await this.Context
+        => await this.Context
                 .Sensors
-				.Where(s => s.IsPublic && !s.IsDeleted)
+                .Where(s => s.IsPublic && !s.IsDeleted)
                 .Select(s => new MapSensorServiceModel
                 {
                     Id = s.Id,
@@ -55,29 +40,25 @@ namespace SmartDormitory.Services
                     },
                 })
                 .ToListAsync();
-        }
 
-		public async Task<ICollection<MapSensorServiceModel>> GetAllUserSensorCoordinates(string userId)
-		{
-			var sensors = await this.Context
-				.Sensors
-				.Where(s => !s.IsDeleted && s.UserId == userId)
-				.Select(s => new MapSensorServiceModel
-				{
-					Id = s.Id,
-					Name = s.Name,
-					Description = s.Description,
-					Coordinates = new Coordinates
-					{
-						Latitude = s.Coordinates.Latitude,
-						Longitude = s.Coordinates.Longitude
-					},
-				})
-				.ToListAsync();
-			return sensors;
-		}
+        public async Task<IEnumerable<MapSensorServiceModel>> GetAllUserSensorCoordinates(string userId)
+            => await this.Context
+                         .Sensors
+                         .Where(s => !s.IsDeleted && s.UserId == userId && !s.IsPublic)
+                         .Select(s => new MapSensorServiceModel
+                         {
+                             Id = s.Id,
+                             Name = s.Name,
+                             Description = s.Description,
+                             Coordinates = new Coordinates
+                             {
+                                 Latitude = s.Coordinates.Latitude,
+                                 Longitude = s.Coordinates.Longitude
+                             },
+                         })
+                         .ToListAsync();
 
-		public async Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10)
+        public async Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10)
         {
             var sensors = this.Context.Sensors.AsQueryable();
 
@@ -125,16 +106,9 @@ namespace SmartDormitory.Services
                 throw new EntityDoesntExistException(nameof(Sensor).ToLower(), sensorId);
             }
 
-            if (sensor.IsDeleted == false)
-            {
-                sensor.IsDeleted = true;
-            }
-            else
-            {
-                sensor.IsDeleted = false;
-            }
+            sensor.IsDeleted = !sensor.IsDeleted ? true : false;
 
-			this.Context.Sensors.Update(sensor);
+            this.Context.Sensors.Update(sensor);
             await this.Context.SaveChangesAsync();
         }
 
@@ -142,47 +116,47 @@ namespace SmartDormitory.Services
             int pollingInterval, bool isPublic, bool alarmOn, float minRange,
             float maxRange, double longtitude, double latitude, bool switchOn)
         {
-			string returnSensorId = "";
+            string returnSensorId = "";
             if (await this.Context.IcbSensors.AnyAsync(s => s.Id == icbSensorId))
             {
-				var sensor = new Sensor()
-				{
-					MaxRangeValue = maxRange,
-					MinRangeValue = minRange,
-					AlarmOn = alarmOn,
-					Description = description,
-					Name = name,
-					UserId = userId,
-					IsPublic = isPublic,
-					PollingInterval = pollingInterval,
-					IcbSensorId = icbSensorId,
-					Coordinates = new Coordinates
-					{
-						Latitude = latitude,
-						Longitude = longtitude
-					},
-					CreatedOn = DateTime.Now,
-					SwitchOn = switchOn
+                var sensor = new Sensor()
+                {
+                    MaxRangeValue = maxRange,
+                    MinRangeValue = minRange,
+                    AlarmOn = alarmOn,
+                    Description = description,
+                    Name = name,
+                    UserId = userId,
+                    IsPublic = isPublic,
+                    PollingInterval = pollingInterval,
+                    IcbSensorId = icbSensorId,
+                    Coordinates = new Coordinates
+                    {
+                        Latitude = latitude,
+                        Longitude = longtitude
+                    },
+                    CreatedOn = DateTime.Now,
+                    SwitchOn = switchOn
                 };
                 await this.Context.Sensors.AddAsync(sensor);
                 await this.Context.SaveChangesAsync();
-				returnSensorId = sensor.Id;
+                returnSensorId = sensor.Id;
             }
-			return returnSensorId;
+            return returnSensorId;
         }
 
         public async Task<Sensor> GetSensorById(string sensorId)
         {
-            var sensor =  await this.Context.Sensors
-                .Where(s => s.Id == sensorId)
+            var sensor = await this.Context.Sensors
+                .Where(s => s.Id == sensorId && !s.IsDeleted)
                 .Include(icb => icb.IcbSensor)
                 .ThenInclude(mt => mt.MeasureType)
                 .FirstOrDefaultAsync();
-			if (sensor == null || sensor.IsDeleted)
-			{
-				throw new EntityDoesntExistException("Sensor is no present in database!");
-			}
-			return sensor;
+            if (sensor == null)
+            {
+                throw new EntityDoesntExistException("Sensor is no present in database!");
+            }
+            return sensor;
         }
 
         public async Task<int> TotalSensorsByCriteria(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1)
@@ -222,10 +196,10 @@ namespace SmartDormitory.Services
             }
 
             var sensors = this.Context.Sensors
-				.Where(s => s.UserId == userId && !s.IsDeleted)
-				.Include(s => s.IcbSensor)
-				.ThenInclude(mt => mt.MeasureType)
-				.AsQueryable();
+                .Where(s => s.UserId == userId && !s.IsDeleted)
+                .Include(s => s.IcbSensor)
+                .ThenInclude(mt => mt.MeasureType)
+                .AsQueryable();
 
             if (measureTypeId != "all")
             {
@@ -250,68 +224,62 @@ namespace SmartDormitory.Services
                 sensors = sensors.Where(s => s.AlarmOn == alarmSetValue);
             }
 
-			return await sensors
-							 .OrderByDescending(s => s.CreatedOn)
-							 .Select(s => new UserSensorListModel
-							 {
-								 Id = s.Id,
-								 Name = s.Name,
-								 SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
-								 MeasureUnit = s.IcbSensor.MeasureType.MeasureUnit,
-								 PollingInterval = s.PollingInterval,
-								 CreatedOn = (DateTime)s.CreatedOn,
-								 IsPublic = s.IsPublic,
-								 AlarmOn = s.AlarmOn,
-								 Value = ExtractValue(s)
-							 })
+            return await sensors
+                             .OrderByDescending(s => s.CreatedOn)
+                             .Select(s => new UserSensorListModel
+                             {
+                                 Id = s.Id,
+                                 Name = s.Name,
+                                 SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
+                                 MeasureUnit = s.IcbSensor.MeasureType.MeasureUnit,
+                                 PollingInterval = s.PollingInterval,
+                                 CreatedOn = (DateTime)s.CreatedOn,
+                                 IsPublic = s.IsPublic,
+                                 AlarmOn = s.AlarmOn,
+                                 Value = ExtractValue(s)
+                             })
                              .ToListAsync();
 
         }
 
-		private string ExtractValue(Sensor sensor)
-		{
-			string result = "";
-			if (sensor.IcbSensor.MeasureType.SuitableSensorType == "Boolean switch (door/occupancy/etc)")
-			{
-				if (sensor.IcbSensor.CurrentValue == 1)
-				{
-					result = "true";
-				}
-				else if (sensor.IcbSensor.CurrentValue == 0)
-				{
-					result = "false";
-				}
-			}
-			else
-			{
-				result = sensor.IcbSensor.CurrentValue.ToString();
-			}
-			return result;
-		}
-
-        public async Task<GaugeDataServiceModel> GetGaudeData(string sensorId)
+        private string ExtractValue(Sensor sensor)
         {
-            var sensor = await GetSensorById(sensorId);
-            if (sensor == null || sensor.IsDeleted)
+            string result = "";
+            if (sensor.IcbSensor.MeasureType.SuitableSensorType == "Boolean switch (door/occupancy/etc)")
+            {
+                if (sensor.CurrentValue == 1)
+                {
+                    result = "true";
+                }
+                else if (sensor.CurrentValue == 0)
+                {
+                    result = "false";
+                }
+            }
+            else
+            {
+                result = sensor.CurrentValue.ToString();
+            }
+            return result;
+        }
+
+        public async Task<GaugeDataServiceModel> GetGaugeData(string sensorId)
+        {
+            var sensor = await this.Context
+                                   .Sensors
+                                   .Where(s => !s.IsDeleted && s.Id == sensorId)
+                                   .Select(s => new GaugeDataServiceModel
+                                   {
+                                       CurrentValue = s.CurrentValue
+                                   })
+                                   .FirstOrDefaultAsync();
+
+            if (sensor is null)
             {
                 throw new EntityDoesntExistException("Sensor does not exist");
             }
 
-            var model = new GaugeDataServiceModel()
-            {
-                ApiCurrentValue = sensor.IcbSensor.CurrentValue,
-                ApiLastUpdateOn = sensor.IcbSensor.LastUpdateOn,
-                ApiMaxRangeValue = sensor.IcbSensor.MaxRangeValue,
-                ApiMinRangeValue = sensor.IcbSensor.MinRangeValue,
-                ApiPollingInterval = sensor.IcbSensor.PollingInterval,
-                UserCurrentValue = sensor.IcbSensor.CurrentValue,
-                UserLastUpdateOn = DateTime.Now,
-                UserPollingInterval = sensor.PollingInterval,
-                UserMaxRangeValue = sensor.MaxRangeValue,
-                UserMinRangeValue = sensor.MinRangeValue,
-                MeasureUnit = sensor.IcbSensor.MeasureType.MeasureUnit
-            };
-            return model;
+            return sensor;
         }
 
         public async Task<string> Update(string sensorId, string userId, string icbSensorId, string name, string description,
@@ -336,12 +304,25 @@ namespace SmartDormitory.Services
             sensor.MaxRangeValue = maxRange;
             sensor.Coordinates.Longitude = longtitude;
             sensor.Coordinates.Latitude = latitude;
-			sensor.ModifiedOn = DateTime.Now;
-			sensor.SwitchOn = switchOn;
+            sensor.ModifiedOn = DateTime.Now;
+            sensor.SwitchOn = switchOn;
 
             this.Context.Sensors.Update(sensor);
             await this.Context.SaveChangesAsync();
             return sensor.Id;
+        }
+
+        public async Task<IEnumerable<Sensor>> GetAll()
+            => await this.Context
+                         .Sensors
+                         .Where(s => !s.IsDeleted)
+                         .OrderBy(s => s.IcbSensorId)
+                         .ToListAsync();
+
+        public async Task UpdateRange(IList<Sensor> sensorsToUpdate)
+        {
+            this.Context.UpdateRange(sensorsToUpdate);
+            await this.Context.SaveChangesAsync();
         }
     }
 }

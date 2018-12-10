@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
 using SmartDormitory.App.Infrastructure.Extensions;
+using SmartDormitory.App.Infrastructure.Filters;
 using SmartDormitory.App.Infrastructure.Hangfire;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
@@ -38,11 +39,8 @@ namespace SmartDormitory.App
             this.RegisterInfrastructure(services);
 
             // IMPORTANT
-            // Comment this line if dropped db and update again
+            // Comment this line if dropped db and update-database       
             this.RegisterHangfireDbTables(services);
-
-            // Comment this line if database is dropped for the first start of the program
-            this.ActivatingHangfireJobs(services);
         }
 
         //todo use later?
@@ -60,7 +58,7 @@ namespace SmartDormitory.App
 
         private void RegisterHangfireDbTables(IServiceCollection services)
         {
-            var connectionString = System.Environment
+            var connectionString = Environment
                                             .GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
 
             GlobalConfiguration.Configuration.UseSqlServerStorage(connectionString);
@@ -78,6 +76,7 @@ namespace SmartDormitory.App
             services.AddTransient<IIcbSensorsService, IcbSensorsService>();
             services.AddTransient<ISensorsService, SensorsService>();
             services.AddTransient<IMeasureTypeService, MeasureTypeService>();
+            services.AddTransient<INotificationService, NotificationService>();
 
             services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
         }
@@ -153,35 +152,48 @@ namespace SmartDormitory.App
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-				app.UseHsts(); // TODO: What is this?
+                app.UseHsts();
             }
-       
-            app.UseHttpsRedirection();
-			app.UseWrongRouteHandler();
 
-			app.UseStaticFiles();
+            app.UseHttpsRedirection();
+            app.UseWrongRouteHandler();
+
+            app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+
+            //seeding
             app.SeedAdminAccount();
+            app.SeedMeasureTypes();
 
-            //hangfire
-            var hangfireServerOptions = new BackgroundJobServerOptions
+            //TODO add app extension method
+            //var scope = serviceProvider.CreateScope();
+            //var context = scope.ServiceProvider.GetService<SmartDormitoryContext>();
+            //context.Database.Migrate();
+
+            //make dashboard visible only for Admins
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                SchedulePollingInterval = TimeSpan.FromSeconds(1)
-            };
+                Authorization = new[] { new HangfireAuthorizeFilter() }
+            });
+            app.UseHangfireServer(new BackgroundJobServerOptions
+            {
+                SchedulePollingInterval = TimeSpan.FromSeconds(5)
+            });
 
-            app.UseHangfireDashboard();
-            app.UseHangfireServer(hangfireServerOptions);
+            //starting jobs
+            RecurringJob.AddOrUpdate<IIcbSensorsService>(job => job.AddSensorsAsync(), Cron.Hourly());
+            RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(j => j.Magic(), Cron.Minutely());
 
             app.UseMvc(routes =>
             {
-				routes.MapRoute(
-					name: "notfound",
-					template: "404",
-					defaults: new { controller = "Error", action = "PageNotFound" });
+                routes.MapRoute(
+                    name: "notfound",
+                    template: "404",
+                    defaults: new { controller = "Error", action = "PageNotFound" });
 
-				routes.MapRoute(
+                routes.MapRoute(
                     name: "areas",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
@@ -189,14 +201,6 @@ namespace SmartDormitory.App
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-        }
-
-        private void ActivatingHangfireJobs(IServiceCollection services)
-        {
-            var sp = services.BuildServiceProvider();
-            var hangFireServices = sp.GetService<IHangfireJobsScheduler>();
-
-            hangFireServices.StartingJobsQueue();
         }
     }
 }

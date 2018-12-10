@@ -203,7 +203,7 @@ namespace SmartDormitory.App.Controllers
 					MinRangeValue = sensor.MinRangeValue,
 					Name = sensor.Name,
 					PollingInterval = sensor.PollingInterval,
-					StartValue = sensor.IcbSensor.CurrentValue,
+					StartValue = sensor.CurrentValue,
 					MeasureUnit = sensor.IcbSensor.MeasureType.MeasureUnit,
 					SwitchOn = sensor.SwitchOn,
 					IsSwitch = sensor.IcbSensor.MeasureType.MeasureUnit == "(true/false)" ? true : false
@@ -218,11 +218,11 @@ namespace SmartDormitory.App.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> GetGaudeData(string sensorId)
+		public async Task<IActionResult> GetGaugeData(string sensorId)
 		{
 			try
 			{
-				var data = await sensorsService.GetGaudeData(sensorId);
+				var data = await sensorsService.GetGaugeData(sensorId);
 				return Json(data);
 			}
 			catch (EntityDoesntExistException e)

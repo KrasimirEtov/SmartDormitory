@@ -18,7 +18,7 @@ namespace SmartDormitory.App.Models.Sensor
         public string IcbSensorId { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "Sensor description should be between 3 and 30 symbols.", MinimumLength = 3)]
+        [StringLength(100, ErrorMessage = "Sensor description should be between 3 and 100 symbols.", MinimumLength = 3)]
         public string Description { get; set; }
 
         [Required]
@@ -49,10 +49,6 @@ namespace SmartDormitory.App.Models.Sensor
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var results = new List<ValidationResult>();
-            if (this.MinRangeValue >= this.MaxRangeValue)
-            {
-                results.Add(new ValidationResult("Max range should be bigger than min range value!"));
-            }
             if (this.MinRangeValue >= this.MaxRangeValue)
             {
                 results.Add(new ValidationResult("Max range should be bigger than min range value!"));

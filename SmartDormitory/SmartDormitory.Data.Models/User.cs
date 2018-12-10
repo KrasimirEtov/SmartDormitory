@@ -14,7 +14,12 @@ namespace SmartDormitory.Data.Models
 
         public ICollection<Sensor> Sensors { get; set; } = new HashSet<Sensor>();
 
+        public ICollection<Notification> Notifications { get; set; } = new HashSet<Notification>();
+
         public bool IsDeleted { get; set; }
+
+        [Required]
+        public bool AgreedGDPR { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime? DeletedOn { get; set; }

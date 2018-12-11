@@ -6,7 +6,7 @@
         .build();
 
     connection.on("ReceiveNotification", function (message) {
-        //console.log(message)
+        console.log(message)
         // debugger
         let count = document.getElementById('unseen').innerHTML;
         document.getElementById('unseen').innerHTML = `${++count}`;

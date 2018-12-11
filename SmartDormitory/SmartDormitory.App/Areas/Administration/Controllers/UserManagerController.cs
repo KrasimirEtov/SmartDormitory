@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartDormitory.App.Areas.Administration.Models.UserManager;
+using SmartDormitory.App.Infrastructure.Common;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
 using System;
@@ -9,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Areas.Administration.Controllers
 {
-    [Area("Administration")]
-    [Authorize(Policy = "Admin")]
+    [Area(WebConstants.AdministrationArea)]
+    [Authorize(Policy = WebConstants.AdminPolicy)]
     public class UserManagerController : Controller
     {
         private const int PageSize = 4;
@@ -33,7 +34,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
             catch (RedirectException e)
             {
                 this.TempData["Error-Message"] = e.Message;
-                return this.RedirectToAction("Index", "UserManager");
+                return this.RedirectToAction(nameof(Index));
             }
         }
 
@@ -48,7 +49,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
             catch (RedirectException e)
             {
                 this.TempData["Error-Message"] = e.Message;
-                return RedirectToAction("Index", "UserManager");
+                return RedirectToAction(nameof(Index));
             }
         }
 

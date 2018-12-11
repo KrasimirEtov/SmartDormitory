@@ -77,11 +77,16 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+                var user = await this.userManager.FindByNameAsync(Input.Username);
+                if (user.IsDeleted)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
+                }
                 if (result.Succeeded)
                 {
                     logger.LogInformation("User logged in.");
 
-                    var user = await this.userManager.FindByNameAsync(Input.Username);
                     var roles = await this.userManager.GetRolesAsync(user);
 
                     if (roles.Contains("Administrator"))

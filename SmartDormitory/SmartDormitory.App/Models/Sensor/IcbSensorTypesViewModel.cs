@@ -10,6 +10,7 @@ namespace SmartDormitory.App.Models.Sensor
         public SelectList MeasureTypes { get; set; }
 
         public IEnumerable<IcbSensorsListViewModel> IcbSensors { get; set; }
-		public string UserId { get; set; }
-	}
+
+        public string UserId { get; set; }
+    }
 }

@@ -22,10 +22,12 @@
         if ($(this).hasClass(isEnabledBtn)) {
             $(this).removeClass(isEnabledBtn).addClass(isDisabledBtn);
             $(this).html(isNotAdminText);
+
         }
         else if ($(this).hasClass(isDisabledBtn)) {
             $(this).removeClass(isDisabledBtn).addClass(isEnabledBtn);
             $(this).html(isAdminText);
+
         }
     });
 

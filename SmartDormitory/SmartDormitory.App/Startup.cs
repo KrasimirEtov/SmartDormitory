@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
+using SmartDormitory.App.Infrastructure.Common;
 using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.App.Infrastructure.Filters;
 using SmartDormitory.App.Infrastructure.Hangfire;
@@ -44,15 +45,14 @@ namespace SmartDormitory.App
             this.RegisterHangfireDbTables(services);
         }
 
-        //todo use later?
         private void RegisterAuthorizations(IServiceCollection services)
         {
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("Admin", policy =>
+                options.AddPolicy(WebConstants.AdminPolicy, policy =>
                 {
                     policy.RequireAuthenticatedUser();
-                    policy.RequireRole("Administrator");
+                    policy.RequireRole(WebConstants.AdminRole);
                 });
             });
         }

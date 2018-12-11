@@ -1,12 +1,11 @@
 ﻿@model CreateUpdateSensorViewModel
 
-<div class="row">
+<div class="row mt-5">
     <div class="col-md-2">
-        <h4><span class="form-row badge badge-pill badge-light text-secondary"> Creating sensor </span></h4>
+        <h2><span class="form-row badge badge-pill badge-light text-secondary"> Creating sensor </span></h2>
     </div>
-
     <div class="col-md-2">
-        <h4><span class="h5 badge badge-pill badge-warning"> Step 2: </span></h4>
+        <h5><span class="h5 badge badge-pill badge-warning"> Step 2: </span></h5>
     </div>
     <div class="col-md-4">
         <h4><span class="h5 badge badge-pill badge-info"> Add sensor details </span></h4>
@@ -17,7 +16,8 @@
         </a>
     </div>
 </div>
-
 <hr />
 
-<partial name="_InputCreateSensorPartial" model="Model" />
+<div class="mt-5">
+    <partial name="_InputCreateSensorPartial" model="Model" />
+</div>

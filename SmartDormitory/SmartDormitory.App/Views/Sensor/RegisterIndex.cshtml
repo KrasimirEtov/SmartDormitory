@@ -2,31 +2,29 @@
 @{
     ViewData["Title"] = "RegisterIndex";
 }
-<div class="row">
+<div class="row mt-5">
     <div class="col-md-2">
-        <h4><span class="form-row badge badge-pill badge-light text-secondary"> Creating sensor </span></h4>
+        <h2><span class="form-row badge badge-pill badge-light text-secondary"> Creating sensor </span></h2>
     </div>
 
     <div class="col-md-2">
-        <h4><span class="h5 badge badge-pill badge-warning"> Step 1: </span></h4>
+        <h5><span class="h5 badge badge-pill badge-warning"> Step 1: </span></h5>
     </div>
     <div class="col-md-4">
-        <h4><span class="h5 badge badge-pill badge-info"> Choose sensor type </span></h4>
+        <h3><span class="h5 badge badge-pill badge-info"> Choose sensor type </span></h3>
     </div>
 </div>
-
+<hr />
 <br />
-<div >
-    @*<div class="form-group col-md-3">
-        <label class="form-control form-control-lg h4 text-center text-black-50">Choose sensor type</label>
-    </div>*@
+<div>
     <div class="form-group w-auto">
-        <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes" class="form-control form-control-lg input text-success text-monospace">
-            <option value="all">-- All --</option>
+        <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes"
+                class="form-control-lg input text-monospace custom-select">
+            <option selected value="">-- Select sensor type --</option>
         </select>
     </div>
 
-    <div id="icbSensorsResults" class="form-group">
+    <div id="icbSensorsResults" class="form-group mt-5">
         <partial name="_IcbSensorsByTypeResult" model="@Model.IcbSensors" />
     </div>
 </div>

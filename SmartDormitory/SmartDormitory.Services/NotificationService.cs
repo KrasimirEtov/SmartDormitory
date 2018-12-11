@@ -17,7 +17,7 @@ namespace SmartDormitory.Services
         {
         }
 
-        public async Task CreateAlarmNotifications(IEnumerable<Sensor> sensors)
+        public async Task<IEnumerable<Notification>> CreateAlarmNotifications(IEnumerable<Sensor> sensors)
         {
             var notifications = new List<Notification>();
 
@@ -36,6 +36,8 @@ namespace SmartDormitory.Services
             }
 
             await this.Context.AddRangeAsync(notifications);
+
+            return notifications;
             //await this.Context.SaveChangesAsync(); calling it at hangfire job method
             //send list notifications to signalR hub to send messages
         }

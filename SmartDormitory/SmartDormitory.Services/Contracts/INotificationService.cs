@@ -7,7 +7,7 @@ namespace SmartDormitory.Services.Contracts
 {
     public interface INotificationService
     {
-        Task CreateAlarmNotifications(IEnumerable<Sensor> sensors);
+        Task<IEnumerable<Notification>> CreateAlarmNotifications(IEnumerable<Sensor> sensors);
 
         Task<IEnumerable<InboxServiceModel>> GetLastUnseenByUserId(string userId, int count = 5);
 

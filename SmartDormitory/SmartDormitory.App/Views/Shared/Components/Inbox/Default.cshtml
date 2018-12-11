@@ -3,7 +3,7 @@
 <li class="dropdown nav-item">
     <p class="dropdown-toggle nav-link ml-5" data-toggle="dropdown">
         <i class="far fa-envelope"></i>Notifications
-        <span class="badge badge-pill badge-primary">@Model.UnseenCount</span>
+        <span id="unseen" class="badge badge-pill badge-primary">@Model.UnseenCount</span>
     </p>
     <ul class="dropdown-menu dropdown-menu-right dropdown-navbar">
         <li class="nav-link text-info text-center">
@@ -31,3 +31,6 @@
 
     </ul>
 </li>
+
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/notifications.js"></script>

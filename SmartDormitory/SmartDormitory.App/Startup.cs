@@ -10,6 +10,7 @@ using SmartDormitory.App.Data;
 using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.App.Infrastructure.Filters;
 using SmartDormitory.App.Infrastructure.Hangfire;
+using SmartDormitory.App.Infrastructure.Hubs;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
 using SmartDormitory.Services.Contracts;
@@ -78,6 +79,7 @@ namespace SmartDormitory.App
             services.AddTransient<IMeasureTypeService, MeasureTypeService>();
             services.AddTransient<INotificationService, NotificationService>();
 
+            services.AddTransient<INotificationManager, NotificationManager>();
             services.AddTransient<IHangfireJobsScheduler, HangfireJobsScheduler>();
         }
 
@@ -122,6 +124,8 @@ namespace SmartDormitory.App
                   options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                   options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
               });
+
+            services.AddSignalR();
         }
 
         private void RegisterData(IServiceCollection services)
@@ -183,8 +187,13 @@ namespace SmartDormitory.App
             });
 
             //starting jobs
-            RecurringJob.AddOrUpdate<IIcbSensorsService>(job => job.AddSensorsAsync(), Cron.Hourly());
-            RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(j => j.Magic(), Cron.Minutely());
+            RecurringJob.AddOrUpdate<IIcbSensorsService>(x => x.AddSensorsAsync(), Cron.Hourly());
+            RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(x => x.Magic(), Cron.Minutely());
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<NotificationsHub>("/notificationHub");
+            });
 
             app.UseMvc(routes =>
             {

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Infrastructure.Hubs
 {
-    public class NotificationsHub //: Hub
+    public class NotificationsHub : Hub
     {
+       
 
         //public Task SendMessageToCaller(string message)
         //{
@@ -17,11 +16,6 @@ namespace SmartDormitory.App.Infrastructure.Hubs
         //{
         //    List<string> groups = new List<string>() { "SignalR Users" };
         //    return Clients.Groups(groups).SendAsync("ReceiveMessage", message);
-        //}
-
-        //public async Task SendMessage(string user, string message)
-        //{
-        //    await Clients.All.SendAsync("ReceiveMessage", user, message);
         //}
 
         //public override async Task OnConnectedAsync()

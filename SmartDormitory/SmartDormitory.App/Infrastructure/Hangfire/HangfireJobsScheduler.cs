@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SmartDormitory.App.Data;
+using SmartDormitory.App.Infrastructure.Hubs;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Models.JsonDtoModels;
@@ -16,10 +17,12 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
     public class HangfireJobsScheduler : IHangfireJobsScheduler
     {
         private readonly IServiceProvider serviceProvider;
+        private readonly INotificationManager notificationManager;
 
-        public HangfireJobsScheduler(IServiceProvider serviceProvider)
+        public HangfireJobsScheduler(IServiceProvider serviceProvider, INotificationManager notificationManager)
         {
             this.serviceProvider = serviceProvider;
+            this.notificationManager = notificationManager;
         }
 
         public void StartingJobsQueue()
@@ -69,16 +72,12 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
         public async Task Magic()
         {
             // hard 10 seconds interval
-            await this.UpdateSensorsData();
-            await Task.Delay(TimeSpan.FromSeconds(10));
-            await this.UpdateSensorsData();
-            await Task.Delay(TimeSpan.FromSeconds(10));
-            await this.UpdateSensorsData();
-            await Task.Delay(TimeSpan.FromSeconds(10));
-            await this.UpdateSensorsData();
-            await Task.Delay(TimeSpan.FromSeconds(10));
-            await this.UpdateSensorsData();
-            await Task.Delay(TimeSpan.FromSeconds(10));
+            for (int i = 0; i < 5; i++)
+            {
+                await this.UpdateSensorsData();
+                await Task.Delay(TimeSpan.FromSeconds(10));
+            }
+
             await this.UpdateSensorsData();
         }
 
@@ -130,22 +129,22 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                         // populate list of sensors with activated alarms
                         alarmsActivatedSensors.Add(userSensor);
                     }
-
                 }
 
                 //create and send alarm notifications
-                await notificationService.CreateAlarmNotifications(alarmsActivatedSensors);
+                var notifications = await notificationService.CreateAlarmNotifications(alarmsActivatedSensors);
+
+                foreach (var notify in notifications)
+                {
+                    await this.notificationManager.SendNotification(notify.ReceiverId, notify.Title);
+                }
 
                 //update all user sensors data at once
                 //await sensorsService.UpdateRange(sensorsToUpdate);
 
                 //--- save everything at once
                 dbContext.UpdateRange(sensorsToUpdate);
-                await dbContext.SaveChangesAsync();
-
-                //await Task.Delay(TimeSpan.FromSeconds(5));
-                //BackgroundJob.Schedule(() => UpdateSensorsData(), TimeSpan.FromSeconds(5));
-                //BackgroundJob.Enqueue(() => StartingJobsQueue());
+                await dbContext.SaveChangesAsync();               
             }
         }
     }

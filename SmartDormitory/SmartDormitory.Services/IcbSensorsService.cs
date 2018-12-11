@@ -74,24 +74,26 @@ namespace SmartDormitory.Services
             return createdSensorsJobData;
         }
 
-
-
-        public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "all")
+        public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "")
         {
             var sensors = this.Context.IcbSensors.Where(s => !s.IsDeleted);
 
-            if (measureTypeId != "all")
+            if (!string.IsNullOrWhiteSpace(measureTypeId))
             {
                 if (await this.measureTypeService.Exists(measureTypeId))
                 {
                     sensors = sensors.Where(s => s.MeasureTypeId == measureTypeId);
                 }
             }
+            else
+            {
+                return new List<IcbSensorRegisterListServiceModel>();
+            }
 
             return await sensors
-                              .OrderBy(s => s.MeasureTypeId)
-                              .ThenBy(s => s.PollingInterval)
+                              .OrderBy(s => s.MeasureType)
                               .ThenBy(s => s.Tag)
+                              .ThenBy(s => s.PollingInterval)
                               .Skip((page - 1) * pageSize)
                               .Take(pageSize)
                               .Select(s => new IcbSensorRegisterListServiceModel
@@ -103,26 +105,6 @@ namespace SmartDormitory.Services
                               })
                               .ToListAsync();
         }
-
-        //public async Task UpdateSensorValueAsync(string id, DateTime timeStamp, string lastValue, string measureUnit)
-        //{
-        //    var icbSensor = await this.Context
-        //                              .IcbSensors
-        //                              .Include(s => s.MeasureType)
-        //                              .FirstOrDefaultAsync(s => s.Id == id);
-
-        //    if (icbSensor != null)
-        //    {
-        //        if (icbSensor.MeasureType.MeasureUnit == measureUnit)
-        //        {
-        //            icbSensor.LastUpdateOn = timeStamp;
-        //            icbSensor.CurrentValue = ApiDataExtractorHelper.GetLastValue(lastValue);
-
-        //            await this.Context.SaveChangesAsync();
-        //        }
-        //    }
-        //    // return sensor?
-        //}
 
         public async Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId)
         {

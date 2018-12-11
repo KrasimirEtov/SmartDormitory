@@ -239,7 +239,6 @@ namespace SmartDormitory.Services
                                  Value = ExtractValue(s)
                              })
                              .ToListAsync();
-
         }
 
         private string ExtractValue(Sensor sensor)
@@ -270,7 +269,9 @@ namespace SmartDormitory.Services
                                    .Where(s => !s.IsDeleted && s.Id == sensorId)
                                    .Select(s => new GaugeDataServiceModel
                                    {
-                                       CurrentValue = s.CurrentValue
+                                       CurrentValue = s.CurrentValue,
+                                       IsUpdated = DateTime.Now.Subtract(s.LastUpdateOn)
+                                                           .TotalSeconds < s.PollingInterval
                                    })
                                    .FirstOrDefaultAsync();
 

@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.App.Models.Sensor;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
+using SmartDormitory.Services.Models.MeasureTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,20 +22,21 @@ namespace SmartDormitory.App.Controllers
         private readonly ISensorsService sensorsService;
         private readonly IIcbSensorsService icbSensorsService;
         private readonly IMeasureTypeService measureTypeService;
+        private readonly IMemoryCache memoryCache;
 
-        public SensorController(ISensorsService sensorsService, IIcbSensorsService icbSensorsService, IMeasureTypeService measureTypeService)
+        public SensorController(ISensorsService sensorsService, IIcbSensorsService icbSensorsService, IMeasureTypeService measureTypeService, IMemoryCache memoryCache)
         {
             this.sensorsService = sensorsService;
             this.icbSensorsService = icbSensorsService;
             this.measureTypeService = measureTypeService;
+            this.memoryCache = memoryCache;
         }
 
         [HttpGet]
         public async Task<IActionResult> MySensors()
         {
             var userId = this.User.GetId();
-            var measureTypes = await this.measureTypeService.GetAllNotDeleted();
-
+            var measureTypes = await this.CachedMeasureTypes();
             var sensors = await this.sensorsService.GetUserSensors(userId);
 
             var model = new MySensorsViewModel
@@ -69,13 +73,12 @@ namespace SmartDormitory.App.Controllers
         [HttpGet]
         public async Task<IActionResult> RegisterIndex()
         {
-            var sensorTypes = await this.measureTypeService.GetAllNotDeleted();
-            //var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId();
-            var userId = User.GetId();
+            var measureTypes = await this.CachedMeasureTypes();
+            var userId = this.User.GetId();
 
             var model = new IcbSensorTypesViewModel
             {
-                MeasureTypes = new SelectList(sensorTypes, "Id", "SuitableSensorType"),
+                MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
                 MeasureTypeId = string.Empty,
                 IcbSensors = new List<IcbSensorsListViewModel>(),
                 UserId = userId
@@ -158,25 +161,6 @@ namespace SmartDormitory.App.Controllers
             this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
             return this.RedirectToAction("Details", "Sensor", new { sensorId = createdSensorId });
         }
-
-        [HttpGet]
-        public IActionResult GoogleMapChooseAdress()
-        {
-            return View();
-        }
-
-        //private List<IcbSensorsListViewModel> MapSensorServiceModelToViewModel(
-        //	IEnumerable<IcbSensorRegisterListServiceModel> sensors, string userId)
-        //{
-        //	return sensors.Select(s => new IcbSensorsListViewModel
-        //	{
-        //		Id = s.Id,
-        //		Description = s.Description,
-        //		PollingInterval = s.PollingInterval,
-        //		Tag = s.Tag.SplitTag(),
-        //		UserId = userId
-        //	}).ToList();
-        //}
 
         [HttpGet]
         public async Task<IActionResult> Details(string sensorId)
@@ -299,5 +283,23 @@ namespace SmartDormitory.App.Controllers
 
             return this.RedirectToAction("Details", "Sensor", new { sensorId = updatedSensorId });
         }
+
+        [NonAction]
+        private async Task<IEnumerable<MeasureTypeServiceModel>> CachedMeasureTypes()
+        {
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
+            };
+
+            if (!this.memoryCache.TryGetValue("MeasureTypes", out IEnumerable<MeasureTypeServiceModel> measureTypes))
+            {
+                measureTypes = await this.measureTypeService.GetAllNotDeleted();
+                this.memoryCache.Set("MeasureTypes", measureTypes, cacheOptions);
+            }
+
+            return measureTypes;
+        }
+
     }
 }

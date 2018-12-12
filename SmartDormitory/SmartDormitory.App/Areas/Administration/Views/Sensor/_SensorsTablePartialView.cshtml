@@ -6,7 +6,7 @@
 }
 
 
-<table class="table table-hover table-striped" width="100">
+<table class="table table-hover table-striped table-fixed">
     <thead class="thead-dark">
         <tr>
             <th class="h5 text-center">Sensor name</th>
@@ -22,16 +22,16 @@
 
         @foreach (var sensor in Model.Sensors)
         {
-            string privacyIcon = sensor.IsPublic ? "fas fa-globe-americas" : "fas fa-user - secret";
+            string privacyIcon = sensor.IsPublic ? "fas fa-globe-americas" : "fas fa-user-secret";
             string privacyColor = sensor.IsPublic ? "text-primary" : "text-warning";
-            string alarmIcon = sensor.AlarmOn ? "fas fa-bell" : "far fa-bell";
+            string alarmIcon = sensor.AlarmOn ? "fas fa-bell" : "far fa-bell-slash";
             string alarmColor = sensor.AlarmOn ? "text-danger" : "";
 
             <tr>
                 <td>
-                    <a asp-area="" asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@(sensor.Id)">
+                    <a class="h6" asp-area="" asp-controller="Sensor" asp-action="Details" asp-route-sensorId="@(sensor.Id)">
                         <span class="badge badge-pill badge-primary"> <i class="fas fa-info"></i></span>
-                        <span class="h6">@sensor.Name</span>
+                        <span >@sensor.Name</span>
                     </a>
                 </td>
                 <td>

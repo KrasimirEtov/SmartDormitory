@@ -3,7 +3,7 @@
 @{
     string sensorPrivacyIcon = Model.IsPublic ? "fa-globe-americas" : "fas fa-lock";
     string sensorPrivacyText = Model.IsPublic ? "Public" : "Private";
-    string sensorAlarmIcon = Model.IsPublic ? "fa-bell" : "fas fa-times-circle";
+    string sensorAlarmIcon = Model.AlarmOn ? "far fa-bell" : "far fa-bell-slash";
     string sensorAlarmText = Model.AlarmOn ? "Alarm On" : "Alarm Off";
     string url = $"/Identity/Account/Manage?userId={Model.UserId}";
     string urlGetGauge = $"/Sensor/GetGaudeData?userId={Model.UserId}";
@@ -48,7 +48,7 @@
                         <h2 class="card-title">Sensor state:</h2>
                         <div class="form-row">
                             <h4><i class="fas @sensorPrivacyIcon col-4"></i> @sensorPrivacyText</h4>
-                            <h4><i class="fas @sensorPrivacyIcon col-3"></i> @sensorAlarmText</h4>
+                            <h4><i class="fas @sensorAlarmIcon col-3"></i> @sensorAlarmText</h4>
                         </div>
 
                     </div>
@@ -198,8 +198,6 @@
     });
 </script>
 
-
-
 <script>
         function initMap() {
             // The location of the sensor
@@ -211,8 +209,8 @@
                     center: sensor,
                     streetViewControl: true,
                     mapTypeId: 'roadmap'
-
                 });
+
             // The marker, positioned at the sensor
             var marker = new google.maps.Marker({ position: sensor, map: map });
             var contentString = '<div id="content">'+
@@ -230,9 +228,9 @@
             var infowindow = new google.maps.InfoWindow({
                 content: contentString
             });
-             marker.addListener('click', function() {
-          infowindow.open(map, marker);
-        });
+            marker.addListener('click', function() {
+                infowindow.open(map, marker);
+            });
         }
 </script>
 

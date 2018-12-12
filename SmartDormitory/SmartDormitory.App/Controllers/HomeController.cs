@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.App.Models;
 using SmartDormitory.App.Models.Home;
 using SmartDormitory.Services.Contracts;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,22 +17,48 @@ namespace SmartDormitory.App.Controllers
         private readonly IMeasureTypeService measureTypeService;
         private readonly IIcbSensorsService icbSensorsService;
         private readonly IUserService userService;
+        private readonly IMemoryCache memoryCache;
 
         public HomeController(ISensorsService sensorsService, IMeasureTypeService measureTypeService,
-            IIcbSensorsService icbSensorsService, IUserService userService)
+            IIcbSensorsService icbSensorsService, IUserService userService, IMemoryCache memoryCache)
         {
             this.sensorsService = sensorsService;
             this.measureTypeService = measureTypeService;
             this.icbSensorsService = icbSensorsService;
             this.userService = userService;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<IActionResult> Index()
         {
-            var sensorTypesCount = await this.measureTypeService.TotalCount();
-            var sensorModelsCount = await this.icbSensorsService.TotalCount();
-            var registeredSensorsCount = await this.sensorsService.TotalSensors();
-            var usersCount = await this.userService.TotalUsers();
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            };
+
+            if (!this.memoryCache.TryGetValue("SensorTypesCount", out int sensorTypesCount))
+            {
+                sensorTypesCount = await this.measureTypeService.TotalCount();
+                this.memoryCache.Set("SensorTypesCount", sensorTypesCount, cacheOptions);
+            }
+
+            if (!this.memoryCache.TryGetValue("SensorModelsCount", out int sensorModelsCount))
+            {
+                sensorModelsCount = await this.icbSensorsService.TotalCount();
+                this.memoryCache.Set("SensorModelsCount", sensorModelsCount, cacheOptions);
+            }
+
+            if (!this.memoryCache.TryGetValue("RegisteredSensorsCount", out int registeredSensorsCount))
+            {
+                registeredSensorsCount = await this.sensorsService.TotalSensors();
+                this.memoryCache.Set("RegisteredSensorsCount", registeredSensorsCount, cacheOptions);
+            }
+
+            if (!this.memoryCache.TryGetValue("UsersCount", out int usersCount))
+            {
+                usersCount = await this.userService.TotalUsers();
+                this.memoryCache.Set("UsersCount", usersCount, cacheOptions);
+            }
 
             var model = new HomeIndexViewModel
             {

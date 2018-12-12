@@ -110,7 +110,7 @@ namespace SmartDormitory.App
 
         private void RegisterInfrastructure(IServiceCollection services)
         {
-            //services.AddMemoryCache();
+            services.AddMemoryCache();
 
             services
               .AddMvc(options =>

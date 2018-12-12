@@ -40,7 +40,7 @@ namespace SmartDormitory.App.Controllers
                 RegisteredSensorsCount = registeredSensorsCount
             };
 
-            return View();
+            return View(model);
         }
 
         [HttpGet]

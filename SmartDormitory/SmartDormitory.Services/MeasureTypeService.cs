@@ -33,6 +33,10 @@ namespace SmartDormitory.Services
                               })
                               .ToListAsync();
 
-
+        public async Task<int> TotalCount()
+                => await this.Context
+                             .MeasureTypes
+                             .Where(mt => !mt.IsDeleted)
+                             .CountAsync();
     }
 }

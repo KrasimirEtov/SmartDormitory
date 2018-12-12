@@ -9,7 +9,6 @@ namespace SmartDormitory.App.Models.Sensor
 
         [Required]
         [StringLength(30, ErrorMessage = "Sensor name should be between 3 and 30 symbols.", MinimumLength = 3)]
-        [Display(Name="Enter name")]
         public string Name { get; set; }
 
         [Required]

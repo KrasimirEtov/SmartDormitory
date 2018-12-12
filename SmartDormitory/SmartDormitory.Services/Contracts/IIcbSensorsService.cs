@@ -11,5 +11,7 @@ namespace SmartDormitory.Services.Contracts
         Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "");
 
         Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId);
+
+        Task<int> TotalCount();
     }
 }

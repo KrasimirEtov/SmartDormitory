@@ -7,9 +7,9 @@ namespace SmartDormitory.Services.Contracts
 {
     public interface ISensorsService
     {
-        Task<IEnumerable<MapSensorServiceModel>> GetAllPublicSensorsCoordinates();
+        Task<IEnumerable<MapSensorServiceModel>> GetAllPublicCoordinates();
         
-		Task<IEnumerable<MapSensorServiceModel>> GetAllUserSensorCoordinates(string userId);
+		Task<IEnumerable<MapSensorServiceModel>> GetAllUserPrivateCoordinates(string userId);
 
 		Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10);
 

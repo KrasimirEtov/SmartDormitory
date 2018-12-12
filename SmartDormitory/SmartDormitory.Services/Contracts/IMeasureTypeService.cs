@@ -9,5 +9,7 @@ namespace SmartDormitory.Services.Contracts
         Task<IEnumerable<MeasureTypeServiceModel>> GetAll();
 
         Task<bool> Exists(string id);
+
+        Task<int> TotalCount();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SmartDormitory.Data.Models;
+using System;
 
 namespace SmartDormitory.Services.Models.Sensors
 {
@@ -8,8 +9,12 @@ namespace SmartDormitory.Services.Models.Sensors
 
         public string Name { get; set; }
 
-        public string Description { get; set; }
+        public bool IsPublic { get; set; }
 
-        public string Id { get; set; }
+        public string SensorType { get; set; }
+
+        public DateTime CreatedOn { get; set; }
+
+        public string UserId { get; set; }
     }
 }

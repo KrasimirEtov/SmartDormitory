@@ -1,12 +1,9 @@
-﻿@*@model IEnumerable<SmartDormitory.Data.Models.Coordinates>*@
+﻿@model IEnumerable<HomeIndexViewModel>
 
 @{
     ViewData["Title"] = "Home Page";
 }
-@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment env
-@{
-    string path = env.WebRootFileProvider.GetFileInfo("images/m1.png")?.PhysicalPath;
-}
+
 <style>
     /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -21,19 +18,24 @@
 <img src='~/images/m2.png'>
 <img src='~/images/m3.png'>
 <img src='~/images/m4.png'>
+<img src='~/images/m5.png'>
 
-<div id="map"></div>
+<div class="row">
+
+</div>
+<div class="row">
+    <div id="map"></div>
+</div>
 
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&callback=initMap">
 </script>
 <script src="~/lib/markerclusterer/js/markerclusterer.js"></script>
 <script>
-    var gm_map;
+    let gm_map;
     // Initialize and add the map
     function initMap() {
-        var sofiaCenterOfTheMap = { lat: 42.6977, lng: 23.3219 };
-        var options_googlemaps = {
+        const options_googlemaps = {
             minZoom: 4,
             zoom: 11,
             center: new google.maps.LatLng(42.6977, 23.3219), //sofia coords
@@ -44,34 +46,55 @@
 
         gm_map = new google.maps.Map(document.getElementById('map'), options_googlemaps);
 
-        var markers = [];
-        var infoWindows = [];
+        let markers = [];
+        let infoWindows = [];
+        const privateSensorIconUrl = 'http://maps.google.com/mapfiles/kml/pushpin/red-pushpin.png';
+        const ownPublicSensorIconUrl = 'http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png';
 
         $.getJSON("/Home/GetSensorsCoordinates", function (data) {
-            //console.log(data)
-            for (let i = 0; i < data.length; i++) {
-                //console.log(data[i].latitude)
-                //console.log(data[i].longitude)
 
-                let latLng = new google.maps.LatLng(data[i].coordinates.latitude, data[i].coordinates.longitude);
+            console.log(data)
+            for (let i = 0; i < data.length; i++) {
+                let latLng = new google.maps.LatLng(data[i].coordinates.latitude,
+                    data[i].coordinates.longitude);
 
                 markers[i] = new google.maps.Marker({
                     position: latLng,
                     map: gm_map,
                     animation: google.maps.Animation.DROP
-                    //icon: '/images/m1.png'    --- change marker icon
                 });
 
-                var contentString = '<div id="content">' +
-                    '<div id="siteNotice">' +
-                    '</div>' +
-                    '<h1 id="firstHeading" class="firstHeading">' + data[i].name + '</h1>' +
-                    '<div id="bodyContent">' +
-                    '<p><b>' + data[i].description + '</b></p>' +
-                    '<p>Sensor link for owners only!:, ID:' + data[i].id + '</p>'
-                '<p>(sensor created: June 22, 2009).</p>' +
-                    '</div>' +
-                    '</div>';
+                let formatDate = data[i].createdOn.replace(/(\d{4})\-(\d{2})\-(\d{2}).*/, '$3-$2-$1');
+                //console.log(formatDate)
+                let contentString =
+                    '<p>Name: ' + '<span class="h6 text-primary">' + data[i].name + '</span></p>' +
+                    '<p>Created on: <span class=" text-danger">' + formatDate + '</span></p>' +
+                    '<p>Sensor type: <span class="h6 text-warning">' + data[i].sensorType + '</span></p>';
+
+                let loggedInUserId = '@this.User.GetId()';
+                let isCurrentUserSensor = loggedInUserId === data[i].userId;
+
+                if (isCurrentUserSensor) {
+                    markers[i].setAnimation(google.maps.Animation.BOUNCE);
+                    markers[i].addListener('click', function() {
+                        if (markers[i].getAnimation() !== null) {
+                            markers[i].setAnimation(null);
+                        } else {
+                            markers[i].setAnimation(google.maps.Animation.BOUNCE);
+                        }
+                    });
+
+                    if (!data[i].isPublic) {
+                        markers[i].setIcon(privateSensorIconUrl);
+                        contentString += '<p>Status: <span class="h6 text-info"> Private <i class="fas fa-user-secret"></i></span></p>';
+                    } else {
+                        markers[i].setIcon(ownPublicSensorIconUrl);
+                        contentString += '<p>Status: <span class="h6 text-info"> Public <i class="fas fa-globe-europe"></i></span></p>';
+                    }
+                }
+                else {
+                    contentString += '<p>Status: <span class="h6 text-info"> Public <i class="fas fa-globe-europe"></i></span></p>';
+                }
 
                 infoWindows[i] = new google.maps.InfoWindow({
                     content: contentString
@@ -79,77 +102,16 @@
 
                 markers[i].addListener('mouseover', function () {
                     infoWindows[i].open(gm_map, markers[i]);
-                })
+                });
 
                 markers[i].addListener('mouseout', function () {
                     infoWindows[i].close();
-                })
-                
+                });
             }
-            //console.log(data)
-            var markerCluster = new MarkerClusterer(gm_map, markers);
+
+            let markerCluster = new MarkerClusterer(gm_map, markers);
         });
-        //var options_markerclusterer = {
-        //    gridSize: 20,
-        //    maxZoom: 18,
-        //    zoomOnClick: false,
-        //    imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
-        //};
-
-        // Add a marker clusterer to manage the markers.
-        
-
     }
-
-    $(function () {
-
-
-        var marker = new google.maps.Marker({
-            //map: gm_map,
-            draggable: true,
-            animation: google.maps.Animation.DROP,
-            position: { lat: 42.646928, lng: 23.393174 }
-        });
-        marker.setMap(gm_map)
-        marker.addListener('click', toggleBounce);
-
-        function toggleBounce() {
-            if (marker.getAnimation() !== null) {
-                marker.setAnimation(null);
-            } else {
-                marker.setAnimation(google.maps.Animation.BOUNCE);
-            }
-        }
-
-        const drop = function () {
-            for (var i = 0; i < markers.length; i++) {
-                setTimeout(function () {
-                    addMarkerMethod();
-                    markers[i].setMap(gm_map);
-                    markers[i].setAnimation(google.maprs.Animation.DROP)
-                }, i * 200);
-            }
-        }
-        //var markers = locations.map(function (location, i) {
-        //    return new google.maps.Marker({
-        //        position: location,
-        //        label: labels[i % labels.length]
-        //    });
-        //});
-
-        //Add a marker clusterer to manage the markers.
-        //var mcOptions = { gridSize: 50, maxZoom: 15, imagePath: '~/images/m1.png' };
-        //var mc = new MarkerClusterer(gm_map, markers, mcOptions);
-        //var markerCluster = new MarkerClusterer(gm_map, markers,
-        //    //{
-
-        //    //    imagePath: '/images/m1.png'
-        //    //    //imagePath: "~/images/"
-        //    //    //imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
-        //    //}
-        //);
-
-    });
 </script>
 
 

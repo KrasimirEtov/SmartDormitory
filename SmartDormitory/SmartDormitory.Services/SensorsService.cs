@@ -24,15 +24,17 @@ namespace SmartDormitory.Services
             this.measureTypeService = measureTypeService;
         }
 
-        public async Task<IEnumerable<MapSensorServiceModel>> GetAllPublicSensorsCoordinates()
+        public async Task<IEnumerable<MapSensorServiceModel>> GetAllPublicCoordinates()
         => await this.Context
                 .Sensors
                 .Where(s => s.IsPublic && !s.IsDeleted)
                 .Select(s => new MapSensorServiceModel
                 {
-                    Id = s.Id,
+                    SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
                     Name = s.Name,
-                    Description = s.Description,
+                    CreatedOn = (DateTime)s.CreatedOn,
+                    UserId = s.UserId,
+                    IsPublic = s.IsPublic,
                     Coordinates = new Coordinates
                     {
                         Latitude = s.Coordinates.Latitude,
@@ -41,15 +43,17 @@ namespace SmartDormitory.Services
                 })
                 .ToListAsync();
 
-        public async Task<IEnumerable<MapSensorServiceModel>> GetAllUserSensorCoordinates(string userId)
+        public async Task<IEnumerable<MapSensorServiceModel>> GetAllUserPrivateCoordinates(string userId)
             => await this.Context
                          .Sensors
                          .Where(s => !s.IsDeleted && s.UserId == userId && !s.IsPublic)
                          .Select(s => new MapSensorServiceModel
                          {
-                             Id = s.Id,
+                             SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
                              Name = s.Name,
-                             Description = s.Description,
+                             CreatedOn = (DateTime)s.CreatedOn,
+                             UserId = s.UserId,
+                             IsPublic = s.IsPublic,
                              Coordinates = new Coordinates
                              {
                                  Latitude = s.Coordinates.Latitude,

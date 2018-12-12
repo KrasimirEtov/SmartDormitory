@@ -122,5 +122,11 @@ namespace SmartDormitory.Services
 
             return sensor;
         }
+
+        public async Task<int> TotalCount()
+                => await this.Context
+                             .IcbSensors
+                             .Where(s => !s.IsDeleted)
+                             .CountAsync();
     }
 }

@@ -6,6 +6,7 @@ using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
 using SmartDormitory.Services.Models.Users;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -91,13 +92,15 @@ namespace SmartDormitory.Services
             if (user.IsDeleted)
             {
                 user.IsDeleted = false;
+				await userManager.SetLockoutEnabledAsync(user, false);
             }
             else
             {
                 user.IsDeleted = true;
-            }
-
-            this.Context.Users.Update(user);
+				await userManager.SetLockoutEnabledAsync(user, true);
+				await userManager.SetLockoutEndDateAsync(user, DateTime.Today.AddDays(30));
+			}		
+			this.Context.Users.Update(user);
             await this.Context.SaveChangesAsync();
         }
 

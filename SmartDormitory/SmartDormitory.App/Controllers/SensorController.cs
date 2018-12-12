@@ -31,7 +31,7 @@ namespace SmartDormitory.App.Controllers
         public async Task<IActionResult> MySensors()
         {
             var userId = this.User.GetId();
-            var measureTypes = await this.measureTypeService.GetAll();
+            var measureTypes = await this.measureTypeService.GetAllNotDeleted();
 
             var sensors = await this.sensorsService.GetUserSensors(userId);
 
@@ -69,7 +69,7 @@ namespace SmartDormitory.App.Controllers
         [HttpGet]
         public async Task<IActionResult> RegisterIndex()
         {
-            var sensorTypes = await this.measureTypeService.GetAll();
+            var sensorTypes = await this.measureTypeService.GetAllNotDeleted();
             //var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId();
             var userId = User.GetId();
 

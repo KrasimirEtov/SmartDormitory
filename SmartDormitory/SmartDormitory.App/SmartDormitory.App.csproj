@@ -38,4 +38,11 @@
     <Folder Include="Areas\Administration\Views\Shared\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\lib\lights\christmaslights.js" />
+    <None Include="wwwroot\lib\lights\soundmanager2-nodebug-jsmin.js" />
+    <None Include="wwwroot\lib\lights\soundmanager2.swf" />
+    <None Include="wwwroot\lib\lights\soundmanager2_flash9.swf" />
+  </ItemGroup>
+
 </Project>

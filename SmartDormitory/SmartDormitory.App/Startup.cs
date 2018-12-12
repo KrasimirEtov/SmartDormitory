@@ -42,7 +42,7 @@ namespace SmartDormitory.App
 
             // IMPORTANT
             // Comment this line if dropped db and update-database       
-            this.RegisterHangfireDbTables(services);
+			this.RegisterHangfireDbTables(services);
         }
 
         private void RegisterAuthorizations(IServiceCollection services)

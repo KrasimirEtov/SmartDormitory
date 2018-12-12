@@ -1,0 +1,71 @@
+﻿@model MeasureTypesListViewModel
+
+<a asp-area="Administration" asp-controller="MeasureType" asp-action="Create" class="btn btn-info btn-block">Create new</a>
+<div id="users-table">
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="th-lg" scope="col" style="text-align:center">Measure Unit</th>
+                    <th class="th-lg" scope="col" style="text-align:center">Sensor Type</th>
+                    <th class="th-lg" scope="col" style="text-align:center">Action</th>
+                </tr>
+            </thead>
+            <tbody id="user-section">
+                @foreach (var type in Model.MeasureTypes)
+                {
+                    <tr style="text-align:center">
+                        <td>@type.MeasureUnit</td>
+                        <td>@type.SuitableSensorType</td>
+                        <td>
+                            @{
+                                string buttonClass = !type.IsDeleted ? "btn-danger" : "btn-dark-green";
+                                string buttonTitle = !type.IsDeleted ? "Disable" : "Enable";
+                            }
+                            <form asp-area="Administration" asp-controller="MeasureType"
+                                  asp-action="Delete" data-type-id="@type.Id" method="post">
+                                <button class="typeStateBtn btn btn-sm @buttonClass" type="submit">
+                                    @buttonTitle
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        const isEnabledBtn = 'btn-danger';
+        const isDisabledBtn = 'btn-dark-green';
+
+        // Form START
+        $("form[id!='logoutForm']").on('submit', function (event) {
+            event.preventDefault();
+            const tokenValue = $('input[name="__RequestVerificationToken"]').val();
+            const typeId = $(this).data('typeId');
+
+            $.post($(this).attr('action'), { typeId: typeId, __RequestVerificationToken: tokenValue }, function () {
+            });
+        });
+        // Form END
+
+        $('button.typeStateBtn').click(function () {
+
+            const enableUserText = 'Enable';
+            const disableUserText = 'Disable';
+
+            if ($(this).hasClass(isEnabledBtn)) {
+                $(this).removeClass(isEnabledBtn).addClass(isDisabledBtn);
+                $(this).html(enableUserText);
+            }
+            else if ($(this).hasClass(isDisabledBtn)) {
+                $(this).removeClass(isDisabledBtn).addClass(isEnabledBtn);
+                $(this).html(disableUserText);
+            }
+        });
+    });
+</script>
+

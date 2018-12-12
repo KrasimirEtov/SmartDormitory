@@ -1,0 +1,46 @@
+﻿@model CreateMeasureTypeViewModel
+
+<div class="row">
+    <div class="col-md-3">
+        <h4><span class="form-row badge badge-pill badge-light text-secondary"> Creating measure type </span></h4>
+    </div>
+
+    <div class="col-md-3">
+        <h4><span class="h5 badge badge-pill badge-warning"> Step 2: </span></h4>
+    </div>
+    <div class="col-md-4">
+        <h4><span class="h5 badge badge-pill badge-info"> Add measure type details </span></h4>
+    </div>
+    <div class="col-md-2">
+        <a asp-area="Administration" asp-controller="Sensor" asp-action="RegisterIndex">
+            <h4><span class="h5 badge badge-pill badge-primary">Go Back</span></h4>
+        </a>
+    </div>
+</div>
+
+<hr />
+
+<form asp-area="Administrator" asp-controller="MeasureType" asp-action="Create" method="post">
+    <div class="form-row">
+        <div class="col-6">
+            <label asp-for="MeasureUnit" class="control-label"><b>Measure unit</b></label>
+            <input asp-for="MeasureUnit" class="form-control" placeholder="Type a measure unit" />
+            <span asp-validation-for="MeasureUnit" class="text-danger"></span>
+        </div>
+            <div class="col-6">
+                <label asp-for="SuitableSensorType" class="control-label"><b>Sensor type</b></label>
+                <input asp-for="SuitableSensorType" class="form-control" placeholder="Type a sensor type" />
+                <span asp-validation-for="SuitableSensorType" class="text-danger"></span>
+            </div>
+    </div>
+    <br />
+    <div class="form-row">
+        <button class="btn btn-info waves-effect my-sm-0 btn-block" type="submit"><b>Create</b></button>
+    </div>
+</form>
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&libraries=places&callback=initMap"
+        async defer></script>
+<script src="~/js/mapsModal.js"></script>
+<script src="~/js/registerSensor.js"></script>

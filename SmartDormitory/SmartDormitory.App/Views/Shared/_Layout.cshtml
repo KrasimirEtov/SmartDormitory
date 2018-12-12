@@ -13,9 +13,10 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
               integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
         <link rel="stylesheet" href="~/css/site.css" />
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+              integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 
-        <script src="~/lib//mdb/js/jquery-3.3.1.min.js"></script>
+        <script src="~/lib/mdb/js/jquery-3.3.1.min.js"></script>
         <script src="~/lib/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.js"></script>
         <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
         <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
@@ -64,7 +65,7 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item">
-                        <a asp-area="" asp-controller="Sensor" asp-action="RegisterIndex" asp-route-userId="@this.User.GetId()"
+                        <a asp-area="" asp-controller="Sensor" asp-action="RegisterIndex"
                            class="nav-link waves-effect">Register sensor</a>
                     </li>
                     <li class="nav-item">
@@ -94,16 +95,18 @@
 
     <partial name="_CookieConsentPartial" />
 
-    <div class="container body-content" style="padding-top:80px;">
+    <div class="container body-content" style="padding-top:90px;">
         <div>
             <partial name="_ResultPartial" />
         </div>
         @RenderBody()
-        <hr />
-        <footer class="page-footer dark-grey-text fixed-bottom">
-            <p>&copy; @DateTime.Now.Year - SmartDormitory.Team 2</p>
-        </footer>
+        <br />
     </div>
+    <footer class="page-footer font-small bg-transparent pt-4">
+        <div class="footer-copyright text-center py-3">
+            <h5 class="mt-2 text-white"><b>&copy; @DateTime.Now.Year - SmartDormitory.Team 2</b></h5>
+        </div>
+    </footer>
 
     <environment include="Development">
         @*<script src="~/lib//mdb/js/jquery-3.3.1.min.js"></script>*@

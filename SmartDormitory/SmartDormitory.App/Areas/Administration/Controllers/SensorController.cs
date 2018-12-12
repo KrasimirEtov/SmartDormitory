@@ -37,7 +37,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         public async Task<IActionResult> Index()
         {
             var measureTypes = await this.measureTypeService
-                                         .GetAll();
+                                         .GetAllNotDeleted();
 
             var model = new SensorsIndexViewModel
             {
@@ -74,7 +74,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         [HttpGet]
         public async Task<IActionResult> RegisterIndex(string userId)
         {
-            var sensorTypes = await this.measureTypeService.GetAll();
+            var sensorTypes = await this.measureTypeService.GetAllNotDeleted();
             var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId();
 
             var model = new IcbSensorTypesViewModel

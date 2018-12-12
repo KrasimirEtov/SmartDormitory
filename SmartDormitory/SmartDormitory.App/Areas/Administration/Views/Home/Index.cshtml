@@ -38,12 +38,12 @@
 
     <div class="col-4 text-center">
         <div class="card text-white bg-primary mb-3 border-dark" style="max-width: 20rem;">
-            <div class="card-header"><b>Admin Count</b></div>
+            <div class="card-header"><b>Sensor measure types</b></div>
             <div class="card-body">
-                <p class="card-text text-white">Total number of admins: <b>5000</b></p>
+                <p class="card-text text-white">Number of active sensor measure types <b>@Model.MeasureTypesCount</b></p>
             </div>
 
-            <a asp-area="Administration" asp-controller="Sensor" asp-action="Index"
+            <a asp-area="Administration" asp-controller="MeasureType" asp-action="Index"
                class="card-footer bg-transparent border-grey text-center">
                 <span class="pull-left text-white">View All</span>
                 <span class="pull-right text-white"><i class="fa fa-arrow-circle-right"></i></span>

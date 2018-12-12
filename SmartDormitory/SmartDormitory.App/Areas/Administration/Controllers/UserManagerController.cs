@@ -29,7 +29,6 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
             {
                 var model = await UpdateAllUsersPage();
                 return View(model);
-
             }
             catch (RedirectException e)
             {

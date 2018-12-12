@@ -7,5 +7,6 @@
         public string SuitableSensorType { get; set; }
 
         public string MeasureUnit { get; set; }
-    }
+		public bool IsDeleted { get; set; }
+	}
 }

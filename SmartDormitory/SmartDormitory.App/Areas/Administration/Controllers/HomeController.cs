@@ -13,24 +13,28 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
     {
         private readonly IUserService userService;
         private readonly ISensorsService sensorsService;
+		private readonly IMeasureTypeService measureTypeService;
 
-        public HomeController(IUserService userService, ISensorsService sensorsService)
+		public HomeController(IUserService userService, ISensorsService sensorsService, IMeasureTypeService measureTypeService)
         {
             this.userService = userService;
             this.sensorsService = sensorsService;
-        }
+			this.measureTypeService = measureTypeService;
+		}
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var users = await userService.TotalUsers();
             var sensors = await sensorsService.TotalSensors();
+			var measureTypes = await this.measureTypeService.TotalCount();
 
             var model = new DashboardViewModel()
             {
                 UsersCount = users,
-                SensorsCount = sensors
-            };
+                SensorsCount = sensors,
+				MeasureTypesCount = measureTypes
+			};
 
             return View(model);
         }

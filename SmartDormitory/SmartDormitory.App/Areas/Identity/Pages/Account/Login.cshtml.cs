@@ -78,12 +78,13 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
                 var user = await this.userManager.FindByNameAsync(Input.Username);
-                if (user.IsDeleted)
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
-                if (result.Succeeded)
+    //            if (user.IsDeleted)
+    //            {
+    //                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+				//	TempData["Error-Message"] = "Your account is locked by an administrator!";
+				//	return RedirectToAction("Index", "Home", new { Area = "" });
+				//}
+				if (result.Succeeded)
                 {
                     logger.LogInformation("User logged in.");
 
@@ -104,8 +105,9 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
                 if (result.IsLockedOut)
                 {
                     logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
-                }
+					TempData["Error-Message"] = "Your account is locked by an administrator!";
+					return RedirectToAction("Index", "Home", new { Area = "" });
+				}
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");

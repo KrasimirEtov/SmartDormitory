@@ -29,5 +29,7 @@ namespace SmartDormitory.Data.Models
 
         [DataType(DataType.DateTime)]
         public DateTime? ModifiedOn { get; set; }
-    }
+
+		public bool IsLocked { get; set; }
+	}
 }

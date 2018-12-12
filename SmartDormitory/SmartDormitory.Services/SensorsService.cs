@@ -158,7 +158,7 @@ namespace SmartDormitory.Services
                 .FirstOrDefaultAsync();
             if (sensor == null)
             {
-                throw new EntityDoesntExistException("Sensor is no present in database!");
+                throw new EntityDoesntExistException("Sensor is not present in the database!");
             }
             return sensor;
         }

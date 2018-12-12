@@ -4,6 +4,7 @@
 {
     <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
         <ul class="navbar-nav nav-flex-icons">
+            <vc:inbox></vc:inbox>
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle waves-effect" id="userDropdown"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -16,7 +17,7 @@
                        class="dropdown-item waves-effect" style="text-align:center">My profile</a>
                     <div class="dropdown-divider"></div>
                     <div class="d-flex justify-content-center">
-                        <button type="submit" class="btn btn-light waves-effect">Sign out</button>
+                        <button type="submit" class="btn btn-outline-deep-orange waves-effect">Sign out</button>
                     </div>
                 </div>
             </li>

@@ -43,7 +43,9 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top scrolling-navbar">
         <a asp-area="" asp-controller="Home" asp-action="Index"
-           class="navbar-brand"><strong>Smart Dormitory</strong></a>
+           class="navbar-brand deep-orange-text font-weight-bold">
+            <i class="fas fa-tachometer-alt"></i> Smart Dormitory
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -53,14 +55,6 @@
                 <li class="nav-item">
                     <a asp-area="" asp-controller="Home" asp-action="Index"
                        class="nav-link waves-effect">Home<span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a asp-area="" asp-controller="Home" asp-action="About"
-                       class="nav-link waves-effect">About</a>
-                </li>
-                <li class="nav-item">
-                    <a asp-area="" asp-controller="Home" asp-action="Contact"
-                       class="nav-link waves-effect">Contact</a>
                 </li>
                 @if (User.Identity.IsAuthenticated)
                 {
@@ -72,20 +66,18 @@
                         <a asp-area="" asp-controller="Sensor" asp-action="MySensors"
                            class="nav-link waves-effect">My sensors</a>
                     </li>
-                    <li class="nav-item">
-                        <vc:inbox></vc:inbox>
-                    </li>
+                    @*<li class="nav-item">
+                            <vc:inbox></vc:inbox>
+                        </li>*@
                 }
                 @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
                 {
-                    <partial name="_AdminPartial" />
                     <li class="nav-item">
-                        <a asp-area="Administration" asp-controller="Sensor" asp-action="Index"
-                           class="nav-link waves-effect">Admin view sensors</a>
+                        <a asp-area="Administration" asp-controller="Home" asp-action="Index"
+                           class="nav-link waves-effect">Admin Panel</a>
                     </li>
                     <li class="nav-item">
-                        <a href="/hangfire"
-                           class="nav-link waves-effect">Hangfire dashboard</a>
+                        <a href="/hangfire" class="nav-link waves-effect">Hangfire dashboard</a>
                     </li>
                 }
             </ul>

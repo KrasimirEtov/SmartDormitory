@@ -1,10 +1,11 @@
 ﻿@model InboxViewComponentModel
 
-<li class="dropdown nav-item">
-    <p class="dropdown-toggle nav-link ml-5" data-toggle="dropdown">
-        <i class="far fa-envelope"></i>Notifications
+<li class="nav-item dropdown no-arrow">
+    <a class="nav-link dropdown-toggle waves-effect" id="userDropdown"
+       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="far fa-envelope"></i> Notifications
         <span id="unseen" class="badge badge-pill badge-primary">@Model.UnseenCount</span>
-    </p>
+    </a>
     <ul class="dropdown-menu dropdown-menu-right dropdown-navbar">
         <li class="nav-link text-info text-center">
             <nav-item dropdown-item><span><small>Last 5 alarms</small></span></nav-item>
@@ -21,14 +22,12 @@
                 </nav-item>
                 <div class="dropdown-divider"></div>
             </li>
-
         }
         <li class="nav-link">
             <a asp-area="" asp-controller="Notification" asp-action="Inbox" @*asp-route-type="received" *@>
                 <span class="badge badge-warning badge-pill"> ...View all</span>
             </a>
         </li>
-
     </ul>
 </li>
 

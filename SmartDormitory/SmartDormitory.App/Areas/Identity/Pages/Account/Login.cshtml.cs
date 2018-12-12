@@ -16,14 +16,11 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly SignInManager<User> signInManager;
-        private readonly ILogger<LoginModel> logger;
         private readonly UserManager<User> userManager;
 
-        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger,
-            UserManager<User> userManager)
+        public LoginModel(SignInManager<User> signInManager, UserManager<User> userManager)
         {
             this.signInManager = signInManager;
-            this.logger = logger;
             this.userManager = userManager;
         }
 
@@ -74,45 +71,40 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
-                var user = await this.userManager.FindByNameAsync(Input.Username);
-    //            if (user.IsDeleted)
-    //            {
-    //                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-				//	TempData["Error-Message"] = "Your account is locked by an administrator!";
-				//	return RedirectToAction("Index", "Home", new { Area = "" });
-				//}
+				// This doesn't count login failures towards account lockout
+				// To enable password failures to trigger account lockout, set lockoutOnFailure: true
+				var user = await this.userManager.FindByNameAsync(Input.Username);
+				if (user is null)
+				{
+					TempData["Error-Message"] = "User account does not exist!";
+					return RedirectToAction("Index", "Home", new { Area = "" });
+				}
+				if (user.IsLocked)
+				{
+					TempData["Error-Message"] = "Your account is locked by an administrator!";
+					return RedirectToAction("Index", "Home", new { Area = "" });
+				}
+				if (user.IsDeleted)
+				{
+					ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+					TempData["Error-Message"] = "User account does not exist!";
+					return RedirectToAction("Index", "Home", new { Area = "" });
+				}
+				var result = await signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: true);            
 				if (result.Succeeded)
                 {
-                    logger.LogInformation("User logged in.");
-
                     var roles = await this.userManager.GetRolesAsync(user);
 
                     if (roles.Contains("Administrator"))
                     {
-                        this.logger.LogInformation("Administrator logged in.");
                         return RedirectToAction("Index", "Home", new { Area = "Administration" });
                     }
                     else
                     {
-                        logger.LogInformation("Regular user logged in.");
-                        //return LocalRedirect(returnUrl);
                         return RedirectToAction("Index", "Home", new { Area = "" });
                     }
                 }
-                if (result.IsLockedOut)
-                {
-                    logger.LogWarning("User account locked out.");
-					TempData["Error-Message"] = "Your account is locked by an administrator!";
-					return RedirectToAction("Index", "Home", new { Area = "" });
-				}
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
+               
             }
 
             // If we got this far, something failed, redisplay form

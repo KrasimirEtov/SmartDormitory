@@ -184,7 +184,7 @@ namespace SmartDormitory.App.Controllers
             try
             {
                 var sensor = await sensorsService.GetSensorById(sensorId);
-                if (sensor.UserId != User.GetId())
+                if (sensor.UserId != User.GetId() && !User.IsInRole("Administrator"))
                 {
                     TempData["Error-Message"] = "Access denied!";
                     return RedirectToAction("Index", "Home");

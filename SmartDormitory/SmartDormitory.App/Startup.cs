@@ -199,7 +199,7 @@ namespace SmartDormitory.App
 
             //starting jobs
             RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(x => x.UpdateIcbSensors(), Cron.Hourly());
-            RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(x => x.Magic(), Cron.Minutely());
+            RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(x => x.HardTenSecondsRecurringJob(), Cron.Minutely());
 
             app.UseNToastNotify();
             app.UseSignalR(routes =>

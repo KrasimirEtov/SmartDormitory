@@ -46,7 +46,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
             }
         }
 
-        public async Task Magic()
+        public async Task HardTenSecondsRecurringJob()
         {
             // hard 10 seconds interval
             for (int i = 0; i < 5; i++)
@@ -69,10 +69,6 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                 var dbContext = scope.ServiceProvider.GetService<SmartDormitoryContext>();
 
                 var userSensorsForUpdate = await sensorsService.GetAllForUpdate();
-                //await dbContext
-                //        .Sensors
-                //        .Where(s => DateTime.Now.Subtract(s.LastUpdateOn).TotalSeconds >= s.PollingInterval)
-                //        .ToListAsync();
 
                 bool isApiDown = false;
                 string apiExceptionMessage = string.Empty;
@@ -131,8 +127,17 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
 
                 if (isApiDown)
                 {
+                    // no internet connection
+                    if (apiExceptionMessage.Equals("No such host is known"))
+                    {
+                        apiExceptionMessage = "Check your internet connection!";
+                        await this.notificationManager.SendRegularUsersAlert(apiExceptionMessage);
+                    }
+                    else
+                    {
+                        await this.notificationManager.SendRegularUsersAlert("Sorry for the inconvenience, our data provider is down. We’re working on it.");
+                    }
                     await this.notificationManager.SendAdminsAlert(apiExceptionMessage);
-                    await this.notificationManager.SendRegularUsersAlert("Sorry for the inconvenience, our data provider is down. We’re working on it.");
                 }
                 else
                 {

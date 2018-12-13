@@ -6,7 +6,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
     {
         void StartingJobsQueue();
         Task UpdateSensorsData();
-        Task Magic();
+        Task HardTenSecondsRecurringJob();
 
         Task UpdateIcbSensors();
     }

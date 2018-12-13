@@ -34,6 +34,7 @@ namespace SmartDormitory.Services.Contracts
 
         Task<IEnumerable<Sensor>> GetAll();
         Task UpdateRange(IList<Sensor> sensorsToUpdate);
-        Task GetSensorsForUpdate();
+
+        Task<IEnumerable<Sensor>> GetAllForUpdate();
     }
 }

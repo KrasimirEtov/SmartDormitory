@@ -53,10 +53,10 @@
                             }
                             else
                             {
-                                string buttonClass = !user.IsDeleted ? "btn-danger" : "btn-dark-green";
-                                string buttonTitle = !user.IsDeleted ? "Disable" : "Enable";
+                                string buttonClass = !user.IsLocked ? "btn-danger" : "btn-dark-green";
+                                string buttonTitle = !user.IsLocked ? "Disable" : "Enable";
                                 <form asp-area="Administration" asp-controller="UserManager"
-                                      asp-action="Delete" data-user-id="@user.Id" method="post">
+                                      asp-action="Disable" data-user-id="@user.Id" method="post">
                                     <button class="userStateBtn btn @buttonClass" data-user-id="@user.Id" type="submit">
                                         @buttonTitle
                                     </button>

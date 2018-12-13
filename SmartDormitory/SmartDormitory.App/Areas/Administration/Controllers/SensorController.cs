@@ -158,8 +158,13 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
                 model.Longtitude, model.Latitude, model.SwitchOn);
 
             this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
-            return this.RedirectToAction("Details", "Sensor", new { sensorId = createdSensorId });
-        }
+			return this.RedirectToAction("Create", "Sensor", new
+			{
+				icbSensorId = model.IcbSensorId,
+				userId = model.UserId,
+				area = "Administration"
+			});
+		}
 
         [HttpGet]
         public async Task<IActionResult> Update(string sensorId)
@@ -200,8 +205,8 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
             catch (EntityDoesntExistException e)
             {
                 TempData["Error-Message"] = e.Message;
-                return this.RedirectToAction("Index", "Home");
-            }
+				return this.RedirectToAction("Index", "Sensor", new { area = "Administration" });
+			}
         }
 
         [HttpPost]

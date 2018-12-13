@@ -83,18 +83,18 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete([FromForm]string userId)
+        public async Task<IActionResult> Disable([FromForm]string userId)
         {
             try
             {
-                await this.userService.DeleteUser(userId);
+                await this.userService.DisableUser(userId);
             }
             catch (EntityDoesntExistException e)
             {
                 this.TempData["Error-Message"] = e.Message;
                 return this.NotFound(e.Message);
             }
-            this.TempData["Success-Message"] = $"User was successfully deleted!";
+            this.TempData["Success-Message"] = $"User was successfully disabled!";
 
             return this.Ok();
         }

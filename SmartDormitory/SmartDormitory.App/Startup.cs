@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +58,16 @@ namespace SmartDormitory.App
             });
         }
 
-        private void RegisterHangfireDbTables(IServiceCollection services)
+		private void RegisterPrivacyPolicy(IServiceCollection services)
+		{
+			services.Configure<CookiePolicyOptions>(options =>
+			{
+				options.CheckConsentNeeded = context => true;
+				options.MinimumSameSitePolicy = SameSiteMode.None;
+			});
+		}
+
+		private void RegisterHangfireDbTables(IServiceCollection services)
         {
             var connectionString = Environment
                                             .GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
@@ -158,17 +168,17 @@ namespace SmartDormitory.App
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
-            app.UseHttpsRedirection();
+			
+			app.UseHttpsRedirection();
             app.UseWrongRouteHandler();
 
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            app.UseAuthentication();
+			app.UseAuthentication();
 
-            //seeding
-            app.SeedAdminAccount();
+			//seeding
+			app.SeedAdminAccount();
             app.SeedMeasureTypes();
 
             //TODO add app extension method

@@ -42,7 +42,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
 
 				await Assert.ThrowsExceptionAsync<EntityDoesntExistException>(
-					() => userService.DeleteUser(userId));
+					() => userService.DisableUser(userId));
 			}
 		}
 
@@ -79,7 +79,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
 
 				await Assert.ThrowsExceptionAsync<EntityDoesntExistException>(
-					() => userService.DeleteUser(userId));
+					() => userService.DisableUser(userId));
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			{
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
 
-				await userService.DeleteUser(userId);
+				await userService.DisableUser(userId);
 				var users = await assertContext.Users.ToListAsync();
 				Assert.AreEqual(users.Count, 0);
 			}

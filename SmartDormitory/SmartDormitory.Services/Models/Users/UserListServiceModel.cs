@@ -9,5 +9,6 @@ namespace SmartDormitory.Services.Models.Users
 		public string UserName { get; set; }
 		public int SensorsCount { get; set; }
 		public bool IsDeleted { get; set; }
+		public bool IsLocked { get; set; }
 	}
 }

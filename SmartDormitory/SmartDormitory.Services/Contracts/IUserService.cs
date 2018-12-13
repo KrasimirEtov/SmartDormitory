@@ -13,7 +13,9 @@ namespace SmartDormitory.Services.Contracts
 		Task<bool> IsAdmin(string userId);
 		Task SetRole(string userId, string roleName);
 		Task RemoveRole(string userId, string roleName);
-		Task DeleteUser(string userId);
+		Task DisableUser(string userId);
 		Task<int> TotalUsers();
+		Task SetGdprStatus(string userId);
+		Task DeleteUser(string userId);
 	}
 }

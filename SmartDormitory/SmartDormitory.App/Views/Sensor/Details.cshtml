@@ -14,8 +14,16 @@
         <div class="card">
             <div class="card-body">
                 <h2 class="card-title" style="text-align:center">Sensor name: @Model.Name</h2>
-                <a asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
-                   class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <a asp-area="Administration" asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
+                       class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
+                }
+                else
+                {
+                    <a asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
+                       class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
+                }
             </div>
         </div>
         <br />

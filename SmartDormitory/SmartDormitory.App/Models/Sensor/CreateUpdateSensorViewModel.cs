@@ -45,7 +45,7 @@ namespace SmartDormitory.App.Models.Sensor
         public int ApiPollingInterval { get; set; }
 
         public bool SwitchOn { get; set; }
-
+    
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var results = new List<ValidationResult>();

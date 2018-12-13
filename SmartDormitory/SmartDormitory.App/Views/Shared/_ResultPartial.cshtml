@@ -1,6 +1,6 @@
 ﻿@if (TempData["Error-Message"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div class="alertMsg alert alert-danger alert-dismissible fade show" role="alert">
         @TempData["Error-Message"]
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -9,7 +9,7 @@
 }
 @if (TempData["Success-Message"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alertMsg alert alert-success alert-dismissible fade show" role="alert">
         @TempData["Success-Message"]
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -18,7 +18,7 @@
 }
 
 <script>
-    $(".alert").delay(4000).slideUp(200, function () {
-        $(this).alert('close');
-    });
+    //$(".alertMsg").delay(4000).slideUp(200, function () {
+    //    $(this).alert('close');
+    //});
 </script>

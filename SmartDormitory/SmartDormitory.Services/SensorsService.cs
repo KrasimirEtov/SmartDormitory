@@ -350,5 +350,12 @@ namespace SmartDormitory.Services
                     },
                 })
                 .ToListAsync();
+
+        public async Task<IEnumerable<Sensor>> GetAllForUpdate()
+            => await this.Context
+                         .Sensors
+                         .Where(s => !s.IsDeleted &&
+                            DateTime.Now.Subtract(s.LastUpdateOn).TotalSeconds >= s.PollingInterval)
+                         .ToListAsync();
     }
 }

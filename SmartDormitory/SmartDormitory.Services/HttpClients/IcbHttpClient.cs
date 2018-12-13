@@ -26,20 +26,10 @@ namespace SmartDormitory.Services.HttpClients
 
         private async Task<string> FetchData(string requestUri)
         {
-            try
-            {
-                var response = await this.client.GetAsync(requestUri);
-                response.EnsureSuccessStatusCode();
+            var response = await this.client.GetAsync(requestUri);
+            response.EnsureSuccessStatusCode();
 
-                return response.Content.ReadAsStringAsync().Result;
-            }
-            catch (HttpRequestException)
-            {
-                //this.logger.LogError($"An error occured connecting to values API {ex.ToString()}");
-
-                // throw some and handle to show UI api is down
-                return "ERROR";
-            }
+            return response.Content.ReadAsStringAsync().Result;
         }
     }
 }

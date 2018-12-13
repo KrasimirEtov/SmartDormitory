@@ -6,7 +6,7 @@ namespace SmartDormitory.Services.Contracts
 {
     public interface IIcbSensorsService
     {
-        Task<IEnumerable<(string Id, int PollingInterval)>> AddSensorsAsync();
+        Task AddSensorsAsync();
 
         Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "");
 

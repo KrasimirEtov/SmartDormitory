@@ -8,6 +8,7 @@ using SmartDormitory.Services.Utils.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Services
@@ -25,53 +26,54 @@ namespace SmartDormitory.Services
             this.measureTypeService = measureTypeService;
         }
 
-        // return newly created icb sensors Guid Ids and PollingInterval so we can add new RecurringJob for each of them
-        public async Task<IEnumerable<(string Id, int PollingInterval)>> AddSensorsAsync()
+        public async Task AddSensorsAsync()
         {
-            // todo dont return them later
-            var createdSensorsJobData = new List<(string Id, int PollingInterval)>();
-            var icbSensors = await this.icbApiService.GetAllIcbSensors();
-
-            foreach (var icbSensor in icbSensors)
+            try
             {
-                bool sensorExists = await this.Context
-                                              .IcbSensors
-                                              .AnyAsync(s => s.Id == icbSensor.ApiSensorId && !s.IsDeleted);
+                var icbSensors = await this.icbApiService.GetAllIcbSensors();
 
-                if (!sensorExists)
+                foreach (var icbSensor in icbSensors)
                 {
-                    var measureType = await this.Context
-                                                .MeasureTypes
-                                                .FirstOrDefaultAsync(mt =>
-                                                                         mt.MeasureUnit == icbSensor.MeasureType
-                                                                            && !mt.IsDeleted);
+                    bool sensorExists = await this.Context
+                                                  .IcbSensors
+                                                  .AnyAsync(s => s.Id == icbSensor.ApiSensorId && !s.IsDeleted);
 
-                    if (measureType != null)
+                    if (!sensorExists)
                     {
-                        var (MinRange, MaxRange) = ApiDataHelper
-                                                        .GetMinAndMaxRange(icbSensor.Description);
+                        var measureType = await this.Context
+                                                    .MeasureTypes
+                                                    .FirstOrDefaultAsync(mt =>
+                                                                             mt.MeasureUnit == icbSensor.MeasureType
+                                                                                && !mt.IsDeleted);
 
-                        var icbSensorToAdd = new IcbSensor
+                        if (measureType != null)
                         {
-                            Id = icbSensor.ApiSensorId,
-                            Description = icbSensor.Description,
-                            Tag = icbSensor.Tag,
-                            MeasureTypeId = measureType.Id,
-                            PollingInterval = icbSensor.MinPollingIntervalInSeconds,
-                            MinRangeValue = MinRange,
-                            MaxRangeValue = MaxRange,
-                            CreatedOn = DateTime.Now
-                        };
+                            var (MinRange, MaxRange) = ApiDataHelper
+                                                            .GetMinAndMaxRange(icbSensor.Description);
 
-                        await this.Context.IcbSensors.AddAsync(icbSensorToAdd);
-                        createdSensorsJobData.Add((icbSensorToAdd.Id, icbSensorToAdd.PollingInterval));
+                            var icbSensorToAdd = new IcbSensor
+                            {
+                                Id = icbSensor.ApiSensorId,
+                                Description = icbSensor.Description,
+                                Tag = icbSensor.Tag,
+                                MeasureTypeId = measureType.Id,
+                                PollingInterval = icbSensor.MinPollingIntervalInSeconds,
+                                MinRangeValue = MinRange,
+                                MaxRangeValue = MaxRange,
+                                CreatedOn = DateTime.Now
+                            };
+
+                            await this.Context.IcbSensors.AddAsync(icbSensorToAdd);
+                        }
                     }
                 }
+
+                await this.Context.SaveChangesAsync();
             }
-
-            await this.Context.SaveChangesAsync();
-
-            return createdSensorsJobData;
+            catch (HttpRequestException e)
+            {
+                throw new HttpRequestException(e.Message);
+            }
         }
 
         public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "")

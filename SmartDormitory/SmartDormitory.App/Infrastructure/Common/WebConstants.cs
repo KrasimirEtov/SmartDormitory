@@ -6,5 +6,7 @@
         public const string AdminPolicy = "Admin";
         public const string AdminRole = "Administrator";
 
+        public const string AdminsGroup = "Admins";
+        public const string RegularsGroup = "Regulars";
     }
 }

@@ -50,7 +50,7 @@
                     }
                     <form asp-area="Administration" asp-controller="Sensor"
                           asp-action="ToggleDelete" method="post" data-sensor-id="@sensor.Id">
-                        <button class="deleteToggleButton btn btn waves-effect @buttonClass" type="submit">
+                        <button class="deleteToggleButton btn btn-sm waves-effect @buttonClass" type="submit">
                             <i class="icon @glyph"></i>
                         </button>
                     </form>
@@ -58,7 +58,7 @@
                 <td class="text-center">
                     <a asp-area="Administration" asp-controller="Sensor"
                        asp-action="Update" asp-route-sensorId="@sensor.Id"
-                       class=" btn btn-secondary waves-effect">
+                       class=" btn btn-sm btn-secondary waves-effect">
                         <i class="far fa-edit"></i>
                     </a>
                 </td>

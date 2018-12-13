@@ -3,6 +3,7 @@ using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.HttpClients;
 using SmartDormitory.Services.Models.JsonDtoModels;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Services
@@ -18,16 +19,30 @@ namespace SmartDormitory.Services
 
         public async Task<IReadOnlyList<ApiSensorDetailsDTO>> GetAllIcbSensors()
         {
-            string jsonResult = await this.client.FetchAllSensors();
+            try
+            {
+                string jsonResult = await this.client.FetchAllSensors();
 
-            return JsonConvert.DeserializeObject<IReadOnlyList<ApiSensorDetailsDTO>>(jsonResult);
+                return JsonConvert.DeserializeObject<IReadOnlyList<ApiSensorDetailsDTO>>(jsonResult);
+            }
+            catch (HttpRequestException e)
+            {
+                throw new HttpRequestException(e.Message);
+            }
         }
 
         public async Task<ApiSensorValueDTO> GetIcbSensorValueById(string id)
         {
-            string jsonResult = await this.client.FetchSensorById(id);
+            try
+            {
+                string jsonResult = await this.client.FetchSensorById(id);
 
-            return JsonConvert.DeserializeObject<ApiSensorValueDTO>(jsonResult);
+                return JsonConvert.DeserializeObject<ApiSensorValueDTO>(jsonResult);
+            }
+            catch (HttpRequestException e)
+            {
+                throw new HttpRequestException(e.Message);
+            }
         }
     }
 }

@@ -43,7 +43,7 @@ namespace SmartDormitory.App
 
             // IMPORTANT
             // Comment this line if dropped db and update-database       
-			this.RegisterHangfireDbTables(services);
+            this.RegisterHangfireDbTables(services);
         }
 
         private void RegisterAuthorizations(IServiceCollection services)
@@ -58,16 +58,16 @@ namespace SmartDormitory.App
             });
         }
 
-		private void RegisterPrivacyPolicy(IServiceCollection services)
-		{
-			services.Configure<CookiePolicyOptions>(options =>
-			{
-				options.CheckConsentNeeded = context => true;
-				options.MinimumSameSitePolicy = SameSiteMode.None;
-			});
-		}
+        private void RegisterPrivacyPolicy(IServiceCollection services)
+        {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+        }
 
-		private void RegisterHangfireDbTables(IServiceCollection services)
+        private void RegisterHangfireDbTables(IServiceCollection services)
         {
             var connectionString = Environment
                                             .GetEnvironmentVariable("SDConnectionString", EnvironmentVariableTarget.User);
@@ -133,7 +133,8 @@ namespace SmartDormitory.App
                   options.AllowAreas = true;
                   options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                   options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
-              });
+              })
+              .AddNToastNotifyToastr();
 
             services.AddSignalR();
         }
@@ -168,17 +169,17 @@ namespace SmartDormitory.App
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-			
-			app.UseHttpsRedirection();
+
+            app.UseHttpsRedirection();
             app.UseWrongRouteHandler();
 
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-			app.UseAuthentication();
+            app.UseAuthentication();
 
-			//seeding
-			app.SeedAdminAccount();
+            //seeding
+            app.SeedAdminAccount();
             app.SeedMeasureTypes();
 
             //TODO add app extension method
@@ -197,9 +198,10 @@ namespace SmartDormitory.App
             });
 
             //starting jobs
-            RecurringJob.AddOrUpdate<IIcbSensorsService>(x => x.AddSensorsAsync(), Cron.Hourly());
+            RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(x => x.UpdateIcbSensors(), Cron.Hourly());
             RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(x => x.Magic(), Cron.Minutely());
 
+            app.UseNToastNotify();
             app.UseSignalR(routes =>
             {
                 routes.MapHub<NotificationsHub>("/notificationHub");

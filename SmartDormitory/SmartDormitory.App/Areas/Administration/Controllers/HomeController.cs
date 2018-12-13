@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartDormitory.App.Areas.Administration.Models.Home;
 using SmartDormitory.App.Infrastructure.Common;
+using SmartDormitory.App.Infrastructure.Extensions;
 using SmartDormitory.Services.Contracts;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Areas.Administration.Controllers
@@ -13,30 +15,37 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
     {
         private readonly IUserService userService;
         private readonly ISensorsService sensorsService;
-		private readonly IMeasureTypeService measureTypeService;
+        private readonly IMeasureTypeService measureTypeService;
 
-		public HomeController(IUserService userService, ISensorsService sensorsService, IMeasureTypeService measureTypeService)
+        public HomeController(IUserService userService, ISensorsService sensorsService, IMeasureTypeService measureTypeService)
         {
             this.userService = userService;
             this.sensorsService = sensorsService;
-			this.measureTypeService = measureTypeService;
-		}
+            this.measureTypeService = measureTypeService;
+        }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var users = await userService.TotalUsers();
             var sensors = await sensorsService.TotalSensors();
-			var measureTypes = await this.measureTypeService.TotalCount();
+            var measureTypes = await this.measureTypeService.TotalCount();
 
             var model = new DashboardViewModel()
             {
                 UsersCount = users,
                 SensorsCount = sensors,
-				MeasureTypesCount = measureTypes
-			};
+                MeasureTypesCount = measureTypes
+            };
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> IndexMapAllSensors()
+        {
+            var allSensors = await this.sensorsService.GetAllCoordinates();
+            return this.Json(allSensors);
         }
     }
 }

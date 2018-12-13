@@ -250,5 +250,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
                 //set image url depends on tag
             }).ToList();
         }
+
+
     }
 }

@@ -25,7 +25,7 @@ namespace SmartDormitory.Services
         }
 
         public async Task<IEnumerable<MapSensorServiceModel>> GetAllPublicCoordinates()
-        => await this.Context
+            => await this.Context
                 .Sensors
                 .Where(s => s.IsPublic && !s.IsDeleted)
                 .Select(s => new MapSensorServiceModel
@@ -329,5 +329,26 @@ namespace SmartDormitory.Services
             this.Context.UpdateRange(sensorsToUpdate);
             await this.Context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<MapSensorServiceModel>> GetAllCoordinates()
+            => await this.Context
+                .Sensors
+                .Where(s => !s.IsDeleted)
+                .Select(s => new MapSensorServiceModel
+                {
+                    Id = s.Id,
+                    SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
+                    Name = s.Name,
+                    CreatedOn = (DateTime)s.CreatedOn,
+                    UserId = s.UserId,
+                    IsPublic = s.IsPublic,
+                    Value = s.CurrentValue,
+                    Coordinates = new Coordinates
+                    {
+                        Latitude = s.Coordinates.Latitude,
+                        Longitude = s.Coordinates.Longitude
+                    },
+                })
+                .ToListAsync();
     }
 }

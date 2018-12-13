@@ -207,11 +207,11 @@
                         contentString += '<p>Status: <span class="h6 text-danger"> Private <i class="fas fa-user-secret"></i></span></p>';
                     } else {
                         markers[i].setIcon(ownPublicSensorIconUrl);
-                        contentString += '<p>Status: <span class="h6 text-info"> Public <i class="fas fa-globe-americas"></i></span></p>';
+                        contentString += '<p>Status: <span class="h6 text-success"> Public <i class="fas fa-globe-americas"></i></span></p>';
                     }
                 }
                 else {
-                    contentString += '<p>Status: <span class="h6 text-info"> Public <i class="fas fa-globe-americas"></i></span></p>';
+                    contentString += '<p>Status: <span class="h6 text-success"> Public <i class="fas fa-globe-americas"></i></span></p>';
                 }
 
                 infoWindows[i] = new google.maps.InfoWindow({

@@ -117,3 +117,8 @@ body {
     height: 43em;
     width: 100%;
 }
+
+#adminDashboardMap {
+    height: 50rem;
+    width: 100%;
+}

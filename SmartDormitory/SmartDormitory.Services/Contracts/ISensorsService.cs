@@ -7,11 +7,13 @@ namespace SmartDormitory.Services.Contracts
 {
     public interface ISensorsService
     {
-        Task<IEnumerable<MapSensorServiceModel>> GetAllPublicCoordinates();
-        
-		Task<IEnumerable<MapSensorServiceModel>> GetAllUserPrivateCoordinates(string userId);
+        Task<IEnumerable<MapSensorServiceModel>> GetAllCoordinates();
 
-		Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10);
+        Task<IEnumerable<MapSensorServiceModel>> GetAllPublicCoordinates();
+
+        Task<IEnumerable<MapSensorServiceModel>> GetAllUserPrivateCoordinates(string userId);
+
+        Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10);
 
         Task ToggleSoftDeleteSensor(string sensorId);
 

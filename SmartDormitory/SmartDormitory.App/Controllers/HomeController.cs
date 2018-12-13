@@ -31,42 +31,7 @@ namespace SmartDormitory.App.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var cacheOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-            };
-
-            if (!this.memoryCache.TryGetValue("SensorTypesCount", out int sensorTypesCount))
-            {
-                sensorTypesCount = await this.measureTypeService.TotalCount();
-                this.memoryCache.Set("SensorTypesCount", sensorTypesCount, cacheOptions);
-            }
-
-            if (!this.memoryCache.TryGetValue("SensorModelsCount", out int sensorModelsCount))
-            {
-                sensorModelsCount = await this.icbSensorsService.TotalCount();
-                this.memoryCache.Set("SensorModelsCount", sensorModelsCount, cacheOptions);
-            }
-
-            if (!this.memoryCache.TryGetValue("RegisteredSensorsCount", out int registeredSensorsCount))
-            {
-                registeredSensorsCount = await this.sensorsService.TotalSensors();
-                this.memoryCache.Set("RegisteredSensorsCount", registeredSensorsCount, cacheOptions);
-            }
-
-            if (!this.memoryCache.TryGetValue("UsersCount", out int usersCount))
-            {
-                usersCount = await this.userService.TotalUsers();
-                this.memoryCache.Set("UsersCount", usersCount, cacheOptions);
-            }
-
-            var model = new HomeIndexViewModel
-            {
-                TotalUsers = usersCount,
-                SensorTypesCount = sensorTypesCount,
-                SensorModelsCount = sensorModelsCount,
-                RegisteredSensorsCount = registeredSensorsCount
-            };
+            HomeIndexViewModel model = await this.IndexModelMemoryCached(TimeSpan.FromMinutes(5));
 
             return View(model);
         }
@@ -110,6 +75,47 @@ namespace SmartDormitory.App.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [NonAction]
+        private async Task<HomeIndexViewModel> IndexModelMemoryCached(TimeSpan absoluteExpirationRelativeToNow)
+        {
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow
+            };
+
+            if (!this.memoryCache.TryGetValue("SensorTypesCount", out int sensorTypesCount))
+            {
+                sensorTypesCount = await this.measureTypeService.TotalCount();
+                this.memoryCache.Set("SensorTypesCount", sensorTypesCount, cacheOptions);
+            }
+
+            if (!this.memoryCache.TryGetValue("SensorModelsCount", out int sensorModelsCount))
+            {
+                sensorModelsCount = await this.icbSensorsService.TotalCount();
+                this.memoryCache.Set("SensorModelsCount", sensorModelsCount, cacheOptions);
+            }
+
+            if (!this.memoryCache.TryGetValue("RegisteredSensorsCount", out int registeredSensorsCount))
+            {
+                registeredSensorsCount = await this.sensorsService.TotalSensors();
+                this.memoryCache.Set("RegisteredSensorsCount", registeredSensorsCount, cacheOptions);
+            }
+
+            if (!this.memoryCache.TryGetValue("UsersCount", out int usersCount))
+            {
+                usersCount = await this.userService.TotalUsers();
+                this.memoryCache.Set("UsersCount", usersCount, cacheOptions);
+            }
+
+            return new HomeIndexViewModel
+            {
+                TotalUsers = usersCount,
+                SensorTypesCount = sensorTypesCount,
+                SensorModelsCount = sensorModelsCount,
+                RegisteredSensorsCount = registeredSensorsCount
+            };
         }
     }
 }

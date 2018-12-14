@@ -7,6 +7,6 @@ namespace SmartDormitory.Services.Contracts
     public interface IIcbApiService
     {
         Task<IReadOnlyList<ApiSensorDetailsDTO>> GetAllIcbSensors();
-        Task<ApiSensorValueDTO> GetIcbSensorValueById(string id);
+        Task<ApiSensorValueDTO> GetIcbSensorDataById(string id);
     }
 }

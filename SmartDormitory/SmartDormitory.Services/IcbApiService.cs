@@ -31,7 +31,7 @@ namespace SmartDormitory.Services
             }
         }
 
-        public async Task<ApiSensorValueDTO> GetIcbSensorValueById(string id)
+        public async Task<ApiSensorValueDTO> GetIcbSensorDataById(string id)
         {
             try
             {

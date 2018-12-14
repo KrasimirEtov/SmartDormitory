@@ -24,20 +24,22 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
             this.notificationManager = notificationManager;
         }
 
-        public void StartingJobsQueue()
+        public void ActivateRecurringJobs()
         {
             //RecurringJob.AddOrUpdate(() => this.UpdateIcbSensors(), Cron.Hourly());         
         }
 
         // seed icb sensors and check for new ones
-        public async Task UpdateIcbSensors()
+        public async Task ReviseIcbSensors()
         {
             using (var scope = this.serviceProvider.CreateScope())
             {
                 var icbSensorsService = scope.ServiceProvider.GetService<IIcbSensorsService>();
+                var apiService = scope.ServiceProvider.GetService<IIcbApiService>();
                 try
                 {
-                    await icbSensorsService.AddSensorsAsync();
+                    var upToDateApiSensors = await apiService.GetAllIcbSensors();
+                    await icbSensorsService.AddSensorsAsync(upToDateApiSensors);
                 }
                 catch (HttpRequestException e)
                 {
@@ -73,7 +75,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                 bool isApiDown = false;
                 string apiExceptionMessage = string.Empty;
 
-                // icbSensorId   
+                //                              icbSensorId   
                 var liveDataCache = new Dictionary<string, ApiSensorValueDTO>();
                 var sensorsToUpdate = new List<Sensor>();
                 var alarmsActivatedSensors = new List<Sensor>();
@@ -85,15 +87,7 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                         // caching all 13 api sensors data for current BackgroundJob iteration
                         if (!liveDataCache.ContainsKey(userSensor.IcbSensorId))
                         {
-                            var newApiData = await icbApi
-                                                .GetIcbSensorValueById(userSensor.IcbSensorId);
-                            if (newApiData is null)
-                            {
-                                // no internet connection
-                                isApiDown = true;
-                                apiExceptionMessage = "Check your internet connection!";
-                            }
-
+                            var newApiData = await icbApi.GetIcbSensorDataById(userSensor.IcbSensorId);
                             liveDataCache[userSensor.IcbSensorId] = newApiData;
                         }
 

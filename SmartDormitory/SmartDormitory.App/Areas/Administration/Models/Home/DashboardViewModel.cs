@@ -1,7 +1,4 @@
-﻿using SmartDormitory.Services.Models.Sensors;
-using System.Collections.Generic;
-
-namespace SmartDormitory.App.Areas.Administration.Models.Home
+﻿namespace SmartDormitory.App.Areas.Administration.Models.Home
 {
     public class DashboardViewModel
     {

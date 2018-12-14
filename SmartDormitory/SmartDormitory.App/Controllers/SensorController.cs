@@ -42,20 +42,17 @@ namespace SmartDormitory.App.Controllers
             var model = new MySensorsViewModel
             {
                 MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
-
                 Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList()
             };
             return View(model);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ReloadMySensorsTable(string measureTypeId = "all", string searchTerm = "",
-            int alarmOn = -1, int privacy = -1)
+        public async Task<IActionResult> ReloadMySensorsTable(string measureTypeId = "all", string searchTerm = "", int alarmOn = -1, int privacy = -1)
         {
             try
             {
                 var userId = this.User.GetId();
-
                 var sensors = (await this.sensorsService
                                          .GetUserSensors(userId, searchTerm, measureTypeId,
                                                                 alarmOn, privacy))
@@ -93,7 +90,7 @@ namespace SmartDormitory.App.Controllers
             try
             {
                 var sensors = await this.icbSensorsService
-                    .GetSensorsByMeasureTypeId(page, PageSize, measureTypeId);
+                    .GetAllByMeasureTypeId(page, PageSize, measureTypeId);
                 var userId = User.GetId();
                 var model = sensors.Select(s => new IcbSensorsListViewModel(s, userId)).ToList();
 
@@ -109,7 +106,7 @@ namespace SmartDormitory.App.Controllers
         public async Task<IActionResult> Create(string icbSensorId)
         {
             // TODO: Better implementation
-            var icbSensor = await this.icbSensorsService.GetSensorById(icbSensorId);
+            var icbSensor = await this.icbSensorsService.GetById(icbSensorId);
             if (icbSensor == null)
             {
                 // TODO: Error

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using SmartDormitory.Services.Models.Sensors;
 using System.Collections.Generic;
 
 namespace SmartDormitory.App.Models.Sensor
@@ -14,6 +13,6 @@ namespace SmartDormitory.App.Models.Sensor
 
         public int AlarmOn { get; set; } = -1;
 
-		public IEnumerable<MySensorListViewModel> Sensors { get; set; }
-	}
+        public IEnumerable<MySensorListViewModel> Sensors { get; set; }
+    }
 }

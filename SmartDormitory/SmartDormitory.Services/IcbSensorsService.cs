@@ -4,11 +4,11 @@ using SmartDormitory.Data.Models;
 using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Models.IcbSensors;
+using SmartDormitory.Services.Models.JsonDtoModels;
 using SmartDormitory.Services.Utils.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Services
@@ -26,57 +26,48 @@ namespace SmartDormitory.Services
             this.measureTypeService = measureTypeService;
         }
 
-        public async Task AddSensorsAsync()
+        public async Task AddSensorsAsync(IReadOnlyList<ApiSensorDetailsDTO> lastApiSensors)
         {
-            try
+            foreach (var icbSensor in lastApiSensors)
             {
-                var icbSensors = await this.icbApiService.GetAllIcbSensors();
+                //bool sensorExists = await this.Context
+                //                              .IcbSensors
+                //                              .AnyAsync(s => !s.IsDeleted && s.Id == icbSensor.ApiSensorId);
 
-                foreach (var icbSensor in icbSensors)
+                if (!await this.ExistsById(icbSensor.ApiSensorId))
                 {
-                    bool sensorExists = await this.Context
-                                                  .IcbSensors
-                                                  .AnyAsync(s => s.Id == icbSensor.ApiSensorId && !s.IsDeleted);
+                    var measureType = await this.Context
+                                                .MeasureTypes
+                                                .FirstOrDefaultAsync(mt =>
+                                                                         mt.MeasureUnit == icbSensor.MeasureType
+                                                                            && !mt.IsDeleted);
 
-                    if (!sensorExists)
+                    if (measureType != null)
                     {
-                        var measureType = await this.Context
-                                                    .MeasureTypes
-                                                    .FirstOrDefaultAsync(mt =>
-                                                                             mt.MeasureUnit == icbSensor.MeasureType
-                                                                                && !mt.IsDeleted);
+                        var (MinRange, MaxRange) = ApiDataHelper
+                                                        .GetMinAndMaxRange(icbSensor.Description);
 
-                        if (measureType != null)
+                        var icbSensorToAdd = new IcbSensor
                         {
-                            var (MinRange, MaxRange) = ApiDataHelper
-                                                            .GetMinAndMaxRange(icbSensor.Description);
+                            Id = icbSensor.ApiSensorId,
+                            Description = icbSensor.Description,
+                            Tag = icbSensor.Tag,
+                            MeasureTypeId = measureType.Id,
+                            PollingInterval = icbSensor.MinPollingIntervalInSeconds,
+                            MinRangeValue = MinRange,
+                            MaxRangeValue = MaxRange,
+                            CreatedOn = DateTime.Now
+                        };
 
-                            var icbSensorToAdd = new IcbSensor
-                            {
-                                Id = icbSensor.ApiSensorId,
-                                Description = icbSensor.Description,
-                                Tag = icbSensor.Tag,
-                                MeasureTypeId = measureType.Id,
-                                PollingInterval = icbSensor.MinPollingIntervalInSeconds,
-                                MinRangeValue = MinRange,
-                                MaxRangeValue = MaxRange,
-                                CreatedOn = DateTime.Now
-                            };
-
-                            await this.Context.IcbSensors.AddAsync(icbSensorToAdd);
-                        }
+                        await this.Context.IcbSensors.AddAsync(icbSensorToAdd);
                     }
                 }
+            }
 
-                await this.Context.SaveChangesAsync();
-            }
-            catch (HttpRequestException e)
-            {
-                throw new HttpRequestException(e.Message);
-            }
+            await this.Context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetSensorsByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "")
+        public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetAllByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "")
         {
             var sensors = this.Context.IcbSensors.Where(s => !s.IsDeleted);
 
@@ -108,7 +99,7 @@ namespace SmartDormitory.Services
                               .ToListAsync();
         }
 
-        public async Task<IcbSensorCreateServiceModel> GetSensorById(string sensorId)
+        public async Task<IcbSensorCreateServiceModel> GetById(string sensorId)
         {
             var sensor = await this.Context.IcbSensors
                 .Where(s => s.Id == sensorId)
@@ -130,5 +121,10 @@ namespace SmartDormitory.Services
                              .IcbSensors
                              .Where(s => !s.IsDeleted)
                              .CountAsync();
+
+        public async Task<bool> ExistsById(string sensorId)
+             => await this.Context
+                          .IcbSensors
+                          .AnyAsync(s => !s.IsDeleted && s.Id == sensorId);
     }
 }

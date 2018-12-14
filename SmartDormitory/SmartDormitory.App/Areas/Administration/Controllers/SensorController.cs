@@ -49,9 +49,9 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> LoadSensorsTable(int page = 1, string measureTypeId = "all", int isPublic = -1, int alarmSet = -1)
+        public async Task<IActionResult> LoadSensorsTable(int page = 1, string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, string searchTerm = "")
         {
-            var model = await this.UpdateSensorsTableViewModel(page, measureTypeId, isPublic, alarmSet);
+            var model = await this.UpdateSensorsTableViewModel(page, measureTypeId, isPublic, alarmSet, searchTerm);
 
             return PartialView("_SensorsTablePartialView", model);
         }
@@ -75,7 +75,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         public async Task<IActionResult> RegisterIndex(string userId)
         {
             var sensorTypes = await this.measureTypeService.GetAllNotDeleted();
-            var sensors = await this.icbSensorsService.GetSensorsByMeasureTypeId();
+            var sensors = await this.icbSensorsService.GetAllByMeasureTypeId();
 
             var model = new IcbSensorTypesViewModel
             {
@@ -94,7 +94,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
             try
             {
                 var sensors = await this.icbSensorsService
-                    .GetSensorsByMeasureTypeId(page, PageSize, measureTypeId);
+                    .GetAllByMeasureTypeId(page, PageSize, measureTypeId);
                 var model = this.MapSensorServiceModelToViewModel(sensors, userId);
 
                 return PartialView("_IcbSensorsByTypeResult", model);
@@ -109,7 +109,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         public async Task<IActionResult> Create(string icbSensorId, string userId)
         {
             // TODO: Better implementation
-            var icbSensor = await this.icbSensorsService.GetSensorById(icbSensorId);
+            var icbSensor = await this.icbSensorsService.GetById(icbSensorId);
             if (icbSensor == null)
             {
                 // TODO: Error
@@ -158,13 +158,13 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
                 model.Longtitude, model.Latitude, model.SwitchOn);
 
             this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
-			return this.RedirectToAction("Create", "Sensor", new
-			{
-				icbSensorId = model.IcbSensorId,
-				userId = model.UserId,
-				area = "Administration"
-			});
-		}
+            return this.RedirectToAction("Create", "Sensor", new
+            {
+                icbSensorId = model.IcbSensorId,
+                userId = model.UserId,
+                area = "Administration"
+            });
+        }
 
         [HttpGet]
         public async Task<IActionResult> Update(string sensorId)
@@ -205,8 +205,8 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
             catch (EntityDoesntExistException e)
             {
                 TempData["Error-Message"] = e.Message;
-				return this.RedirectToAction("Index", "Sensor", new { area = "Administration" });
-			}
+                return this.RedirectToAction("Index", "Sensor", new { area = "Administration" });
+            }
         }
 
         [HttpPost]
@@ -226,11 +226,11 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
             return this.RedirectToAction("Index", "Sensor", new { area = "Administration" });
         }
 
-        private async Task<SensorPartialTableViewModel> UpdateSensorsTableViewModel(int page = 1, string measureTypeId = "all", int isPublic = -1, int alarmSet = -1)
+        private async Task<SensorPartialTableViewModel> UpdateSensorsTableViewModel(int page = 1, string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, string searchTerm = "")
         {
-            var sensors = await this.sensorsService.AllAdmin(measureTypeId, isPublic, alarmSet, page, PageSize);
+            var sensors = await this.sensorsService.AllAdmin(measureTypeId, isPublic, alarmSet, page, PageSize, searchTerm);
 
-            int totalSensors = await this.sensorsService.TotalSensorsByCriteria(measureTypeId, isPublic, alarmSet);
+            int totalSensors = await this.sensorsService.TotalSensorsByCriteria(measureTypeId, isPublic, alarmSet, searchTerm);
 
             var vm = new SensorPartialTableViewModel()
             {
@@ -255,7 +255,5 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
                 //set image url depends on tag
             }).ToList();
         }
-
-
     }
 }

@@ -62,10 +62,17 @@ namespace SmartDormitory.Services
                          })
                          .ToListAsync();
 
-        public async Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10)
+        public async Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10, string searchTerm = "")
         {
             var sensors = this.Context.Sensors.AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                sensors = sensors.Where(s => !s.IsDeleted &&
+                                (s.Name.ToLower().Contains(searchTerm.ToLower()) ||
+                                    s.Description.ToLower().Contains(searchTerm.ToLower()) ||
+                                    s.User.UserName.ToLower().Contains(searchTerm.ToLower())));
+            }
             if (measureTypeId != "all")
             {
                 if (await this.measureTypeService.Exists(measureTypeId))
@@ -84,21 +91,21 @@ namespace SmartDormitory.Services
                 sensors = sensors.Where(s => s.AlarmOn == alarmSetValue);
             }
 
-            return sensors
-                       .OrderByDescending(s => s.CreatedOn)
-                       .Skip((page - 1) * pageSize)
-                       .Take(pageSize)
-                       .Select(s => new AdminListSensorModel
-                       {
-                           Id = s.Id,
-                           Name = s.Name,
-                           IsDeleted = s.IsDeleted,
-                           SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
-                           OwnerId = s.UserId,
-                           OwnerUsername = s.User.UserName,
-                           IsPublic = s.IsPublic,
-                           AlarmOn = s.AlarmOn
-                       });
+            return await sensors
+                           .OrderByDescending(s => s.CreatedOn)
+                           .Skip((page - 1) * pageSize)
+                           .Take(pageSize)
+                           .Select(s => new AdminListSensorModel
+                           {
+                               Id = s.Id,
+                               Name = s.Name,
+                               IsDeleted = s.IsDeleted,
+                               SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
+                               OwnerId = s.UserId,
+                               OwnerUsername = s.User.UserName,
+                               IsPublic = s.IsPublic,
+                               AlarmOn = s.AlarmOn
+                           }).ToListAsync();
         }
 
         public async Task ToggleSoftDeleteSensor(string sensorId)
@@ -163,10 +170,17 @@ namespace SmartDormitory.Services
             return sensor;
         }
 
-        public async Task<int> TotalSensorsByCriteria(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1)
+        public async Task<int> TotalSensorsByCriteria(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, string searchTerm = "")
         {
             var sensors = this.Context.Sensors.AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                sensors = sensors.Where(s => !s.IsDeleted &&
+                                (s.Name.ToLower().Contains(searchTerm.ToLower()) ||
+                                    s.Description.ToLower().Contains(searchTerm.ToLower()) ||
+                                    s.User.UserName.ToLower().Contains(searchTerm.ToLower())));
+            }
             if (measureTypeId != "all")
             {
                 if (await this.measureTypeService.Exists(measureTypeId))

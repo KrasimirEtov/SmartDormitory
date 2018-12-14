@@ -13,13 +13,13 @@ namespace SmartDormitory.Services.Contracts
 
         Task<IEnumerable<MapSensorServiceModel>> GetAllUserPrivateCoordinates(string userId);
 
-        Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10);
+        Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10, string searchTerm = "");
 
         Task ToggleSoftDeleteSensor(string sensorId);
 
         Task<Sensor> GetSensorById(string sensorId);
 
-        Task<int> TotalSensorsByCriteria(string measureTypeId, int isPublic = -1, int alarmSet = -1);
+        Task<int> TotalSensorsByCriteria(string measureTypeId, int isPublic = -1, int alarmSet = -1, string searchTerm = "");
         Task<int> TotalSensors();
 
         Task<IEnumerable<UserSensorListModel>> GetUserSensors(string userId, string searchTerm = "", string measureTypeId = "all", int alarmOn = -1, int isPublic = -1);

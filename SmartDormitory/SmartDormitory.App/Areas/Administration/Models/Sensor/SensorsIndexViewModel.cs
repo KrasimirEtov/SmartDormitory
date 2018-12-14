@@ -5,9 +5,6 @@ namespace SmartDormitory.App.Areas.Administration.Models.Sensor
 {
     public class SensorsIndexViewModel
     {
-        [Display(Name = "Search by username, sensor name or description")]
-        public string SearchTerm { get; set; }
-
         public string MeasureTypeId { get; set; } = "all";
 
         [Display(Name = "Sensor type")]

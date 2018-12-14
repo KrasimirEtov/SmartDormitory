@@ -5,7 +5,6 @@
     var nextDisabled = Model.CurrentPage == Model.TotalPages ? "disabled" : string.Empty;
 }
 
-
 <table class="table table-hover table-striped table-fixed">
     <thead class="thead-dark">
         <tr>
@@ -107,8 +106,9 @@
                 let typeId = $("#MeasureTypeId").val();
                 let isPublic = $("#IsPublic").val();
                 let alarmSet = $("#AlarmSet").val();
+                let searchTerm = $("#searchTerm").val();
                 let url = "@Url.Action("LoadSensorsTable", "Sensor")?measureTypeId=" + typeId +
-                  "&isPublic=" + isPublic + "&alarmSet=" + alarmSet + "&page=" + targetPage;
+                    "&isPublic=" + isPublic + "&alarmSet=" + alarmSet + "&page=" + targetPage + "&searchTerm=" + searchTerm;;
 
                 $("#sensorsTable").load(url);
             })
@@ -117,6 +117,7 @@
         movePage("#nextPage", @Model.NextPage);
         movePage("#prevPage", @Model.PreviousPage);
 
+        //this?
         $("form[id!='logoutForm']").on('submit', function (event) {
             event.preventDefault();
             const tokenValue = $('input[name="__RequestVerificationToken"]').val();

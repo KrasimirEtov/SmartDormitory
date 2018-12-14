@@ -4,10 +4,10 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
 {
     public interface IHangfireJobsScheduler
     {
-        void StartingJobsQueue();
-        Task UpdateSensorsData();
+        void ActivateRecurringJobs();
+        //Task UpdateSensorsData();
         Task HardTenSecondsRecurringJob();
 
-        Task UpdateIcbSensors();
+        Task ReviseIcbSensors();
     }
 }

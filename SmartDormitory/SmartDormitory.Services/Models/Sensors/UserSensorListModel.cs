@@ -21,5 +21,7 @@ namespace SmartDormitory.Services.Models.Sensors
         public bool IsPublic { get; set; }
 
 		public string Value { get; set; }
+
+		public DateTime LastUpdateOn { get; set; }
 	}
 }

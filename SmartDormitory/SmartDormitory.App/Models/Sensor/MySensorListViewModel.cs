@@ -23,6 +23,7 @@ namespace SmartDormitory.App.Models.Sensor
             this.ImagePath = model.MeasureUnit.GetImagePathByMeasureUnit();
             this.PollingInterval = model.PollingInterval;
 			this.Value = model.Value;
+			this.LastUpdateOn = model.LastUpdateOn;
         }
 
         public string Id { get; set; }
@@ -44,5 +45,6 @@ namespace SmartDormitory.App.Models.Sensor
         public bool IsPublic { get; set; }
 
 		public string Value { get; set; }
+		public DateTime LastUpdateOn { get; set; }
 	}
 }

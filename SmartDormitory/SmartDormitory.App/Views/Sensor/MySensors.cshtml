@@ -53,10 +53,8 @@
 
 </div>
 <hr />
-<div class="form-row">
-    <div id="mySensors" class="form-group">
-        <partial name="_MySensorsTable" model="@Model.Sensors" />
-    </div>
+<div id="mySensors" class="form-group">
+    <partial name="_MySensorsTable" model="@Model.Sensors" />
 </div>
 
 <script>
@@ -69,7 +67,7 @@
 
             let url = "@Url.Action("ReloadMySensorsTable", "Sensor")?measureTypeId=" + typeId
                 + '&searchTerm=' + searchTerm + '&alarmOn=' + alarm + '&privacy=' + privacy;
-
+            
            $("#mySensors").load(url);
         }
         $("#MeasureTypeId").change(reloadTable);
@@ -78,8 +76,9 @@
         $("#searchBtn").click(reloadTable);
 
         setInterval(function () {
-            reloadTable;
-        }, 60 * 1000);
+            console.log(@Model.MinPollingInterval);
+            reloadTable();
+        }, @Model.MinPollingInterval * 1000);
 
         $("#searchTerm").keyup(function (event) {
             if (event.keyCode === 13) {

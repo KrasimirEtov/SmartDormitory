@@ -39,10 +39,11 @@ namespace SmartDormitory.App.Controllers
             var measureTypes = await this.CachedMeasureTypes();
             var sensors = await this.sensorsService.GetUserSensors(userId);
 
-            var model = new MySensorsViewModel
-            {
-                MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
-                Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList()
+			var model = new MySensorsViewModel
+			{
+				MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
+				Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList(),
+				MinPollingInterval = sensors.Min(x => x.PollingInterval)
             };
             return View(model);
         }
@@ -281,7 +282,23 @@ namespace SmartDormitory.App.Controllers
             return this.RedirectToAction("Details", "Sensor", new { sensorId = updatedSensorId });
         }
 
-        [NonAction]
+		[HttpPost]
+		public async Task<IActionResult> ToggleDelete(string sensorId)
+		{
+			try
+			{
+				await this.sensorsService.ToggleSoftDeleteSensor(sensorId);
+			}
+			catch (EntityDoesntExistException e)
+			{
+				TempData["Error-Message"] = e.Message;
+				return this.RedirectToAction("MySensors", "Sensor");
+			}
+
+			return RedirectToAction("MySensors", "Sensor");
+		}
+
+		[NonAction]
         private async Task<IEnumerable<MeasureTypeServiceModel>> CachedMeasureTypes()
         {
             var cacheOptions = new MemoryCacheEntryOptions

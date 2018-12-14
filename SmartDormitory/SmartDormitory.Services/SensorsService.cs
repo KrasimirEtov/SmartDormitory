@@ -254,7 +254,8 @@ namespace SmartDormitory.Services
                                  CreatedOn = (DateTime)s.CreatedOn,
                                  IsPublic = s.IsPublic,
                                  AlarmOn = s.AlarmOn,
-                                 Value = ExtractValue(s)
+                                 Value = ExtractValue(s),
+								 LastUpdateOn = s.LastUpdateOn
                              })
                              .ToListAsync();
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using SmartDormitory.Services.Exceptions;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Infrastructure.Middleware
@@ -14,10 +15,20 @@ namespace SmartDormitory.App.Infrastructure.Middleware
 
 		public async Task Invoke(HttpContext context)
 		{
+			try
+			{
+				await this.next.Invoke(context);
 
-			await this.next.Invoke(context);
-
-			if (context.Response.StatusCode == 404)
+				if (context.Response.StatusCode == 404)
+				{
+					context.Response.Redirect("/404");
+				}
+			}
+			catch (EntityDoesntExistException ex)
+			{
+				context.Response.Redirect("/404");
+			}
+			catch (InvalidClientInputException ex)
 			{
 				context.Response.Redirect("/404");
 			}

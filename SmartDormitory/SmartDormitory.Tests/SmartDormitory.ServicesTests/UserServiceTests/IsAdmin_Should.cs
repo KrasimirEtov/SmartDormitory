@@ -7,9 +7,6 @@ using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
 using SmartDormitory.Services.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests

@@ -17,6 +17,7 @@
         {
             public const string NullExceptionMessage = "Parameter {0} cannot be null!";
             public const string GuidExceptionMessage = "Parameter {0} is not a valid GUID!";
+            public const string IntBiggerThanMessage = "Parameter {0} must be bigger than {1}!";
         }
     }
 }

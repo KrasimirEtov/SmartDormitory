@@ -65,34 +65,38 @@ namespace SmartDormitory.Services
 
         public async Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetAllByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "")
         {
-            var sensors = this.Context.IcbSensors.Where(s => !s.IsDeleted);
+            Validator.ValidateIntBiggerThan(page, 1, nameof(page));
+            Validator.ValidateIntBiggerThan(pageSize, 0, nameof(pageSize));
 
             if (!string.IsNullOrWhiteSpace(measureTypeId))
             {
+                Validator.ValidateGuid(measureTypeId);
+                var sensors = this.Context.IcbSensors.Where(s => !s.IsDeleted);
+
                 if (await this.measureTypeService.Exists(measureTypeId))
                 {
                     sensors = sensors.Where(s => s.MeasureTypeId == measureTypeId);
                 }
+
+                return await sensors
+                                .OrderBy(s => s.MeasureType)
+                                .ThenBy(s => s.Tag)
+                                .ThenBy(s => s.PollingInterval)
+                                .Skip((page - 1) * pageSize)
+                                .Take(pageSize)
+                                .Select(s => new IcbSensorRegisterListServiceModel
+                                {
+                                    Description = s.Description,
+                                    Id = s.Id,
+                                    PollingInterval = s.PollingInterval,
+                                    Tag = s.Tag
+                                })
+                                .ToListAsync();
             }
             else
             {
                 return new List<IcbSensorRegisterListServiceModel>();
             }
-
-            return await sensors
-                              .OrderBy(s => s.MeasureType)
-                              .ThenBy(s => s.Tag)
-                              .ThenBy(s => s.PollingInterval)
-                              .Skip((page - 1) * pageSize)
-                              .Take(pageSize)
-                              .Select(s => new IcbSensorRegisterListServiceModel
-                              {
-                                  Description = s.Description,
-                                  Id = s.Id,
-                                  PollingInterval = s.PollingInterval,
-                                  Tag = s.Tag
-                              })
-                              .ToListAsync();
         }
 
         public async Task<IcbSensorCreateServiceModel> GetById(string sensorId)

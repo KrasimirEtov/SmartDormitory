@@ -61,7 +61,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
         {
             try
             {
-                await this.sensorsService.ToggleSoftDeleteSensor(sensorId);
+                await this.sensorsService.DeleteSensor(sensorId);
             }
             catch (EntityDoesntExistException e)
             {

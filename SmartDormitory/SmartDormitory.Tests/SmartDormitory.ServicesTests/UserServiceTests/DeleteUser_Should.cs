@@ -30,7 +30,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			.UseInMemoryDatabase(databaseName: "DeleteUser_Throw_EntityDoesntExistException_When_User_Does_Not_Exist")
 				.Options;
 
-			string userId = "myId";
+			string userId = Guid.NewGuid().ToString();
 
 			userManagerMock = MockUserManager<User>();
 
@@ -54,7 +54,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			.UseInMemoryDatabase(databaseName: "Throw_EntityDoesntExistException_When_User_Is_Deleted")
 				.Options;
 
-			string userId = "myId";
+			string userId = Guid.NewGuid().ToString();
 
 			user = new User()
 			{
@@ -91,7 +91,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			.UseInMemoryDatabase(databaseName: "Remove_User_When_Exists_And_Is_Not_Deleted")
 				.Options;
 
-			string userId = "myId";
+			string userId = Guid.NewGuid().ToString();
 
 			user = new User()
 			{

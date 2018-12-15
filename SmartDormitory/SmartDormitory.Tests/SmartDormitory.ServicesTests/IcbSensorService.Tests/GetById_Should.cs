@@ -28,10 +28,9 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
             // Act && Asert
             using (var assertContext = new SmartDormitoryContext(contextOptions))
             {
-                var icbApiServiceMock = new Mock<IIcbApiService>();
                 var measureTypeServiceMock = new Mock<IMeasureTypeService>();
-                var icbSensorService = new IcbSensorsService(assertContext, icbApiServiceMock.Object, measureTypeServiceMock.Object);
-                var result = await icbSensorService.GetById(id);
+                var sut = new IcbSensorsService(assertContext, measureTypeServiceMock.Object);
+                var result = await sut.GetById(id);
 
                 Assert.IsNull(result);
             }
@@ -63,10 +62,9 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
             // Act && Asert
             using (var assertContext = new SmartDormitoryContext(contextOptions))
             {
-                var icbApiServiceMock = new Mock<IIcbApiService>();
                 var measureTypeServiceMock = new Mock<IMeasureTypeService>();
-                var icbSensorService = new IcbSensorsService(assertContext, icbApiServiceMock.Object, measureTypeServiceMock.Object);
-                var result = await icbSensorService.GetById(id);
+                var sut = new IcbSensorsService(assertContext, measureTypeServiceMock.Object);
+                var result = await sut.GetById(id);
 
                 Assert.IsNotNull(result);
                 Assert.IsTrue(id.Equals(result.Id));
@@ -110,11 +108,10 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
             // Act && Asert
             using (var assertContext = new SmartDormitoryContext(contextOptions))
             {
-                var icbApiServiceMock = new Mock<IIcbApiService>();
                 var measureTypeServiceMock = new Mock<IMeasureTypeService>();
-                var icbSensorService = new IcbSensorsService(assertContext, icbApiServiceMock.Object, measureTypeServiceMock.Object);
+                var sut = new IcbSensorsService(assertContext, measureTypeServiceMock.Object);
 
-                var result = await icbSensorService.GetById(id);
+                var result = await sut.GetById(id);
 
                 Assert.IsInstanceOfType(result, typeof(IcbSensorCreateServiceModel));
             }
@@ -125,10 +122,9 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
         {
             // Arrange
             var contextMock = new Mock<SmartDormitoryContext>();
-            var icbApiServiceMock = new Mock<IIcbApiService>();
             var measureTypeServiceMock = new Mock<IMeasureTypeService>();
 
-            var icbSensorService = new IcbSensorsService(contextMock.Object, icbApiServiceMock.Object, measureTypeServiceMock.Object);
+            var icbSensorService = new IcbSensorsService(contextMock.Object, measureTypeServiceMock.Object);
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<ArgumentNullException>(
@@ -136,18 +132,17 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
         }
 
         [TestMethod]
-        public async Task ThrowArugmentException_WhenPassedInvalidGuid()
+        public async Task ThrowArgumentException_WhenPassedInvalidGuid()
         {
             // Arrange
             var contextMock = new Mock<SmartDormitoryContext>();
-            var icbApiServiceMock = new Mock<IIcbApiService>();
             var measureTypeServiceMock = new Mock<IMeasureTypeService>();
 
-            var icbSensorService = new IcbSensorsService(contextMock.Object, icbApiServiceMock.Object, measureTypeServiceMock.Object);
+            var sut = new IcbSensorsService(contextMock.Object, measureTypeServiceMock.Object);
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<ArgumentException>(
-                () => icbSensorService.GetById("invalidGuid"), "Parameter sensorId is not a valid GUID!");
+                () => sut.GetById("invalidGuid"), "Parameter sensorId is not a valid GUID!");
         }
     }
 }

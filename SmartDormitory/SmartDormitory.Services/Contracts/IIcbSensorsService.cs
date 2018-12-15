@@ -1,4 +1,5 @@
-﻿using SmartDormitory.Services.Models.IcbSensors;
+﻿using SmartDormitory.Data.Models;
+using SmartDormitory.Services.Models.IcbSensors;
 using SmartDormitory.Services.Models.JsonDtoModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace SmartDormitory.Services.Contracts
 {
     public interface IIcbSensorsService
     {
-        Task AddSensorsAsync(IReadOnlyList<ApiSensorDetailsDTO> lastApiSensors);
+        Task AddSensors(IReadOnlyList<ApiSensorDetailsDTO> lastApiSensors);
 
         Task<IEnumerable<IcbSensorRegisterListServiceModel>> GetAllByMeasureTypeId(int page = 1, int pageSize = 10, string measureTypeId = "");
 
@@ -16,5 +17,7 @@ namespace SmartDormitory.Services.Contracts
         Task<int> TotalCount();
 
         Task<bool> ExistsById(string sensorId);
+
+        Task<IEnumerable<IcbSensor>> GetAll();
     }
 }

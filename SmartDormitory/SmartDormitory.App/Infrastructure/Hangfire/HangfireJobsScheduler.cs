@@ -8,6 +8,7 @@ using SmartDormitory.Services.Models.JsonDtoModels;
 using SmartDormitory.Services.Utils.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -17,11 +18,15 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
     {
         private readonly IServiceProvider serviceProvider;
         private readonly INotificationManager notificationManager;
+        private readonly IIcbSensorsService icbSensorsService;
+        private readonly IIcbApiService apiService;
 
-        public HangfireJobsScheduler(IServiceProvider serviceProvider, INotificationManager notificationManager)
+        public HangfireJobsScheduler(IServiceProvider serviceProvider, INotificationManager notificationManager, IIcbSensorsService icbSensorsService, IIcbApiService apiService)
         {
             this.serviceProvider = serviceProvider;
             this.notificationManager = notificationManager;
+            this.icbSensorsService = icbSensorsService;
+            this.apiService = apiService;
         }
 
         public void ActivateRecurringJobs()
@@ -32,19 +37,21 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
         // seed icb sensors and check for new ones
         public async Task ReviseIcbSensors()
         {
-            using (var scope = this.serviceProvider.CreateScope())
+            try
             {
-                var icbSensorsService = scope.ServiceProvider.GetService<IIcbSensorsService>();
-                var apiService = scope.ServiceProvider.GetService<IIcbApiService>();
-                try
-                {
-                    var upToDateApiSensors = await apiService.GetAllIcbSensors();
-                    await icbSensorsService.AddSensorsAsync(upToDateApiSensors);
-                }
-                catch (HttpRequestException e)
-                {
-                    await this.notificationManager.SendAdminsAlert(e.Message);
-                }
+                var upToDateApiSensors = await apiService.GetAllIcbSensors();
+                var dbExistingSensors = await icbSensorsService.GetAll();
+
+                var sensorsToAdd = upToDateApiSensors
+                                .Where(s => !dbExistingSensors
+                                                .Any(dbSensor =>
+                                                    dbSensor.Id != s.ApiSensorId))
+                                .ToList();
+                await icbSensorsService.AddSensors(sensorsToAdd);
+            }
+            catch (HttpRequestException e)
+            {
+                await this.notificationManager.SendAdminsAlert(e.Message);
             }
         }
 

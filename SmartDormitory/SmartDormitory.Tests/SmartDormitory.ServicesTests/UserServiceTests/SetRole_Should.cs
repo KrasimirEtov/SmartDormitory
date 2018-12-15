@@ -7,6 +7,7 @@ using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
 using SmartDormitory.Services.Exceptions;
+using System;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
@@ -27,7 +28,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			.UseInMemoryDatabase(databaseName: "SetRole_Throw_EntityDoesntExistException_When_User_Does_Not_Exist")
 				.Options;
 
-			string userId = "myId";
+			string userId = Guid.NewGuid().ToString();
 			string roleName = "AdministratorTest";
 
 			userManagerMock = MockUserManager<User>();
@@ -45,30 +46,37 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 		}
 
 		[TestMethod]
-		public async Task Successfully_Set_User_Role_When_Parameters_Are_Valid()
+		public async Task Successfully_Call_AddRole_Method_When_Parameters_Are_Valid()
 		{
 			// BAD TEST - NOT ISOLATED
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Successfully_Set_User_Role_When_Parameters_Are_Valid")
+			.UseInMemoryDatabase(databaseName: "Successfully_Call_AddRole_Method_When_Parameters_Are_Valid")
 				.Options;
+			string userId = Guid.NewGuid().ToString();
 
-			string userId = "myId";
-			string roleName = "AdministratorTest";
+			user = new User()
+			{
+				Id = userId,
+				UserName = "testUserName"
+			};
 
 			userManagerMock = MockUserManager<User>();
-			
-			//             await this.userManager.AddToRoleAsync(user, roleName);
-
 			roleManagerMock = MockRoleManager();
+
+			using (var actContext = new SmartDormitoryContext(contextOptions))
+			{
+				await actContext.Users.AddAsync(user);
+				await actContext.SaveChangesAsync();
+			}
 
 			// Act && Assert
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
+				await userService.SetRole(userId, It.IsAny<string>());
 
-				await Assert.ThrowsExceptionAsync<EntityDoesntExistException>(
-					() => userService.SetRole(userId, roleName));
+				userManagerMock.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Once);
 			}
 		}
 

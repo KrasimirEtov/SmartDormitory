@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using SmartDormitory.App.Data;
@@ -12,26 +11,25 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
+namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.UserServiceTests
 {
 	[TestClass]
-	public class GetUser_Should
+	public class TotalUsers_Should
 	{
 		private DbContextOptions<SmartDormitoryContext> contextOptions;
 		private Mock<UserManager<User>> userManagerMock;
 		private Mock<RoleManager<IdentityRole>> roleManagerMock;
-
 		private User user;
 
 		[TestMethod]
-		public async Task Return_User_When_Id_Is_Found()
+		public async Task Return_Valid_Users_Count()
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_User_When_Id_Is_Found")
+			.UseInMemoryDatabase(databaseName: "Return_Valid_Users_Count")
 				.Options;
 
-			string userId = Guid.NewGuid().ToString();
+			string userId = "myId";
 
 			user = new User()
 			{
@@ -41,8 +39,6 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 
 			userManagerMock = MockUserManager<User>();
 			roleManagerMock = MockRoleManager();
-
-
 			using (var actContext = new SmartDormitoryContext(contextOptions))
 			{
 				await actContext.Users.AddAsync(user);
@@ -54,40 +50,10 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			{
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
 
-				var result = await userService.GetUser(userId);
-				Assert.IsNotNull(result);
-				Assert.AreEqual(result.Id, userId);
+				var usersCount = await userService.TotalUsers();
+
+				Assert.AreEqual(1, usersCount);
 			}
-		}
-
-		[TestMethod]
-		public async Task Throw_ArugmentException_When_Passed_Id_Is_Null()
-		{
-			// Arrange
-			var contextMock = new Mock<SmartDormitoryContext>();
-			userManagerMock = MockUserManager<User>();
-			roleManagerMock = MockRoleManager();
-
-			var userService = new UserService(contextMock.Object, userManagerMock.Object, roleManagerMock.Object);
-
-			// Act & Assert
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(
-				() => userService.GetUser(null));
-		}
-
-		[TestMethod]
-		public async Task Throw_ArugmentException_When_Passed_Invalid_Guid()
-		{
-			// Arrange
-			var contextMock = new Mock<SmartDormitoryContext>();
-			userManagerMock = MockUserManager<User>();
-			roleManagerMock = MockRoleManager();
-
-			var userService = new UserService(contextMock.Object, userManagerMock.Object, roleManagerMock.Object);
-
-			// Act & Assert
-			await Assert.ThrowsExceptionAsync<ArgumentException>(
-				() => userService.GetUser("invalidGuid"));
 		}
 
 		private Mock<UserManager<TUser>> MockUserManager<TUser>() where TUser : class

@@ -8,12 +8,15 @@ using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
 using SmartDormitory.Services.Exceptions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
+namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.UserServiceTests
 {
 	[TestClass]
-	public class IsInRole_Should
+	public class SetGdprStatus_Should
 	{
 		private DbContextOptions<SmartDormitoryContext> contextOptions;
 		private Mock<UserManager<User>> userManagerMock;
@@ -21,73 +24,18 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 		private User user;
 
 		[TestMethod]
-		public async Task Return_True_When_User_Exists_And_Is_In_Role()
-		{
-			// Arrange
-			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_True_When_User_Exists_And_Is_In_Role")
-				.Options;
-
-			string userId = Guid.NewGuid().ToString();
-
-			user = new User()
-			{
-				Id = userId,
-				UserName = "testUserName"
-			};
-
-			userManagerMock = MockUserManager<User>();
-			userManagerMock
-				.Setup(x => x.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
-				.ReturnsAsync(true);
-
-			roleManagerMock = MockRoleManager();
-
-			using (var actContext = new SmartDormitoryContext(contextOptions))
-			{
-				await actContext.Users.AddAsync(user);
-				await actContext.SaveChangesAsync();
-			}
-
-			// Act && Assert
-			using (var assertContext = new SmartDormitoryContext(contextOptions))
-			{
-				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
-
-				var result = await userService.IsAdmin(userId);
-
-				Assert.IsTrue(result);
-			}
-		}
-
-		[TestMethod]
 		public async Task Throw_EntityDoesntExistException_When_User_Does_Not_Exist()
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Throw_EntityDoesntExistException_When_User_Does_Not_Exist")
+			.UseInMemoryDatabase(databaseName: "SetGdprStatus_Throw_EntityDoesntExistException_When_User_Does_Not_Exist")
 				.Options;
 
 			string userId = Guid.NewGuid().ToString();
 
-			user = new User()
-			{
-				Id = userId,
-				UserName = "testUserName"
-			};
-
 			userManagerMock = MockUserManager<User>();
-			userManagerMock
-				.Setup(x => x.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
-				.ReturnsAsync(true);
 
 			roleManagerMock = MockRoleManager();
-
-			using (var actContext = new SmartDormitoryContext(contextOptions))
-			{
-				await actContext.Users.AddAsync(user);
-				await actContext.SaveChangesAsync();
-			}
 
 			// Act && Assert
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
@@ -95,18 +43,18 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
 
 				await Assert.ThrowsExceptionAsync<EntityDoesntExistException>(
-					() => userService.IsAdmin(Guid.NewGuid().ToString()));
+					() => userService.SetGdprStatus(userId));
 			}
 		}
 
 		[TestMethod]
-		public async Task Return_False_When_User_Exists_And_Is_Not_In_Role()
+		public async Task Correctly_Update_User_Info_When_User_Exists()
 		{
+			// BAD TEST - NOT ISOLATED
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_False_When_User_Exists_And_Is_Not_In_Role")
+			.UseInMemoryDatabase(databaseName: "Correctly_Update_User_Info_When_User_Exists")
 				.Options;
-
 			string userId = Guid.NewGuid().ToString();
 
 			user = new User()
@@ -116,10 +64,6 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			};
 
 			userManagerMock = MockUserManager<User>();
-			userManagerMock
-				.Setup(x => x.IsInRoleAsync(It.IsAny<User>(), "Administrator2"))
-				.ReturnsAsync(true);
-
 			roleManagerMock = MockRoleManager();
 
 			using (var actContext = new SmartDormitoryContext(contextOptions))
@@ -132,10 +76,10 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
-
-				var result = await userService.IsAdmin(userId);
-
-				Assert.IsFalse(result);
+				await userService.SetGdprStatus(userId);
+				user = await assertContext.Users
+					.Where(u => u.Id == userId).FirstOrDefaultAsync();
+				Assert.IsTrue(user.AgreedGDPR);
 			}
 		}
 

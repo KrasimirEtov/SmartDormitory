@@ -5,11 +5,13 @@ using SmartDormitory.Services.Abstract;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Models.IcbSensors;
 using SmartDormitory.Services.Models.JsonDtoModels;
+using SmartDormitory.Services.Utils;
 using SmartDormitory.Services.Utils.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static SmartDormitory.Services.Utils.Constants.ValidatorConstants;
 
 namespace SmartDormitory.Services
 {
@@ -101,8 +103,11 @@ namespace SmartDormitory.Services
 
         public async Task<IcbSensorCreateServiceModel> GetById(string sensorId)
         {
-            var sensor = await this.Context.IcbSensors
-                .Where(s => s.Id == sensorId)
+            Validator.ValidateNull(sensorId);
+            Validator.ValidateGuid(sensorId);
+
+            return await this.Context.IcbSensors
+                .Where(s => !s.IsDeleted && s.Id == sensorId)
                 .Select(s => new IcbSensorCreateServiceModel()
                 {
                     Id = s.Id,
@@ -112,8 +117,6 @@ namespace SmartDormitory.Services
                     MeasureType = s.MeasureType
                 })
                 .FirstOrDefaultAsync();
-
-            return sensor;
         }
 
         public async Task<int> TotalCount()

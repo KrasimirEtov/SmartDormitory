@@ -20,7 +20,7 @@
     <div class="form-group w-auto">
         <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes"
                 class="form-control-lg input text-monospace custom-select">
-            <option selected value="">-- Select sensor type --</option>
+            <option selected value="@string.Empty">-- Select sensor type --</option>
         </select>
     </div>
 

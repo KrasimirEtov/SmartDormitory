@@ -20,5 +20,13 @@ namespace SmartDormitory.Services.Utils
                 throw new ArgumentNullException(string.Format(ValidatorConstants.NullExceptionMessage, nameof(value)));
             }
         }
+
+        public static void ValidateIntBiggerThan(int value, int bottomRange, string validatingParamName)
+        {
+            if (value < bottomRange)
+            {
+                throw new ArgumentOutOfRangeException(string.Format(ValidatorConstants.IntBiggerThanMessage, validatingParamName, bottomRange));
+            }
+        }
     }
 }

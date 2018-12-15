@@ -18,8 +18,9 @@
                     <div class="col-6">
                         <div class="col">
                             @if (User.IsInRole("Administrator"))
-                            {
-                                <a asp-area="Administration" asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
+                                    {
+                                        string areaName = User.GetId() == Model.UserId ? "" : "Administration";
+                                <a asp-area="@areaName" asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
                                    class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
                             }
                             else
@@ -108,12 +109,6 @@
     </div>
 </div>
 
-<!-- Button trigger modal-->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalConfirmDelete">
-    Launch
-    modal
-</button>
-
 <!--Modal: modalConfirmDelete-->
 <div class="modal fade" id="modalConfirmDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true">
@@ -167,7 +162,7 @@
                 gaugeColor: "#FF0000", // false
                 levelColors: ["#00b200"], // true
                 textRenderer: function (val) {
-                    if (val == -1) {
+                    if (val < 0) {
                         // toastr send notify alert
                         return 'Api is down!';
                     } else if (val == 0) {

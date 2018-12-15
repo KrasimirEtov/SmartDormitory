@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using SmartDormitory.Services.Exceptions;
+using System;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Infrastructure.Middleware
@@ -24,13 +24,9 @@ namespace SmartDormitory.App.Infrastructure.Middleware
 					context.Response.Redirect("/404");
 				}
 			}
-			catch (EntityDoesntExistException ex)
+			catch (Exception ex)
 			{
-				context.Response.Redirect("/404");
-			}
-			catch (InvalidClientInputException ex)
-			{
-				context.Response.Redirect("/404");
+				context.Response.Redirect("/errorPage");
 			}
 		}
 	}

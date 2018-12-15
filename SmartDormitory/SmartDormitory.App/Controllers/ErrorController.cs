@@ -4,7 +4,13 @@ namespace SmartDormitory.App.Controllers
 {
     public class ErrorController : Controller
     {
-        public IActionResult PageNotFound()
+
+		public IActionResult Index()
+		{
+			return this.View();
+		}
+
+		public IActionResult PageNotFound()
         {
             return this.View();
         }

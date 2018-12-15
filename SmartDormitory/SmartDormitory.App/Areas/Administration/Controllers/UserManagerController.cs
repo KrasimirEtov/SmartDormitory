@@ -59,7 +59,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
             var user = await this.userService.GetUser(userId);
             if (user == null)
             {
-                this.TempData["Error-Message"] = $"User does not exist!";
+                //this.TempData["Error-Message"] = $"User does not exist!";
                 return this.NotFound();
             }
             try
@@ -67,17 +67,17 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
                 if (await userService.IsAdmin(user.Id))
                 {
                     await this.userService.RemoveRole(user.Id, "Administrator");
-                    this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
+                    //this.TempData["Success-Message"] = $"{user.UserName} successfully removed!";
                 }
                 else
                 {
                     await this.userService.SetRole(user.Id, "Administrator");
-                    this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
+                   // this.TempData["Success-Message"] = $"You successfully made [{user.UserName}] administrator!";
                 }
             }
             catch (EntityDoesntExistException e)
             {
-                TempData["Error-Message"] = e.Message;
+                //TempData["Error-Message"] = e.Message;
             }
             return this.Ok();
         }

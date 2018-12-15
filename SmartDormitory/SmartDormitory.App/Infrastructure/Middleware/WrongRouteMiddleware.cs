@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.App.Infrastructure.Middleware
@@ -14,12 +15,18 @@ namespace SmartDormitory.App.Infrastructure.Middleware
 
 		public async Task Invoke(HttpContext context)
 		{
-
-			await this.next.Invoke(context);
-
-			if (context.Response.StatusCode == 404)
+			try
 			{
-				context.Response.Redirect("/404");
+				await this.next.Invoke(context);
+
+				if (context.Response.StatusCode == 404)
+				{
+					context.Response.Redirect("/404");
+				}
+			}
+			catch (Exception ex)
+			{
+				context.Response.Redirect("/errorPage");
 			}
 		}
 	}

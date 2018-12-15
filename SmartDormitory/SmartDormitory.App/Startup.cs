@@ -163,11 +163,14 @@ namespace SmartDormitory.App
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
-            }
-            else
+				app.UseExceptionHandler("/Error/Index");
+
+			}
+			else
             {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
+				//app.UseExceptionHandler("/Home/Error");
+				app.UseExceptionHandler("/Error/Index");
+				app.UseHsts();
             }
 
             app.UseHttpsRedirection();
@@ -209,7 +212,12 @@ namespace SmartDormitory.App
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
+				routes.MapRoute(
+					name: "errorpage",
+					template: "errorPage",
+					defaults: new { controller = "Error", action = "Index" });
+
+				routes.MapRoute(
                     name: "notfound",
                     template: "404",
                     defaults: new { controller = "Error", action = "PageNotFound" });

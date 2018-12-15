@@ -64,7 +64,9 @@ namespace SmartDormitory.Services
 
         public async Task<IEnumerable<AdminListSensorModel>> AllAdmin(string measureTypeId = "all", int isPublic = -1, int alarmSet = -1, int page = 1, int pageSize = 10, string searchTerm = "")
         {
-            var sensors = this.Context.Sensors.AsQueryable();
+            var sensors = this.Context.Sensors
+				.Where(u => !u.User.IsDeleted)
+				.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -254,7 +256,8 @@ namespace SmartDormitory.Services
                                  CreatedOn = (DateTime)s.CreatedOn,
                                  IsPublic = s.IsPublic,
                                  AlarmOn = s.AlarmOn,
-                                 Value = ExtractValue(s)
+                                 Value = ExtractValue(s),
+								 LastUpdateOn = s.LastUpdateOn
                              })
                              .ToListAsync();
         }

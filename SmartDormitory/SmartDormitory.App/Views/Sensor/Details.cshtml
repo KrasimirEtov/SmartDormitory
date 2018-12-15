@@ -14,16 +14,29 @@
         <div class="card">
             <div class="card-body">
                 <h2 class="card-title" style="text-align:center">Sensor name: @Model.Name</h2>
-                @if (User.IsInRole("Administrator"))
-                {
-                    <a asp-area="Administration" asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
-                       class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
-                }
-                else
-                {
-                    <a asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
-                       class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
-                }
+                <div class="form-row">
+                    <div class="col-6">
+                        <div class="col">
+                            @if (User.IsInRole("Administrator"))
+                                    {
+                                        string areaName = User.GetId() == Model.UserId ? "" : "Administration";
+                                <a asp-area="@areaName" asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
+                                   class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
+                                   class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
+                            }
+                        </div>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-outline-danger btn-block" data-toggle="modal" data-target="#modalConfirmDelete">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
         <br />
@@ -96,6 +109,40 @@
     </div>
 </div>
 
+<!--Modal: modalConfirmDelete-->
+<div class="modal fade" id="modalConfirmDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-notify modal-danger" role="document">
+        <!--Content-->
+        <div class="modal-content text-center">
+            <!--Header-->
+            <div class="modal-header d-flex justify-content-center">
+                <p class="heading">Are you sure?</p>
+            </div>
+
+            <!--Body-->
+            <div class="modal-body">
+
+                <i class="fa fa-times fa-4x animated rotateIn"></i>
+
+            </div>
+
+            <!--Footer-->
+            <div class="modal-footer flex-center">
+                <form asp-area="" asp-controller="Sensor" asp-action="ToggleDelete" asp-route-sensorId="@Model.SensorId"
+                      method="post">
+                    <button type="submit" class="btn btn-outline-danger">
+                        Yes
+                    </button>
+                </form>
+                <a class="btn  btn-danger waves-effect" data-dismiss="modal">No</a>
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+<!--Modal: modalConfirmDelete-->
+
 <script src="~/lib/justgage/raphael-2.1.4.min.js"></script>
 <script src="~/lib/justgage/justgage.js"></script>
 
@@ -115,7 +162,7 @@
                 gaugeColor: "#FF0000", // false
                 levelColors: ["#00b200"], // true
                 textRenderer: function (val) {
-                    if (val == -1) {
+                    if (val < 0) {
                         // toastr send notify alert
                         return 'Api is down!';
                     } else if (val == 0) {

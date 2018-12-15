@@ -22,7 +22,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_Valid_Sensor_Enumerable")
+			.UseInMemoryDatabase(databaseName: "AllPublic_Return_Valid_Sensor_Enumerable")
 				.Options;
 
 			var sensor = SetupFakeSensor();

@@ -6,9 +6,7 @@ using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
 using SmartDormitory.Services.Contracts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.NotificationService.Tests
@@ -24,7 +22,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.NotificationService.
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_Valid_Sensor_Enumerable")
+			.UseInMemoryDatabase(databaseName: "All_Return_Valid_Sensor_Enumerable")
 				.Options;
 
 			var sensor = SetupFakeSensor();

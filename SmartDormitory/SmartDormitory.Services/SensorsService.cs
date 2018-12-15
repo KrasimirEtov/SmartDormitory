@@ -316,7 +316,7 @@ namespace SmartDormitory.Services
 							DateTime.Now.Subtract(s.LastUpdateOn).TotalSeconds >= s.PollingInterval)
 						 .ToListAsync();
 
-		public async Task<IQueryable<Sensor>> QueryFilter(IQueryable<Sensor> sensors,
+		private async Task<IQueryable<Sensor>> QueryFilter(IQueryable<Sensor> sensors,
 			string measureTypeId = "all", int isPublic = -1, int alarmOn = -1)
 		{
 			if (measureTypeId != "all")

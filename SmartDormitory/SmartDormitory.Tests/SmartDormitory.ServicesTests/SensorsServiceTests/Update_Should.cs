@@ -5,55 +5,52 @@ using SmartDormitory.App.Data;
 using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
 using SmartDormitory.Services.Contracts;
+using SmartDormitory.Services.Exceptions;
 using System;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 {
 	[TestClass]
-	public class GetSensorById_Should
+	public class Update_Should
 	{
 		private DbContextOptions<SmartDormitoryContext> contextOptions;
 		private Mock<IMeasureTypeService> measureTypeServiceMock = new Mock<IMeasureTypeService>();
 
 		[TestMethod]
-		public async Task Throw_ArugmentException_When_Passed_Id_Is_Null()
-		{
-			// Arrange
-			var contextMock = new Mock<SmartDormitoryContext>();
-
-			var sut = new SensorsService(contextMock.Object,
-				measureTypeServiceMock.Object);
-
-			// Act & Assert
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(
-				() => sut.GetSensorById(null));
-		}
-
-		[TestMethod]
-		public async Task Throw_ArugmentException_When_Passed_Invalid_Guid()
-		{
-			// Arrange
-			var contextMock = new Mock<SmartDormitoryContext>();
-
-			var sut = new SensorsService(contextMock.Object,
-				measureTypeServiceMock.Object);
-
-			// Act & Assert
-			await Assert.ThrowsExceptionAsync<ArgumentException>(
-				() => sut.GetSensorById("InvalidGuid"));
-		}
-
-		[TestMethod]
-		public async Task Return_Sensor_When_Id_Is_Found()
+		public async Task Throw_EntityDoesntExistException_When_Sensor_Does_Not_Exist()
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_Sensor_When_Id_Is_Found")
+			.UseInMemoryDatabase(databaseName: "Update_Throw_EntityDoesntExistException_When_Sensor_Does_Not_Exist")
+				.Options;
+
+			string sensorId = Guid.NewGuid().ToString();
+
+			// Act && Assert
+
+			using (var assertContext = new SmartDormitoryContext(contextOptions))
+			{
+				var sut = new SensorsService(assertContext,
+				measureTypeServiceMock.Object);
+
+				await Assert.ThrowsExceptionAsync<EntityDoesntExistException>(
+					() => sut.Update(sensorId, It.IsAny<string>(), It.IsAny<string>(),
+					It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(),
+					It.IsAny<bool>(), It.IsAny<float>(), It.IsAny<float>(), It.IsAny<double>(),
+					It.IsAny<double>(), It.IsAny<bool>()));
+			}
+		}
+
+		[TestMethod]
+		public async Task Successfully_Update_Sensor_When_Parameters_Are_Valid()
+		{
+			// Arrange
+			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
+			.UseInMemoryDatabase(databaseName: "Successfully_Update_Sensor_When_Parameters_Are_Valid")
 				.Options;
 
 			var sensor = SetupFakeSensor();
-
 			using (var actContext = new SmartDormitoryContext(contextOptions))
 			{
 				await actContext.Sensors.AddAsync(sensor);
@@ -63,39 +60,14 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			// Act && Assert
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
-				var sut = new SensorsService(assertContext,
-								measureTypeServiceMock.Object);
-
-				var result = await sut.GetSensorById(sensor.Id);
-				Assert.AreEqual(result.Id, sensor.Id);
-			}
-		}
-
-		[TestMethod]
-		public async Task Return_Null_When_Id_Is_Not_Found()
-		{
-			// Arrange
-			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Sensor_Return_Null_When_Id_Is_Not_Found")
-				.Options;
-
-			var sensor = SetupFakeSensor();
-			sensor.IsDeleted = true;
-
-			using (var actContext = new SmartDormitoryContext(contextOptions))
-			{
-				await actContext.Sensors.AddAsync(sensor);
-				await actContext.SaveChangesAsync();
-			}
-
-			// Act && Assert
-			using (var assertContext = new SmartDormitoryContext(contextOptions))
-			{
-				var sut = new SensorsService(assertContext,
-								measureTypeServiceMock.Object);
-
-				var result = await sut.GetSensorById(sensor.Id);
-				Assert.AreEqual(null, result);
+				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
+				var resultId = await sut.Update(sensor.Id, sensor.UserId, sensor.IcbSensorId,
+					sensor.Name, sensor.Description, sensor.PollingInterval, sensor.IsPublic,
+					sensor.AlarmOn, sensor.MinRangeValue, sensor.MaxRangeValue,
+					sensor.Coordinates.Longitude, sensor.Coordinates.Latitude, sensor.SwitchOn);
+				var resultSensor = await assertContext.Sensors.FirstOrDefaultAsync(s => s.Id == sensor.Id);
+				Assert.AreEqual(resultSensor.ModifiedOn.Value.Day, DateTime.Now.Day);
+				Assert.AreEqual(resultSensor.Id, sensor.Id);
 			}
 		}
 

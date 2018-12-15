@@ -175,7 +175,7 @@ namespace SmartDormitory.Services
 		}
 
 		public async Task<int> TotalSensors()
-			=> await this.Context.Sensors.CountAsync(s => s.IsDeleted == false);
+			=> await this.Context.Sensors.CountAsync(s => !s.IsDeleted);
 
 		public async Task<IEnumerable<UserSensorListModel>> GetUserSensors(string userId,
 			string searchTerm = "", string measureTypeId = "all", int alarmOn = -1, int isPublic = -1)
@@ -241,6 +241,9 @@ namespace SmartDormitory.Services
 
 		public async Task<GaugeDataServiceModel> GetGaugeData(string sensorId)
 		{
+			Validator.ValidateNull(sensorId);
+			Validator.ValidateGuid(sensorId);
+
 			var sensor = await this.Context
 								   .Sensors
 								   .Where(s => !s.IsDeleted && s.Id == sensorId)
@@ -251,11 +254,6 @@ namespace SmartDormitory.Services
 														   .TotalSeconds < s.PollingInterval
 								   })
 								   .FirstOrDefaultAsync();
-
-			if (sensor is null)
-			{
-				throw new EntityDoesntExistException("Sensor does not exist");
-			}
 
 			return sensor;
 		}
@@ -288,19 +286,6 @@ namespace SmartDormitory.Services
 			this.Context.Sensors.Update(sensor);
 			await this.Context.SaveChangesAsync();
 			return sensor.Id;
-		}
-
-		public async Task<IEnumerable<Sensor>> GetAll()
-			=> await this.Context
-						 .Sensors
-						 .Where(s => !s.IsDeleted)
-						 .OrderBy(s => s.IcbSensorId)
-						 .ToListAsync();
-
-		public async Task UpdateRange(IList<Sensor> sensorsToUpdate)
-		{
-			this.Context.UpdateRange(sensorsToUpdate);
-			await this.Context.SaveChangesAsync();
 		}
 
 		public async Task<IEnumerable<MapSensorServiceModel>> GetAllCoordinates()

@@ -6,12 +6,14 @@ using SmartDormitory.Data.Models;
 using SmartDormitory.Services;
 using SmartDormitory.Services.Contracts;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 {
 	[TestClass]
-	public class GetSensorById_Should
+	public class GetGaugeData_Should
 	{
 		private DbContextOptions<SmartDormitoryContext> contextOptions;
 		private Mock<IMeasureTypeService> measureTypeServiceMock = new Mock<IMeasureTypeService>();
@@ -49,7 +51,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_Sensor_When_Id_Is_Found")
+			.UseInMemoryDatabase(databaseName: "Gauge_Return_Sensor_When_Id_Is_Found")
 				.Options;
 
 			var sensor = SetupFakeSensor();
@@ -66,8 +68,8 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 				var sut = new SensorsService(assertContext,
 								measureTypeServiceMock.Object);
 
-				var result = await sut.GetSensorById(sensor.Id);
-				Assert.AreEqual(result.Id, sensor.Id);
+				var result = await sut.GetGaugeData(sensor.Id);
+				Assert.AreEqual(result.CurrentValue, sensor.CurrentValue);
 			}
 		}
 
@@ -76,12 +78,11 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Sensor_Return_Null_When_Id_Is_Not_Found")
+			.UseInMemoryDatabase(databaseName: "Return_Null_When_Id_Is_Not_Found")
 				.Options;
 
 			var sensor = SetupFakeSensor();
 			sensor.IsDeleted = true;
-
 			using (var actContext = new SmartDormitoryContext(contextOptions))
 			{
 				await actContext.Sensors.AddAsync(sensor);
@@ -94,7 +95,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 				var sut = new SensorsService(assertContext,
 								measureTypeServiceMock.Object);
 
-				var result = await sut.GetSensorById(sensor.Id);
+				var result = await sut.GetGaugeData(sensor.Id);
 				Assert.AreEqual(null, result);
 			}
 		}

@@ -11,91 +11,61 @@ using System.Threading.Tasks;
 namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 {
 	[TestClass]
-	public class GetSensorById_Should
+	public class RegisterNewSensor_Should
 	{
 		private DbContextOptions<SmartDormitoryContext> contextOptions;
 		private Mock<IMeasureTypeService> measureTypeServiceMock = new Mock<IMeasureTypeService>();
 
 		[TestMethod]
-		public async Task Throw_ArugmentException_When_Passed_Id_Is_Null()
-		{
-			// Arrange
-			var contextMock = new Mock<SmartDormitoryContext>();
-
-			var sut = new SensorsService(contextMock.Object,
-				measureTypeServiceMock.Object);
-
-			// Act & Assert
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(
-				() => sut.GetSensorById(null));
-		}
-
-		[TestMethod]
-		public async Task Throw_ArugmentException_When_Passed_Invalid_Guid()
-		{
-			// Arrange
-			var contextMock = new Mock<SmartDormitoryContext>();
-
-			var sut = new SensorsService(contextMock.Object,
-				measureTypeServiceMock.Object);
-
-			// Act & Assert
-			await Assert.ThrowsExceptionAsync<ArgumentException>(
-				() => sut.GetSensorById("InvalidGuid"));
-		}
-
-		[TestMethod]
-		public async Task Return_Sensor_When_Id_Is_Found()
+		public async Task Return_Empty_String_When_Icb_Sensors_Are_Empty()
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_Sensor_When_Id_Is_Found")
+			.UseInMemoryDatabase(databaseName: "Return_Valid_Sensor_Enumerable")
 				.Options;
 
-			var sensor = SetupFakeSensor();
+			string expected = "";
 
+			// Act && Assert
+			using (var assertContext = new SmartDormitoryContext(contextOptions))
+			{
+				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
+				var result = await sut.RegisterNewSensor(It.IsAny<string>(), "icbSensorId",
+					It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(),
+					It.IsAny<bool>(), It.IsAny<float>(), It.IsAny<float>(), It.IsAny<double>(),
+					It.IsAny<double>(), It.IsAny<bool>());
+				Assert.AreEqual(expected, result);
+			}
+		}
+
+		[TestMethod]
+		public async Task Successfully_Register_Sensor_When_Parameters_Are_Valid()
+		{
+			// Arrange
+			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
+			.UseInMemoryDatabase(databaseName: "Successfully_Register_Sensor_When_Parameters_Are_Valid")
+				.Options;
+
+			string icbSensorId = Guid.NewGuid().ToString();
 			using (var actContext = new SmartDormitoryContext(contextOptions))
 			{
-				await actContext.Sensors.AddAsync(sensor);
+				await actContext.IcbSensors.AddAsync(new IcbSensor()
+				{
+					Id = icbSensorId
+				});
 				await actContext.SaveChangesAsync();
 			}
 
 			// Act && Assert
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
-				var sut = new SensorsService(assertContext,
-								measureTypeServiceMock.Object);
-
-				var result = await sut.GetSensorById(sensor.Id);
-				Assert.AreEqual(result.Id, sensor.Id);
-			}
-		}
-
-		[TestMethod]
-		public async Task Return_Null_When_Id_Is_Not_Found()
-		{
-			// Arrange
-			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Sensor_Return_Null_When_Id_Is_Not_Found")
-				.Options;
-
-			var sensor = SetupFakeSensor();
-			sensor.IsDeleted = true;
-
-			using (var actContext = new SmartDormitoryContext(contextOptions))
-			{
-				await actContext.Sensors.AddAsync(sensor);
-				await actContext.SaveChangesAsync();
-			}
-
-			// Act && Assert
-			using (var assertContext = new SmartDormitoryContext(contextOptions))
-			{
-				var sut = new SensorsService(assertContext,
-								measureTypeServiceMock.Object);
-
-				var result = await sut.GetSensorById(sensor.Id);
-				Assert.AreEqual(null, result);
+				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
+				var result = await sut.RegisterNewSensor("userId", icbSensorId, "name", "desc", 50,
+					true, true, 40, 50, 20.5, 40.5, true);
+				var sensorsCount = await assertContext.Sensors.CountAsync();
+				var sensor = await assertContext.Sensors.FirstOrDefaultAsync(x => x.Id == result);
+				Assert.AreEqual(result, sensor.Id);
+				Assert.AreEqual(1, sensorsCount);
 			}
 		}
 

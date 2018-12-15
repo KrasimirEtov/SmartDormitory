@@ -81,6 +81,7 @@ namespace SmartDormitory.Services
             {
                 throw new EntityDoesntExistException("User does not exist");
             }
+			
             await this.userManager.RemoveFromRoleAsync(user, roleName);
         }
 

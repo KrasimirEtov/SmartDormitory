@@ -44,6 +44,34 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			}
 		}
 
+		[TestMethod]
+		public async Task Successfully_Set_User_Role_When_Parameters_Are_Valid()
+		{
+			// BAD TEST - NOT ISOLATED
+			// Arrange
+			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
+			.UseInMemoryDatabase(databaseName: "Successfully_Set_User_Role_When_Parameters_Are_Valid")
+				.Options;
+
+			string userId = "myId";
+			string roleName = "AdministratorTest";
+
+			userManagerMock = MockUserManager<User>();
+			
+			//             await this.userManager.AddToRoleAsync(user, roleName);
+
+			roleManagerMock = MockRoleManager();
+
+			// Act && Assert
+			using (var assertContext = new SmartDormitoryContext(contextOptions))
+			{
+				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
+
+				await Assert.ThrowsExceptionAsync<EntityDoesntExistException>(
+					() => userService.SetRole(userId, roleName));
+			}
+		}
+
 		private Mock<UserManager<TUser>> MockUserManager<TUser>() where TUser : class
 		{
 			var store = new Mock<IUserStore<TUser>>();

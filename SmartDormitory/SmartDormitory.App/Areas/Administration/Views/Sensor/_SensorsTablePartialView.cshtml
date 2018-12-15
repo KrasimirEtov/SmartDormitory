@@ -108,7 +108,7 @@
                 let alarmSet = $("#AlarmSet").val();
                 let searchTerm = $("#searchTerm").val();
                 let url = "@Url.Action("LoadSensorsTable", "Sensor")?measureTypeId=" + typeId +
-                    "&isPublic=" + isPublic + "&alarmSet=" + alarmSet + "&page=" + targetPage + "&searchTerm=" + searchTerm;;
+                    "&isPublic=" + isPublic + "&alarmSet=" + alarmSet + "&page=" + targetPage + "&searchTerm=" + searchTerm;
 
                 $("#sensorsTable").load(url);
             })

@@ -20,9 +20,14 @@ namespace SmartDormitory.Services
         }
 
         public async Task<bool> Exists(string id)
-            => await this.Context
-                   .MeasureTypes
-                   .AnyAsync(mt => !mt.IsDeleted && mt.Id == id);
+        {
+            Validator.ValidateNull(id);
+            Validator.ValidateGuid(id);
+
+            return await this.Context
+                 .MeasureTypes
+                 .AnyAsync(mt => !mt.IsDeleted && mt.Id == id);
+        }
 
         public async Task<IEnumerable<MeasureTypeServiceModel>> GetAllNotDeleted()
                  => await this.Context

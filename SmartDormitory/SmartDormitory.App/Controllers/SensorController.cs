@@ -7,6 +7,7 @@ using SmartDormitory.App.Models.Sensor;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
 using SmartDormitory.Services.Models.MeasureTypes;
+using SmartDormitory.Services.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,34 +39,37 @@ namespace SmartDormitory.App.Controllers
 			var userId = this.User.GetId();
 			var measureTypes = await this.CachedMeasureTypes();
 			var sensors = await this.sensorsService.GetUserSensors(userId);
-
 			var model = new MySensorsViewModel
 			{
 				MeasureTypes = new SelectList(measureTypes, "Id", "SuitableSensorType"),
-				Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList(),
-				MinPollingInterval = sensors.Min(x => x.PollingInterval)
+				
 			};
+			if (!sensors.Any())
+			{
+				model.Sensors = new List<MySensorListViewModel>();
+				model.MinPollingInterval = 0;
+			}
+			else
+			{
+				model.Sensors = sensors.Select(s => new MySensorListViewModel(s)).ToList();
+				model.MinPollingInterval = sensors.Min(x => x.PollingInterval);
+			}
+
 			return View(model);
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> ReloadMySensorsTable(string measureTypeId = "all", string searchTerm = "", int alarmOn = -1, int privacy = -1)
 		{
-			try
-			{
-				var userId = this.User.GetId();
-				var sensors = (await this.sensorsService
-										 .GetUserSensors(userId, searchTerm, measureTypeId,
-																alarmOn, privacy))
-										.Select(s => new MySensorListViewModel(s))
-										.ToList();
 
-				return PartialView("_MySensorsTable", sensors);
-			}
-			catch (EntityDoesntExistException e)
-			{
-				return NotFound(e.Message);
-			}
+			var userId = this.User.GetId();
+			var sensors = (await this.sensorsService
+									 .GetUserSensors(userId, searchTerm, measureTypeId,
+															alarmOn, privacy))
+									.Select(s => new MySensorListViewModel(s))
+									.ToList();
+
+			return PartialView("_MySensorsTable", sensors);
 		}
 
 		[HttpGet]
@@ -144,6 +148,20 @@ namespace SmartDormitory.App.Controllers
 			if (!this.ModelState.IsValid)
 			{
 				TempData["Error-Message"] = "Error while trying to create a new sensor";
+				return this.RedirectToAction("Create", "Sensor", new
+				{
+					icbSensorId = model.IcbSensorId,
+					userId = model.UserId
+				});
+			}
+			try
+			{
+				Validator.ValidateSensorValues(model.MinRangeValue, model.ApiMinRangeValue,
+					model.MaxRangeValue, model.ApiMaxRangeValue, model.PollingInterval, model.ApiPollingInterval);
+			}
+			catch (ArgumentOutOfRangeException e)
+			{
+				TempData["Error-Message"] = e.Message;
 				return this.RedirectToAction("Create", "Sensor", new
 				{
 					icbSensorId = model.IcbSensorId,
@@ -268,12 +286,22 @@ namespace SmartDormitory.App.Controllers
 		{
 			if (!this.ModelState.IsValid)
 			{
-
-				// TODO: Redirect to register index + temp data message
 				TempData["Error-Message"] = "Oops something went wrong! Try again..";
 				return this.RedirectToAction("Update", "Sensor", new { sensorId = model.SensorId });
 			}
-
+			try
+			{
+				Validator.ValidateSensorValues(model.MinRangeValue, model.ApiMinRangeValue,
+					model.MaxRangeValue, model.ApiMaxRangeValue, model.PollingInterval, model.ApiPollingInterval);
+			}
+			catch (ArgumentOutOfRangeException e)
+			{
+				TempData["Error-Message"] = e.Message;
+				return this.RedirectToAction("Update", "Sensor", new
+				{
+					sensorId = model.SensorId
+				});
+			}
 			var updatedSensorId = await this.sensorsService.Update(model.SensorId, model.UserId, model.IcbSensorId, model.Name, model.Description,
 				model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
 				model.Longtitude, model.Latitude, model.SwitchOn);
@@ -294,7 +322,7 @@ namespace SmartDormitory.App.Controllers
 				TempData["Error-Message"] = e.Message;
 				return this.RedirectToAction("MySensors", "Sensor");
 			}
-
+			TempData["Success-Message"] = "You succesfully deleted your sensor";
 			return RedirectToAction("MySensors", "Sensor");
 		}
 

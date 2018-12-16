@@ -8,6 +8,7 @@ using SmartDormitory.App.Models.Sensor;
 using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
 using SmartDormitory.Services.Models.IcbSensors;
+using SmartDormitory.Services.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -151,8 +152,23 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
                     area = "Administration"
                 });
             }
+			try
+			{
+				Validator.ValidateSensorValues(model.MinRangeValue, model.ApiMinRangeValue,
+					model.MaxRangeValue, model.ApiMaxRangeValue, model.PollingInterval, model.ApiPollingInterval);
+			}
+			catch (ArgumentOutOfRangeException e)
+			{
+				TempData["Error-Message"] = e.Message;
+				return this.RedirectToAction("Create", "Sensor", new
+				{
+					icbSensorId = model.IcbSensorId,
+					userId = model.UserId,
+					area = "Administration"
+				});
+			}
 
-            var createdSensorId = await this.sensorsService.RegisterNewSensor(model.UserId, model.IcbSensorId, model.Name,
+			var createdSensorId = await this.sensorsService.RegisterNewSensor(model.UserId, model.IcbSensorId, model.Name,
                 model.Description, model.PollingInterval, model.IsPublic,
                 model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
                 model.Longtitude, model.Latitude, model.SwitchOn);
@@ -217,8 +233,22 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
                 TempData["Error-Message"] = "Oops something went wrong! Try again..";
                 return this.RedirectToAction("Update", "Sensor", new { sensorId = model.SensorId, area = "Administration" });
             }
+			try
+			{
+				Validator.ValidateSensorValues(model.MinRangeValue, model.ApiMinRangeValue,
+					model.MaxRangeValue, model.ApiMaxRangeValue, model.PollingInterval, model.ApiPollingInterval);
+			}
+			catch (ArgumentOutOfRangeException e)
+			{
+				TempData["Error-Message"] = e.Message;
+				return this.RedirectToAction("Update", "Sensor", new
+				{
+					sensorId = model.SensorId,
+					area = "Administration"
+				});
+			}
 
-            var updatedSensorId = await this.sensorsService.Update(model.SensorId, model.UserId, model.IcbSensorId, model.Name, model.Description,
+			var updatedSensorId = await this.sensorsService.Update(model.SensorId, model.UserId, model.IcbSensorId, model.Name, model.Description,
                 model.PollingInterval, model.IsPublic, model.AlarmOn, model.MinRangeValue, model.MaxRangeValue,
                 model.Longtitude, model.Latitude, model.SwitchOn);
             this.TempData["Success-Message"] = $"You successfully updated the sensor!";

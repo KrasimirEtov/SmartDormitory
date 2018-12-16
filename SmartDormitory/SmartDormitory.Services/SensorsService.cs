@@ -136,7 +136,8 @@ namespace SmartDormitory.Services
 						Longitude = longtitude
 					},
 					CreatedOn = DateTime.Now,
-					SwitchOn = switchOn
+					SwitchOn = switchOn,
+					CurrentValue = -50
 				};
 				await this.Context.Sensors.AddAsync(sensor);
 				await this.Context.SaveChangesAsync();

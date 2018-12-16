@@ -162,9 +162,11 @@
                 gaugeColor: "#FF0000", // false
                 levelColors: ["#00b200"], // true
                 textRenderer: function (val) {
-                    if (val < 0) {
+                    if (val <= -100) {
                         // toastr send notify alert
                         return 'Api is down!';
+                    } else if (val == -50 || val == null) {
+                        return 'fetching';
                     } else if (val == 0) {
                         return 'Closed';
                     } else if (val == 1) {
@@ -182,7 +184,7 @@
                 $.getJSON('/Sensor/GetGaugeData?sensorId=@Model.SensorId', function (data) {
                     // check if data is null or is not live updated
                     if (data.currentValue === undefined || !data.isUpdated) {
-                        isSwitchGauge.refresh(-1);
+                        isSwitchGauge.refresh(-100);
                     }
                     else {
                         isSwitchGauge.refresh(data.currentValue);
@@ -191,7 +193,8 @@
             }, @Model.PollingInterval * 1000);
         }
         else {
-            var isNotSwitchDefaults = {
+            console.log(@Model.StartValue);
+            var isNotSwitchDefaults = {        
                 value: @Model.StartValue,
                 min: @Model.MinRangeValue,
                 max: @Model.MaxRangeValue,
@@ -210,14 +213,27 @@
                 ],
                 textRenderer: function (val) {
 
-                    if (val < 0) {
-                        // toastr send notify alert
+                    if (val <= -100) {
                         return 'Api is down';
+                    } else if (val === -99) {
+                        return 'cached! ' + val;
+                    } else if (val == -50 || val == null) {
+                        return 'fetching';
                     } else if (val < @Model.MinRangeValue) {
-                        return 'Alarm! ' + val;
+                        if (@Model.AlarmOn) {
+                            return 'Alarm! ' + val;
+                        }
+                        else {
+                            return 'Out of range';
+                        }
                     } else if (val > @Model.MaxRangeValue) {
-                        return 'Alarm! ' + val;
-                    } else if (val > @Model.MinRangeValue && val < @Model.MaxRangeValue) {
+                        if (@Model.AlarmOn) {
+                            return 'Alarm! ' + val;
+                        }
+                        else {
+                            return 'Out of range';
+                        }
+                    } else if (val >= @Model.MinRangeValue && val <= @Model.MaxRangeValue) {
                         return val;
                     }
                 },
@@ -233,10 +249,12 @@
 
             setInterval(function () {
                 $.getJSON('/Sensor/GetGaugeData?sensorId=@Model.SensorId', function (data) {
-                    // check if data is null or is not live updated
-                    if (data.currentValue === undefined || !data.isUpdated) {
-                        isNotSwitchGauge.refresh(-1);
-                    } else {
+                    if (data.currentValue === undefined) {
+                        isNotSwitchGauge.refresh(-100);
+                    } else if (!data.isUpdated) {
+                        isNotSwitchGauge.refresh(-99);
+                    }
+                    else {
                         isNotSwitchGauge.refresh(data.currentValue);
                     }
                 });

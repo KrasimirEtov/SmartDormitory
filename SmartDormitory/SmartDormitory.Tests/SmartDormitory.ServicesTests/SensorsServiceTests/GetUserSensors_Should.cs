@@ -180,6 +180,70 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			}
 		}
 
+		[TestMethod]
+		public async Task Return_Valid_Sensor_Enumerable_When_MeasureType_Is_Boolean_True()
+		{
+			// Arrange
+			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
+			.UseInMemoryDatabase
+			(databaseName: "GetUserSensorsReturn_Return_Valid_Sensor_Enumerable_When_MeasureType_Is_Boolean_True")
+				.Options;
+
+			var sensor = SetupFakeSensor();
+			sensor.IcbSensor.MeasureType.SuitableSensorType = "Boolean switch (door/occupancy/etc)";
+			sensor.CurrentValue = 1;
+
+			using (var actContext = new SmartDormitoryContext(contextOptions))
+			{
+				await actContext.Sensors.AddAsync(sensor);
+				await actContext.SaveChangesAsync();
+			}
+			measureTypeServiceMock
+				.Setup(x => x.Exists(It.IsAny<string>()))
+				.ReturnsAsync(true);
+
+			// Act && Assert
+			using (var assertContext = new SmartDormitoryContext(contextOptions))
+			{
+				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
+				var sensors = await sut.GetUserSensors(sensor.UserId, "",
+					"all", -1, -1);
+				Assert.AreEqual(1, sensors.Count());
+			}
+		}
+
+		[TestMethod]
+		public async Task Return_Valid_Sensor_Enumerable_When_MeasureType_Is_Boolean_False()
+		{
+			// Arrange
+			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
+			.UseInMemoryDatabase
+			(databaseName: "GetUserSensorsReturn_Return_Valid_Sensor_Enumerable_When_MeasureType_Is_Boolean_False")
+				.Options;
+
+			var sensor = SetupFakeSensor();
+			sensor.IcbSensor.MeasureType.SuitableSensorType = "Boolean switch (door/occupancy/etc)";
+			sensor.CurrentValue = 0;
+
+			using (var actContext = new SmartDormitoryContext(contextOptions))
+			{
+				await actContext.Sensors.AddAsync(sensor);
+				await actContext.SaveChangesAsync();
+			}
+			measureTypeServiceMock
+				.Setup(x => x.Exists(It.IsAny<string>()))
+				.ReturnsAsync(true);
+
+			// Act && Assert
+			using (var assertContext = new SmartDormitoryContext(contextOptions))
+			{
+				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
+				var sensors = await sut.GetUserSensors(sensor.UserId, "",
+					"all", -1, -1);
+				Assert.AreEqual(1, sensors.Count());
+			}
+		}
+
 		private Sensor SetupFakeSensor()
 		{
 			string measureTypeId = "temperature";

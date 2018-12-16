@@ -104,9 +104,13 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
                         return RedirectToAction("Index", "Home", new { Area = "" });
                     }
                 }
+				else
+				{
+					TempData["Error-Message"] = "Wrong username or password!";
+					return RedirectToPage("./Login");
+				}
                
             }
-
             // If we got this far, something failed, redisplay form
             return Page();
         }

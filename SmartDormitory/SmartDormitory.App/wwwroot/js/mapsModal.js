@@ -15,8 +15,9 @@ function initMap() {
     const map = new google.maps.Map(document.getElementById('mapModal'), options_googlemaps);
 
     // Create the search box and link it to the UI element.
-    var input = document.getElementById('pac-input');
-    var searchBox = new google.maps.places.SearchBox(input);
+    let input = document.getElementById('pac-input');
+    let searchBox = new google.maps.places.SearchBox(input);
+
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
     // Bias the SearchBox results towards current map's viewport.
@@ -24,7 +25,14 @@ function initMap() {
         searchBox.setBounds(map.getBounds());
     });
 
-    var markers = [];
+    //prevent submiting register sensor form when pressing Enter key
+    google.maps.event.addDomListener(input, 'keydown', function (e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+        }
+    });
+
+    let markers = [];
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
     searchBox.addListener('places_changed', function () {
@@ -72,7 +80,6 @@ function initMap() {
         });
         map.fitBounds(bounds);
     });
-
     // This event listener calls methods when the map is clicked.
     google.maps.event.addListener(map, 'click', function (event) {
         deleteMarker();

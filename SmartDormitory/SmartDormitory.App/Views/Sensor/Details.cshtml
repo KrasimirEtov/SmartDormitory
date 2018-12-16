@@ -193,7 +193,6 @@
             }, @Model.PollingInterval * 1000);
         }
         else {
-            console.log(@Model.StartValue);
             var isNotSwitchDefaults = {        
                 value: @Model.StartValue,
                 min: @Model.MinRangeValue,
@@ -202,9 +201,13 @@
                 gaugeWidthScale: 0.3,
                 pointer: true,
                 pointerOptions: {
-                    toplength: 15,
-                    bottomlength: 10,
-                    bottomwidth: 2
+                    toplength: -8,
+                    bottomlength: 12,
+                    bottomwidth: 15,
+                    color: '#EE7600',
+                    stroke: '#808080',
+                    stroke_width: 1,
+                    stroke_linecap: 'round'
                 },
                 levelColors: [
                     "#FF0000",

@@ -122,3 +122,27 @@ body {
     height: 50rem;
     width: 100%;
 }
+
+#scrollToTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 15px;
+    z-index: 99;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    background-color: #EE7600;
+    color: white;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 4px;
+    margin: 4px 2px;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+    #scrollToTopBtn:hover {
+        background-color: #EE7600;
+        opacity: 1;
+    }

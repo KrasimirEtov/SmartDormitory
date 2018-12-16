@@ -14,4 +14,3 @@
         $("#success-alert").slideUp(500);
     });
 });
-

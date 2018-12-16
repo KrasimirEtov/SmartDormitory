@@ -165,6 +165,8 @@
                     if (val < 0) {
                         // toastr send notify alert
                         return 'Api is down!';
+                    } else if (val == null) {
+                        return 'getting latest value';
                     } else if (val == 0) {
                         return 'Closed';
                     } else if (val == 1) {
@@ -191,7 +193,8 @@
             }, @Model.PollingInterval * 1000);
         }
         else {
-            var isNotSwitchDefaults = {
+            console.log(@Model.StartValue);
+            var isNotSwitchDefaults = {        
                 value: @Model.StartValue,
                 min: @Model.MinRangeValue,
                 max: @Model.MaxRangeValue,
@@ -210,14 +213,15 @@
                 ],
                 textRenderer: function (val) {
 
-                    if (val < 0) {
-                        // toastr send notify alert
+                    if (val <= -10) {
                         return 'Api is down';
+                    } else if (val == null) {
+                        return 'getting latest value';
                     } else if (val < @Model.MinRangeValue) {
                         return 'Alarm! ' + val;
                     } else if (val > @Model.MaxRangeValue) {
                         return 'Alarm! ' + val;
-                    } else if (val > @Model.MinRangeValue && val < @Model.MaxRangeValue) {
+                    } else if (val >= @Model.MinRangeValue && val <= @Model.MaxRangeValue) {
                         return val;
                     }
                 },
@@ -233,9 +237,8 @@
 
             setInterval(function () {
                 $.getJSON('/Sensor/GetGaugeData?sensorId=@Model.SensorId', function (data) {
-                    // check if data is null or is not live updated
                     if (data.currentValue === undefined || !data.isUpdated) {
-                        isNotSwitchGauge.refresh(-1);
+                        isNotSwitchGauge.refresh(-10);
                     } else {
                         isNotSwitchGauge.refresh(data.currentValue);
                     }

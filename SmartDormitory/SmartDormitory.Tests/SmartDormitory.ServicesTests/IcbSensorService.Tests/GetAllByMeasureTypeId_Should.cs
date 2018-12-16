@@ -127,7 +127,67 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
             }
         }
 
-        [TestMethod]
+		[TestMethod]
+		public async Task ReturnCorrectList_WhenPassedValidParamsWithFiltration()
+		{
+			// Arrange
+			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
+		   .UseInMemoryDatabase(databaseName: "ReturnCorrectList_WhenPassedValidParamsWithFiltration")
+			   .Options;
+
+			var existingmeasureTypeId = Guid.NewGuid().ToString();
+			var existingMeasureType = new MeasureType
+			{
+				Id = existingmeasureTypeId,
+				MeasureUnit = "Existing unit",
+				SuitableSensorType = "Some string"
+			};
+
+			var existingId = Guid.NewGuid().ToString();
+			using (var assertContext = new SmartDormitoryContext(contextOptions))
+			{
+				await assertContext.MeasureTypes.AddAsync(existingMeasureType);
+				await assertContext.IcbSensors.AddRangeAsync(new IcbSensor
+				{
+					Id = existingId,
+					PollingInterval = 10,
+					Description = "Some description",
+					Tag = "Some tag",
+					MinRangeValue = 10,
+					MaxRangeValue = 20,
+					IsDeleted = false,
+					MeasureTypeId = existingmeasureTypeId
+				},
+							 new IcbSensor
+							 {
+								 Id = Guid.NewGuid().ToString(),
+								 PollingInterval = 10,
+								 Description = "Some description",
+								 Tag = "Some tag",
+								 MinRangeValue = 10,
+								 MaxRangeValue = 20,
+								 IsDeleted = true,
+								 MeasureTypeId = existingmeasureTypeId
+							 });
+				await assertContext.SaveChangesAsync();
+			}
+
+			// Act && Asert
+			using (var assertContext = new SmartDormitoryContext(contextOptions))
+			{
+				var measureTypeServiceMock = new Mock<IMeasureTypeService>();
+				measureTypeServiceMock
+					.Setup(x => x.Exists(It.IsAny<string>()))
+					.ReturnsAsync(true);
+				var sut = new IcbSensorsService(assertContext, measureTypeServiceMock.Object);
+				var result = await sut.GetAllByMeasureTypeId(measureTypeId: existingmeasureTypeId);
+
+				Assert.IsTrue(result.Count() == 1);
+				Assert.IsTrue(result.Any(s => s.Id.Equals(existingId)));
+			}
+		}
+
+		[TestMethod]
         public async Task ThrowArgumentOutOfRangeException_WhenPassedNegativePageValue()
         {
             // Arrange

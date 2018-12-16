@@ -104,6 +104,11 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
                         return RedirectToAction("Index", "Home", new { Area = "" });
                     }
                 }
+				else
+				{
+					TempData["Error-Message"] = "Invalid login info";
+					return RedirectToPage("./Login");
+				}
                
             }
 

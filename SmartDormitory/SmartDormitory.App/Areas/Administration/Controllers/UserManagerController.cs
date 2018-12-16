@@ -33,7 +33,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 			catch (RedirectException e)
 			{
 				this.TempData["Error-Message"] = e.Message;
-				return this.RedirectToAction(nameof(Index),nameof(UserManagerController));
+				return this.RedirectToAction(nameof(Index), nameof(UserManagerController));
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 			catch (RedirectException e)
 			{
 				this.TempData["Error-Message"] = e.Message;
-				return RedirectToAction(nameof(Index));
+				return RedirectToAction(nameof(Index), nameof(UserManagerController));
 			}
 		}
 
@@ -89,7 +89,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 				this.TempData["Error-Message"] = e.Message;
 				return this.NotFound(e.Message);
 			}
-			this.TempData["Success-Message"] = $"User was successfully disabled!";
+			//this.TempData["Success-Message"] = $"User was successfully disabled!";
 
 			return this.Ok();
 		}

@@ -294,7 +294,7 @@ namespace SmartDormitory.App.Controllers
 				TempData["Error-Message"] = e.Message;
 				return this.RedirectToAction("MySensors", "Sensor");
 			}
-
+			TempData["Success-Message"] = "You succesfully deleted your sensor";
 			return RedirectToAction("MySensors", "Sensor");
 		}
 

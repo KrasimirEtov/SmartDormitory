@@ -10,7 +10,6 @@ using SmartDormitory.Services.Contracts;
 using SmartDormitory.Services.Exceptions;
 using SmartDormitory.Services.Models.Users;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -18,43 +17,43 @@ using System.Threading.Tasks;
 namespace SmartDormitory.Tests.SmartDormitory.AppTests.Areas.Administration.ControllerTests.UserManagerControllerTests
 {
 	[TestClass]
-	public class IndexAction_Should
+	public class UsersAction_Should
 	{
 		private Mock<IUserService> userServiceMock = new Mock<IUserService>();
 		private User user;
 		private UserManagerController controller;
 
 		[TestMethod]
-		public async Task IndexAction_Returns_ViewResult()
+		public async Task UsersAction_Returns_PartialViewResult()
 		{
 			// Arrange && Act
 			var controller = SetupController(1);
 
-			var result = await controller.Index();
+			var result = await controller.Users();
 
 			// Assert
-			Assert.IsInstanceOfType(result, typeof(ViewResult));
+			Assert.IsInstanceOfType(result, typeof(PartialViewResult));
 		}
 
 		[TestMethod]
-		public async Task IndexAction_Returns_Correct_ViewModel()
+		public async Task UsersAction_Returns_Correct_ViewModel()
 		{
 			// Arrange && Act
 			var controller = SetupController(1);
 
-			var result = await controller.Index() as ViewResult;
+			var result = await controller.Users() as PartialViewResult;
 
 			// Assert
 			Assert.IsInstanceOfType(result.Model, typeof(UsersPagingViewModel));
 		}
 
 		[TestMethod]
-		public async Task IndexAction_Calls_Correct_Service_Methods()
+		public async Task UsersAction_Calls_Correct_Service_Methods()
 		{
 			// Arrange && Act
 			var controller = SetupController(1);
 
-			var result = await controller.Index() as ViewResult;
+			var result = await controller.Users() as ViewResult;
 
 			// Assert
 
@@ -70,7 +69,7 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.Areas.Administration.Cont
 			var controller = this.SetupController(2);
 
 			// Act
-			var result = await controller.Index();
+			var result = await controller.Users();
 
 			// Assert
 			Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));

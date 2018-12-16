@@ -32,9 +32,6 @@ namespace SmartDormitory.Services.Contracts
             int pollingInterval, bool isPublic, bool alarmOn, float minRange,
             float maxRange, double longtitude, double latitude, bool switchOn);
 
-        Task<IEnumerable<Sensor>> GetAll();
-        Task UpdateRange(IList<Sensor> sensorsToUpdate);
-
         Task<IEnumerable<Sensor>> GetAllForUpdate();
     }
 }

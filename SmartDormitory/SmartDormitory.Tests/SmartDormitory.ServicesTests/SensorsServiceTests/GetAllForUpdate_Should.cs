@@ -12,21 +12,20 @@ using System.Threading.Tasks;
 namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 {
 	[TestClass]
-	public class GetAllPublicCoordinates_Should
+	public class GetAllForUpdate_Should
 	{
 		private DbContextOptions<SmartDormitoryContext> contextOptions;
 		private Mock<IMeasureTypeService> measureTypeServiceMock = new Mock<IMeasureTypeService>();
 
 		[TestMethod]
-		public async Task Return_Valid_Sensor_Enumerable()
+		public async Task Return_Valid_Sensors_List()
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "AllPublic_Return_Valid_Sensor_Enumerable")
+			.UseInMemoryDatabase(databaseName: "Return_Valid_Sensors_List")
 				.Options;
 
 			var sensor = SetupFakeSensor();
-
 			using (var actContext = new SmartDormitoryContext(contextOptions))
 			{
 				await actContext.Sensors.AddAsync(sensor);
@@ -34,11 +33,12 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			}
 
 			// Act && Assert
+
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
-				var sensors = await sut.GetAllPublicCoordinates();
-				Assert.AreEqual(1, sensors.Count());
+				var result = await sut.GetAllForUpdate();
+				Assert.AreEqual(1, result.Count());
 			}
 		}
 
@@ -53,6 +53,8 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 				},
 				CreatedOn = DateTime.Now,
 				CurrentValue = 20,
+				LastUpdateOn = DateTime.Now,
+				PollingInterval = -100,
 				Description = "description",
 				Id = Guid.NewGuid().ToString(),
 				IsPublic = true,

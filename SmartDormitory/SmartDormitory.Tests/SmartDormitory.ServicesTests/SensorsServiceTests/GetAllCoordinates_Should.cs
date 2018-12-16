@@ -9,20 +9,20 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
+namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.NotificationService.Tests
 {
 	[TestClass]
-	public class GetAllPublicCoordinates_Should
+	public class GetAllCoordinates_Should
 	{
 		private DbContextOptions<SmartDormitoryContext> contextOptions;
 		private Mock<IMeasureTypeService> measureTypeServiceMock = new Mock<IMeasureTypeService>();
 
 		[TestMethod]
-		public async Task Return_Valid_Sensor_Enumerable()
+		public async Task Return_Valid_All_Sensor_Coordinates_Enumerable()
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "AllPublic_Return_Valid_Sensor_Enumerable")
+			.UseInMemoryDatabase(databaseName: "All_Return_Valid_Sensor_Enumerable")
 				.Options;
 
 			var sensor = SetupFakeSensor();
@@ -37,7 +37,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
-				var sensors = await sut.GetAllPublicCoordinates();
+				var sensors = await sut.GetAllCoordinates();
 				Assert.AreEqual(1, sensors.Count());
 			}
 		}

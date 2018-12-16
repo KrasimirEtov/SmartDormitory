@@ -33,7 +33,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 			catch (RedirectException e)
 			{
 				this.TempData["Error-Message"] = e.Message;
-				return this.RedirectToAction(nameof(Index));
+				return this.RedirectToAction(nameof(Index),nameof(UserManagerController));
 			}
 		}
 
@@ -93,6 +93,7 @@ namespace SmartDormitory.App.Areas.Administration.Controllers
 
 			return this.Ok();
 		}
+
 
 		private async Task<UsersPagingViewModel> UpdateAllUsersPage(int page = 1)
 		{

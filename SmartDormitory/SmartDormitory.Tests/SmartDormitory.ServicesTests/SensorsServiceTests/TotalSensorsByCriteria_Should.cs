@@ -7,24 +7,24 @@ using SmartDormitory.Services;
 using SmartDormitory.Services.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 {
 	[TestClass]
-	public class AllAdmin_Should
+	public class TotalSensorsByCriteria_Should
 	{
 		private DbContextOptions<SmartDormitoryContext> contextOptions;
 		private Mock<IMeasureTypeService> measureTypeServiceMock = new Mock<IMeasureTypeService>();
+
 
 		[TestMethod]
 		public async Task Return_Valid_Sensor_Enumerable_When_Passed_Parameters_Are_Default()
 		{
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Return_Valid_Sensor_Enumerable_When_Passed_Parameters_Are_Default")
+			.UseInMemoryDatabase(databaseName: "TotalSensorsCriteria_Return_Valid_Sensor_Enumerable_When_Passed_Parameters_Are_Default")
 				.Options;
 
 			var sensor = SetupFakeSensor();
@@ -39,8 +39,8 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
-				var sensors = await sut.AllAdmin();
-				Assert.AreEqual(1, sensors.Count());
+				var sensors = await sut.TotalSensorsByCriteria();
+				Assert.AreEqual(1, sensors);
 			}
 		}
 
@@ -50,7 +50,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
 			.UseInMemoryDatabase
-			(databaseName: "AllAdmin_Return_Valid_Sensor_Enumerable_When_SearchTerm_Is_Not_Default")
+			(databaseName: "TotalSensorsCriteria_Return_Valid_Sensor_Enumerable_When_SearchTerm_Is_Not_Default")
 				.Options;
 
 			var sensor = SetupFakeSensor();
@@ -65,8 +65,8 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
-				var sensors = await sut.AllAdmin("all", -1, -1, 1, 10, "testera");
-				Assert.AreEqual(1, sensors.Count());
+				var sensors = await sut.TotalSensorsByCriteria("all", -1, -1, "testera");
+				Assert.AreEqual(1, sensors);
 			}
 		}
 
@@ -76,7 +76,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
 			.UseInMemoryDatabase
-			(databaseName: "AllAdmin_Return_Valid_Sensor_Enumerable_When_MeasureType_Is_Not_Default")
+			(databaseName: "TotalSensorsCriteria_Return_Valid_Sensor_Enumerable_When_MeasureType_Is_Not_Default")
 				.Options;
 
 			var sensor = SetupFakeSensor();
@@ -94,8 +94,8 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
-				var sensors = await sut.AllAdmin("temperature");
-				Assert.AreEqual(1, sensors.Count());
+				var sensors = await sut.TotalSensorsByCriteria("temperature");
+				Assert.AreEqual(1, sensors);
 			}
 		}
 
@@ -105,7 +105,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
 			.UseInMemoryDatabase
-			(databaseName: "AllAdmin_Return_Valid_Sensor_Enumerable_When_IsPublic_Is_Not_Default")
+			(databaseName: "TotalSensorsCriteria_Return_Valid_Sensor_Enumerable_When_IsPublic_Is_Not_Default")
 				.Options;
 
 			var sensor = SetupFakeSensor();
@@ -123,9 +123,9 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
-				
-				var sensors = await sut.AllAdmin("all", 1, -1, 1, 10, "");
-				Assert.AreEqual(1, sensors.Count());
+
+				var sensors = await sut.TotalSensorsByCriteria("all", 1, -1, "");
+				Assert.AreEqual(1, sensors);
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			// Arrange
 			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
 			.UseInMemoryDatabase
-			(databaseName: "AllAdmin_Return_Valid_Sensor_Enumerable_When_AlarmOn_Is_Not_Default")
+			(databaseName: "TotalSensorsCriteria_Return_Valid_Sensor_Enumerable_When_AlarmOn_Is_Not_Default")
 				.Options;
 
 			var sensor = SetupFakeSensor();
@@ -153,8 +153,8 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 			using (var assertContext = new SmartDormitoryContext(contextOptions))
 			{
 				var sut = new SensorsService(assertContext, measureTypeServiceMock.Object);
-				var sensors = await sut.AllAdmin("all", -1, 1, 1, 10, "");
-				Assert.AreEqual(1, sensors.Count());
+				var sensors = await sut.TotalSensorsByCriteria("all", -1, 1, "");
+				Assert.AreEqual(1, sensors);
 			}
 		}
 

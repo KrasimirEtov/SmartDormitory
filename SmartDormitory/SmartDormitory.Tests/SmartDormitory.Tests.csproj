@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SmartDormitory.AppTests\" />
     <Folder Include="SmartDormitory.ServicesTests\NotificationService.Tests\" />
   </ItemGroup>
 

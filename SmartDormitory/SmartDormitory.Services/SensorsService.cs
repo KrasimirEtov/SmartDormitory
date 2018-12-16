@@ -199,7 +199,6 @@ namespace SmartDormitory.Services
 			}
 			sensors = await QueryFilter(sensors, measureTypeId, isPublic, alarmOn);
 
-
 			return await sensors
 							 .OrderByDescending(s => s.CreatedOn)
 							 .Select(s => new UserSensorListModel

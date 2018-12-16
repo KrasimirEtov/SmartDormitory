@@ -10,9 +10,9 @@ namespace SmartDormitory.Services
 {
     public class IcbApiService : IIcbApiService
     {
-        private readonly IcbHttpClient client;
+        private readonly IIcbHttpClient client;
 
-        public IcbApiService(IcbHttpClient client)
+        public IcbApiService(IIcbHttpClient client)
         {
             this.client = client;
         }

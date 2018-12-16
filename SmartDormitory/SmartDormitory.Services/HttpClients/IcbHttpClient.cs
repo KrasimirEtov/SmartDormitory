@@ -5,7 +5,7 @@ using static SmartDormitory.Services.Utils.Constants;
 
 namespace SmartDormitory.Services.HttpClients
 {
-    public class IcbHttpClient : HttpClient
+    public class IcbHttpClient : HttpClient, IIcbHttpClient
     {
         private readonly HttpClient client;
 

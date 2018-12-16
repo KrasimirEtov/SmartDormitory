@@ -78,7 +78,7 @@ namespace SmartDormitory.App
 
         private void RegisterServices(IServiceCollection services)
         {
-            services.AddHttpClient<IcbHttpClient>();
+            services.AddHttpClient<IIcbHttpClient, IcbHttpClient>();
             services.AddScoped<UserManager<User>>();
             services.AddScoped<RoleManager<IdentityRole>>();
 

@@ -18,7 +18,7 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
         private DbContextOptions<SmartDormitoryContext> contextOptions;
 
         [TestMethod]
-        public async Task ReturnCorrectSensorsCount_WhenCalled()
+        public async Task ReturnCorrectSensorsList_WhenCalled()
         {
             // Arrange
             contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
@@ -45,15 +45,15 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
             using (var assertContext = new SmartDormitoryContext(contextOptions))
             {
                 var measureTypeServiceMock = new Mock<IMeasureTypeService>();
-                var icbSensorService = new IcbSensorsService(assertContext, measureTypeServiceMock.Object);
-                IEnumerable<IcbSensor> result = await icbSensorService.GetAll();
+                var sut = new IcbSensorsService(assertContext, measureTypeServiceMock.Object);
+                IEnumerable<IcbSensor> result = await sut.GetAll();
 
                 Assert.IsTrue(result.Count() == 1);
             }
         }
 
         [TestMethod]
-        public async Task ReturnZero_WhenHaveOnlySoftDeletedSensors()
+        public async Task ReturnEmptyList_WhenHaveOnlySoftDeletedSensors()
         {
             // Arrange
             contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
@@ -93,8 +93,8 @@ namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.IcbSensorService.Tes
             using (var assertContext = new SmartDormitoryContext(contextOptions))
             {
                 var measureTypeServiceMock = new Mock<IMeasureTypeService>();
-                var icbSensorService = new IcbSensorsService(assertContext, measureTypeServiceMock.Object);
-                IEnumerable<IcbSensor> result = await icbSensorService.GetAll();
+                var sut = new IcbSensorsService(assertContext, measureTypeServiceMock.Object);
+                IEnumerable<IcbSensor> result = await sut.GetAll();
 
                 Assert.IsTrue(result.Count() == 0);
             }

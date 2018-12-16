@@ -44,9 +44,9 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
 
                 var sensorsToAdd = upToDateApiSensors
                                 .Where(s => !dbExistingSensors
-                                                .Any(dbSensor =>
-                                                    dbSensor.Id != s.ApiSensorId))
+                                       .Any(dbSensor => dbSensor.Id != s.ApiSensorId))
                                 .ToList();
+
                 await icbSensorsService.AddSensors(sensorsToAdd);
             }
             catch (HttpRequestException e)

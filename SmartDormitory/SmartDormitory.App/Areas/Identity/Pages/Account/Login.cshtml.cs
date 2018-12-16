@@ -106,12 +106,11 @@ namespace SmartDormitory.App.Areas.Identity.Pages.Account
                 }
 				else
 				{
-					TempData["Error-Message"] = "Invalid login info";
+					TempData["Error-Message"] = "Wrong username or password!";
 					return RedirectToPage("./Login");
 				}
                
             }
-
             // If we got this far, something failed, redisplay form
             return Page();
         }

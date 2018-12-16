@@ -1,61 +1,71 @@
 ﻿@model MySensorsViewModel
-
-<div class="form-row">
-    <div class="col-lg-4">
-        <label class="text-center text-black-50">Search</label>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text cyan lighten-2" id="basic-text1">
-                    <i class="fa fa-search text-white" aria-hidden="true"></i>
-                </span>
-            </div>
-            <input type="text" id="searchTerm" class="form-control" aria-describedby="searchBtn">
-            <div class="input-group-append">
-                <button class="btn btn-md btn-outline-default m-0 px-3 py-2 z-depth-0 waves-effect" type="submit" id="searchBtn">Find</button>
+@if (!Model.Sensors.Any())
+{
+    <div class="text-center">
+        <h2>You don't have any registered sensors.</h2>
+        <br />
+        <h2>Consider adding one?</h2>
+    </div>
+}
+else
+{
+    <div class="form-row">
+        <div class="col-lg-4">
+            <label class="text-center text-black-50">Search</label>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text cyan lighten-2" id="basic-text1">
+                        <i class="fa fa-search text-white" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <input type="text" id="searchTerm" class="form-control" aria-describedby="searchBtn">
+                <div class="input-group-append">
+                    <button class="btn btn-md btn-outline-default m-0 px-3 py-2 z-depth-0 waves-effect" type="submit" id="searchBtn">Find</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-lg-4 form-group">
-        <label class="text-black-50">Choose sensor type</label>
-        <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes" class="form-control text-warning text-monospace">
-            <option value="all" class="grey_color">-- All --</option>
-        </select>
-
-    </div>
-    <div class="col-lg-2 form-group">
-        <label class="text-center text-black-50">Privacy</label>
-        <select asp-for="@Model.Privacy" class="form-control text-warning text-monospace">
-            <option value="-1" class="grey_color">-- All --</option>
-            <option value="1">Public</option>
-            <option value="0">Private</option>
-        </select>
-    </div>
-    <div class="col-lg-2 form-group">
-        <label class="text-center text-black-50">Notifications</label>
-        <select asp-for="@Model.AlarmOn" class="form-control text-warning text-monospace">
-            <option value="-1" class="grey_color">-- All --</option>
-            <option value="1">Active</option>
-            <option value="0">Inactive</option>
-        </select>
-    </div>
-    @*TODO: add sort by creation day or alarms history count*@
-    @*<div class="col-lg-2 form-group">
-            <label class="text-center text-black-50">Sort by</label>
-
-            <select asp-for="@Model.MeasureTypeId" class="form-control text-warning text-monospace">
-                <option value="" class="grey_color">-- None --</option>
-                <option value="createdOn">Creation date</option>
-                <option value="alarmsCount">Alarms count</option>
+        <div class="col-lg-4 form-group">
+            <label class="text-black-50">Choose sensor type</label>
+            <select asp-for="@Model.MeasureTypeId" asp-items="Model.MeasureTypes" class="form-control text-warning text-monospace">
+                <option value="all" class="grey_color">-- All --</option>
             </select>
 
-        </div>*@
+        </div>
+        <div class="col-lg-2 form-group">
+            <label class="text-center text-black-50">Privacy</label>
+            <select asp-for="@Model.Privacy" class="form-control text-warning text-monospace">
+                <option value="-1" class="grey_color">-- All --</option>
+                <option value="1">Public</option>
+                <option value="0">Private</option>
+            </select>
+        </div>
+        <div class="col-lg-2 form-group">
+            <label class="text-center text-black-50">Notifications</label>
+            <select asp-for="@Model.AlarmOn" class="form-control text-warning text-monospace">
+                <option value="-1" class="grey_color">-- All --</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+            </select>
+        </div>
+        @*TODO: add sort by creation day or alarms history count*@
+        @*<div class="col-lg-2 form-group">
+                <label class="text-center text-black-50">Sort by</label>
 
-</div>
-<hr />
-<div id="mySensors" class="form-group">
-    <partial name="_MySensorsTable" model="@Model.Sensors" />
-</div>
+                <select asp-for="@Model.MeasureTypeId" class="form-control text-warning text-monospace">
+                    <option value="" class="grey_color">-- None --</option>
+                    <option value="createdOn">Creation date</option>
+                    <option value="alarmsCount">Alarms count</option>
+                </select>
+
+            </div>*@
+
+    </div>
+    <hr />
+    <div id="mySensors" class="form-group">
+        <partial name="_MySensorsTable" model="@Model.Sensors" />
+    </div>
+}
 
 <script>
     $(function () {
@@ -67,7 +77,7 @@
 
             let url = "@Url.Action("ReloadMySensorsTable", "Sensor")?measureTypeId=" + typeId
                 + '&searchTerm=' + searchTerm + '&alarmOn=' + alarm + '&privacy=' + privacy;
-            
+
            $("#mySensors").load(url);
         }
         $("#MeasureTypeId").change(reloadTable);

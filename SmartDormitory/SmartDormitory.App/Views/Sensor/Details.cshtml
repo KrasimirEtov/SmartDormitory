@@ -193,7 +193,8 @@
             }, @Model.PollingInterval * 1000);
         }
         else {
-            var isNotSwitchDefaults = {        
+            var alarmOn = @Json.Serialize(Model.AlarmOn);
+            var isNotSwitchDefaults = {
                 value: @Model.StartValue,
                 min: @Model.MinRangeValue,
                 max: @Model.MaxRangeValue,
@@ -202,8 +203,8 @@
                 pointer: true,
                 pointerOptions: {
                     toplength: -8,
-                    bottomlength: 12,
-                    bottomwidth: 15,
+                    bottomlength: 8,
+                    bottomwidth: 10,
                     color: '#EE7600',
                     stroke: '#808080',
                     stroke_width: 1,
@@ -223,14 +224,14 @@
                     } else if (val == -50 || val == null) {
                         return 'fetching';
                     } else if (val < @Model.MinRangeValue) {
-                        if (@Model.AlarmOn) {
+                        if (alarmOn) {
                             return 'Alarm! ' + val;
                         }
                         else {
                             return 'Out of range';
                         }
                     } else if (val > @Model.MaxRangeValue) {
-                        if (@Model.AlarmOn) {
+                        if (alarmOn) {
                             return 'Alarm! ' + val;
                         }
                         else {

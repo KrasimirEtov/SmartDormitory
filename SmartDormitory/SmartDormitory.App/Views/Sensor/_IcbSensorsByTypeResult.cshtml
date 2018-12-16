@@ -6,7 +6,7 @@
 }
 else
 {
-    <table class="table table-hover table-striped table-fixed">
+    <table class="table table-hover table-striped table-fixed table-responsive-sm">
         <thead class="thead-dark">
             <tr>
                 <th>Sensor model</th>
@@ -26,9 +26,8 @@ else
                         <small>seconds</small>
                     </td>
                     <td>
-                        <a asp-controller="Sensor" asp-action="Create" asp-route-icbSensorId="@sensor.Id"
-                           asp-route-userId="@sensor.UserId"
-                           class="btn btn-primary">Next</a>
+                        <a asp-area="" asp-controller="Sensor" asp-action="Create" asp-route-icbSensorId="@sensor.Id"
+                           class="btn btn-outline-deep-orange font-weight-bold waves-effect">Proceed</a>
                     </td>
                 </tr>
             }

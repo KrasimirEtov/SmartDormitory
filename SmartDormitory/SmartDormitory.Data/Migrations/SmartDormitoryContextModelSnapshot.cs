@@ -214,6 +214,8 @@ namespace SmartDormitory.Data.Migrations
 
                     b.HasIndex("ReceiverId");
 
+                    b.HasIndex("SensorId");
+
                     b.ToTable("Notifications");
                 });
 
@@ -389,6 +391,10 @@ namespace SmartDormitory.Data.Migrations
                     b.HasOne("SmartDormitory.Data.Models.User", "Receiver")
                         .WithMany("Notifications")
                         .HasForeignKey("ReceiverId");
+
+                    b.HasOne("SmartDormitory.Data.Models.Sensor", "Sensor")
+                        .WithMany()
+                        .HasForeignKey("SensorId");
                 });
 
             modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>

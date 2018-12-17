@@ -47,7 +47,8 @@ namespace SmartDormitory.Data.Migrations
                     AgreedGDPR = table.Column<bool>(nullable: false),
                     DeletedOn = table.Column<DateTime>(nullable: true),
                     CreatedOn = table.Column<DateTime>(nullable: true),
-                    ModifiedOn = table.Column<DateTime>(nullable: true)
+                    ModifiedOn = table.Column<DateTime>(nullable: true),
+                    IsLocked = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -178,33 +179,6 @@ namespace SmartDormitory.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Notifications",
-                columns: table => new
-                {
-                    Id = table.Column<string>(nullable: false),
-                    IsDeleted = table.Column<bool>(nullable: false),
-                    DeletedOn = table.Column<DateTime>(nullable: true),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    ModifiedOn = table.Column<DateTime>(nullable: true),
-                    Title = table.Column<string>(nullable: true),
-                    Message = table.Column<string>(nullable: true),
-                    ReceiverId = table.Column<string>(nullable: true),
-                    Seen = table.Column<bool>(nullable: false),
-                    SensorId = table.Column<string>(nullable: true),
-                    AlarmValue = table.Column<float>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notifications", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Notifications_AspNetUsers_ReceiverId",
-                        column: x => x.ReceiverId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "IcbSensors",
                 columns: table => new
                 {
@@ -272,6 +246,39 @@ namespace SmartDormitory.Data.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    DeletedOn = table.Column<DateTime>(nullable: true),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    ModifiedOn = table.Column<DateTime>(nullable: true),
+                    Title = table.Column<string>(nullable: true),
+                    Message = table.Column<string>(nullable: true),
+                    ReceiverId = table.Column<string>(nullable: true),
+                    Seen = table.Column<bool>(nullable: false),
+                    SensorId = table.Column<string>(nullable: true),
+                    AlarmValue = table.Column<float>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_AspNetUsers_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Sensors_SensorId",
+                        column: x => x.SensorId,
+                        principalTable: "Sensors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -322,6 +329,11 @@ namespace SmartDormitory.Data.Migrations
                 column: "ReceiverId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notifications_SensorId",
+                table: "Notifications",
+                column: "SensorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Sensors_IcbSensorId",
                 table: "Sensors",
                 column: "IcbSensorId");
@@ -353,10 +365,10 @@ namespace SmartDormitory.Data.Migrations
                 name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "Sensors");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "Sensors");
 
             migrationBuilder.DropTable(
                 name: "IcbSensors");

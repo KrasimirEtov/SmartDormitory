@@ -114,7 +114,7 @@ body {
 }
 
 #homeIndexMap {
-    height: 43em;
+    height: 40em;
     width: 100%;
 }
 
@@ -124,7 +124,7 @@ body {
 }
 
 #adminDashboardMap {
-    height: 50rem;
+    height: 40rem;
     width: 100%;
 }
 
@@ -151,3 +151,10 @@ body {
         background-color: #EE7600;
         opacity: 1;
     }
+
+.myPrimaryCardColor {
+    background-color: #e0dad5;
+}
+.mySecondCardColor {
+    background-color: #ead7c7;
+}

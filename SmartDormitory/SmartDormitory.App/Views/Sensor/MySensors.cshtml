@@ -195,7 +195,6 @@ else
         gm_map = new google.maps.Map(document.getElementById('mySensorsMap'), options_googlemaps)
 
         let markers = [];
-        let infoWindows = [];
         const privateSensorIconUrl = 'http://maps.google.com/mapfiles/kml/pushpin/red-pushpin.png';
         const ownPublicSensorIconUrl = 'http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png';
 
@@ -237,18 +236,15 @@ else
                         markers[i].setIcon(ownPublicSensorIconUrl);
                         contentString += '<p>Status: <span class="h6 text-success"> Public <i class="fas fa-globe-americas"></i></span></p>';
                     }
+                contentString += '<p class="h6"><a href="/Sensor/Details?sensorId=' + data[i].id + '" class="badge badge-info">Sensor details</a></p>';
 
 
-                infoWindows[i] = new google.maps.InfoWindow({
+
+                let infowindow = new google.maps.InfoWindow({
                     content: contentString
                 });
-
-                markers[i].addListener('mouseover', function () {
-                    infoWindows[i].open(gm_map, markers[i]);
-                });
-
-                markers[i].addListener('mouseout', function () {
-                    infoWindows[i].close();
+                markers[i].addListener('click', function () {
+                    infowindow.open(gm_map, markers[i]);
                 });
             }
 

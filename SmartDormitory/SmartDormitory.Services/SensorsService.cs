@@ -345,6 +345,7 @@ namespace SmartDormitory.Services
 						 .Where(s => !s.IsDeleted && s.UserId == userId)
 						 .Select(s => new MapSensorServiceModel
 						 {
+							 Id = s.Id,
 							 SensorType = s.IcbSensor.MeasureType.SuitableSensorType,
 							 Name = s.Name,
 							 CreatedOn = (DateTime)s.CreatedOn,

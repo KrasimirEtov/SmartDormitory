@@ -185,11 +185,6 @@ namespace SmartDormitory.App
             app.SeedAdminAccount();
             app.SeedMeasureTypes();
 
-            //TODO add app extension method
-            //var scope = serviceProvider.CreateScope();
-            //var context = scope.ServiceProvider.GetService<SmartDormitoryContext>();
-            //context.Database.Migrate();
-
             //make dashboard visible only for Admins
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {

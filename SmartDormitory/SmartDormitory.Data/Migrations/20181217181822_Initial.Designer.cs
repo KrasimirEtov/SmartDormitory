@@ -10,8 +10,8 @@ using SmartDormitory.App.Data;
 namespace SmartDormitory.Data.Migrations
 {
     [DbContext(typeof(SmartDormitoryContext))]
-    [Migration("20181212230409_Add_User_IsLocked_Property")]
-    partial class Add_User_IsLocked_Property
+    [Migration("20181217181822_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -216,6 +216,8 @@ namespace SmartDormitory.Data.Migrations
 
                     b.HasIndex("ReceiverId");
 
+                    b.HasIndex("SensorId");
+
                     b.ToTable("Notifications");
                 });
 
@@ -391,6 +393,10 @@ namespace SmartDormitory.Data.Migrations
                     b.HasOne("SmartDormitory.Data.Models.User", "Receiver")
                         .WithMany("Notifications")
                         .HasForeignKey("ReceiverId");
+
+                    b.HasOne("SmartDormitory.Data.Models.Sensor", "Sensor")
+                        .WithMany()
+                        .HasForeignKey("SensorId");
                 });
 
             modelBuilder.Entity("SmartDormitory.Data.Models.Sensor", b =>

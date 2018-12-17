@@ -171,7 +171,7 @@
         const ownPublicSensorIconUrl = 'http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png';
 
         $.getJSON("/Administration/Home/IndexMapAllSensors", function (data) {
-            console.log(data)
+            //console.log(data)
             for (let i = 0; i < data.length; i++) {
                 let latLng = new google.maps.LatLng(data[i].coordinates.latitude,
                     data[i].coordinates.longitude);
@@ -192,7 +192,7 @@
                     '<p>Last value: <span class="h5">' + data[i].value + '</span></p>' +
                     '<h6> <a href="/Sensor/Details?sensorId=' + data[i].id + '" class="badge badge-info">Sensor details</a>          ' +
                     '<a href="/Identity/Account/Manage?userId=' + data[i].userId + '" class="badge badge-info">Owner profile</a></h6>';
-                console.log(data[i].value )
+               // console.log(data[i].value )
                 let loggedInUserId = '@this.User.GetId()';
                 let isCurrentUserSensor = loggedInUserId === data[i].userId;
 

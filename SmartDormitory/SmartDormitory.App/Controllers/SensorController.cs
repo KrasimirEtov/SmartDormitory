@@ -326,6 +326,13 @@ namespace SmartDormitory.App.Controllers
 			return RedirectToAction("MySensors", "Sensor");
 		}
 
+		[HttpGet]
+		public async Task<JsonResult> IndexMapAllUserSensors()
+		{
+			var allSensors = await this.sensorsService.GetAllUserCoordinates(User.GetId());
+			return this.Json(allSensors);
+		}
+
 		[NonAction]
 		private async Task<IEnumerable<MeasureTypeServiceModel>> CachedMeasureTypes()
 		{

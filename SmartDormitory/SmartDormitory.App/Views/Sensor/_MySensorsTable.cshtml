@@ -3,13 +3,18 @@
 @for (int i = 0; i < Model.Count(); i += 3)
 {
 
-    string privacyText = Model[i].IsPublic ? "public" : "private";
+    
 
     <div class="row">
         @{
             int rowLimit = i + 3;
             for (int c = i; c < (Model.Count() < rowLimit ? Model.Count() : rowLimit); c++)
             {
+                string privacyText = Model[c].IsPublic ? "public" : "private";
+                string alarmText = Model[c].AlarmOn ? "on" : "off";
+                string measureUnitDisplay = Model[c].SensorType.Contains("Boolean") ? "" : Model[c].MeasureUnit;
+                string privacyIcon = Model[c].IsPublic ? "fas fa-globe-americas" : "fas fa-user-secret";
+                string alarmIcon = Model[c].AlarmOn ? "fas fa-bell" : "far fa-bell-slash";
                 <div class=" col-lg-4 col-md-4 col-sm-12">
                     <!-- Card -->
                     <div class="card">
@@ -30,8 +35,9 @@
                             <!-- Text -->
                             <p class="card-text text-warning text-center">(@Model[c].SensorType)</p>
                             <p class="card-text text-white">Refresh rate: @Model[c].PollingInterval <small>seconds</small></p>
-                            <p class="card-text text-white">Sensor is: @privacyText</p>
-                            <p class="card-text text-white">Current value: @Model[c].Value</p>
+                            <p class="card-text text-white">Sensor is: @privacyText <i class="@privacyIcon"></i></p>
+                            <p class="card-text text-white">Alarm is: @alarmText <i class="@alarmIcon"></i></p>
+                            <p class="card-text text-white">Current value: @Model[c].Value @measureUnitDisplay</p>
                         </div>
                         <div class="card-footer elegant-color border-white">
                             <span class="pull-left text-white"><small>Last update on: @Model[c].LastUpdateOn</small></span>

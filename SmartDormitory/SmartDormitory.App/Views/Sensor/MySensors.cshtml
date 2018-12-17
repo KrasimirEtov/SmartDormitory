@@ -48,24 +48,209 @@ else
                 <option value="0">Inactive</option>
             </select>
         </div>
-        @*TODO: add sort by creation day or alarms history count*@
-        @*<div class="col-lg-2 form-group">
-                <label class="text-center text-black-50">Sort by</label>
-
-                <select asp-for="@Model.MeasureTypeId" class="form-control text-warning text-monospace">
-                    <option value="" class="grey_color">-- None --</option>
-                    <option value="createdOn">Creation date</option>
-                    <option value="alarmsCount">Alarms count</option>
-                </select>
-
-            </div>*@
-
+    </div>
+    <div class="form-row">
+        <button class="btn btn-outline-deep-orange waves-effect my-sm-0 btn-block"
+                data-toggle="modal" data-target="#mySensorsMapsModal">
+            <b>View on map</b> <i class="fas fa-map-marked-alt"></i>
+        </button>
+        @*<a id="scrollToMap" href="#mySensorsMap"
+               class="btn btn-outline-deep-orange waves-effect my-sm-0 btn-block">
+                View sensors on map
+            </a>*@
     </div>
     <hr />
     <div id="mySensors" class="form-group">
         <partial name="_MySensorsTable" model="@Model.Sensors" />
     </div>
+    <div class="modal fade" id="mySensorsMapsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body mb-0 p-0">
+                    <div id="mySensorsMap"></div>
+                </div>
+                <div class="modal-footer bg-dark justify-content-center">
+                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">
+                        Close
+                        <i class="fas fa-map-marker-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
+
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbGBfxwfVNuXS1OY-O8qbuglmWIbkEC70&callback=initMap">
+</script>
+<script src="~/lib/markerclusterer/js/markerclusterer.js"></script>
+<script>
+    let gm_map;
+    // Initialize and add the map
+    function initMap() {
+
+        const options_googlemaps = {
+            minZoom: 4,
+            zoom: 11,
+            center: new google.maps.LatLng(42.6977, 23.3219), //sofia coords
+            maxZoom: 18,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            streetViewControl: false,
+            styles: [
+                { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+                { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+                { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+                {
+                    featureType: 'administrative.locality',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#d59563' }]
+                },
+                {
+                    featureType: 'poi',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#d59563' }]
+                },
+                {
+                    featureType: 'poi.park',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#263c3f' }]
+                },
+                {
+                    featureType: 'poi.park',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#6b9a76' }]
+                },
+                {
+                    featureType: 'road',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#38414e' }]
+                },
+                {
+                    featureType: 'road',
+                    elementType: 'geometry.stroke',
+                    stylers: [{ color: '#212a37' }]
+                },
+                {
+                    featureType: 'road',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#9ca5b3' }]
+                },
+                {
+                    featureType: 'road.highway',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#746855' }]
+                },
+                {
+                    featureType: 'road.highway',
+                    elementType: 'geometry.stroke',
+                    stylers: [{ color: '#1f2835' }]
+                },
+                {
+                    featureType: 'road.highway',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#f3d19c' }]
+                },
+                {
+                    featureType: 'transit',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#2f3948' }]
+                },
+                {
+                    featureType: 'transit.station',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#d59563' }]
+                },
+                {
+                    featureType: 'poi.business',
+                    stylers: [{ visibility: 'off' }]
+                },
+                {
+                    featureType: 'transit',
+                    elementType: 'labels.icon',
+                    stylers: [{ visibility: 'off' }]
+                },
+                {
+                    featureType: 'water',
+                    elementType: 'geometry',
+                    stylers: [{ color: '#17263c' }]
+                },
+                {
+                    featureType: 'water',
+                    elementType: 'labels.text.fill',
+                    stylers: [{ color: '#515c6d' }]
+                },
+                {
+                    featureType: 'water',
+                    elementType: 'labels.text.stroke',
+                    stylers: [{ color: '#17263c' }]
+                }
+            ]
+        }
+
+        gm_map = new google.maps.Map(document.getElementById('mySensorsMap'), options_googlemaps)
+
+        let markers = [];
+        let infoWindows = [];
+        const privateSensorIconUrl = 'http://maps.google.com/mapfiles/kml/pushpin/red-pushpin.png';
+        const ownPublicSensorIconUrl = 'http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png';
+
+        $.getJSON("/Sensor/IndexMapAllUserSensors", function (data) {
+            for (let i = 0; i < data.length; i++) {
+                let latLng = new google.maps.LatLng(data[i].coordinates.latitude,
+                    data[i].coordinates.longitude);
+
+                markers[i] = new google.maps.Marker({
+                    position: latLng,
+                    map: gm_map,
+                    animation: google.maps.Animation.DROP,
+                    icon: '/images/map-marker.png'
+                });
+
+                let formatDate = data[i].createdOn.replace(/(\d{4})\-(\d{2})\-(\d{2}).*/, '$3-$2-$1');
+                //console.log(formatDate)
+                let contentString =
+                    '<p>Name: ' + '<span class="h6 text-primary">' + data[i].name + '</span></p>' +
+                    '<p>Created on: <span class=" text-danger">' + formatDate + '</span></p>' +
+                    '<p>Sensor type: <span class="h6 text-warning">' + data[i].sensorType + '</span></p>';
+
+                let loggedInUserId = '@this.User.GetId()';
+
+                    //add sensor details url if owner?
+                    markers[i].setAnimation(google.maps.Animation.BOUNCE);
+                    markers[i].addListener('click', function() {
+                        if (markers[i].getAnimation() !== null) {
+                            markers[i].setAnimation(null);
+                        } else {
+                            markers[i].setAnimation(google.maps.Animation.BOUNCE);
+                        }
+                    });
+
+                    if (!data[i].isPublic) {
+                        markers[i].setIcon(privateSensorIconUrl);
+                        contentString += '<p>Status: <span class="h6 text-danger"> Private <i class="fas fa-user-secret"></i></span></p>';
+                    } else {
+                        markers[i].setIcon(ownPublicSensorIconUrl);
+                        contentString += '<p>Status: <span class="h6 text-success"> Public <i class="fas fa-globe-americas"></i></span></p>';
+                    }
+
+
+                infoWindows[i] = new google.maps.InfoWindow({
+                    content: contentString
+                });
+
+                markers[i].addListener('mouseover', function () {
+                    infoWindows[i].open(gm_map, markers[i]);
+                });
+
+                markers[i].addListener('mouseout', function () {
+                    infoWindows[i].close();
+                });
+            }
+
+            let markerCluster = new MarkerClusterer(gm_map, markers);
+        });
+    }
+</script>
 
 <script>
     $(function () {
@@ -86,7 +271,6 @@ else
         $("#searchBtn").click(reloadTable);
 
         setInterval(function () {
-            console.log(@Model.MinPollingInterval);
             reloadTable();
         }, @Model.MinPollingInterval * 1000);
 

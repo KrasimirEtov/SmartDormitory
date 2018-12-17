@@ -155,5 +155,15 @@ namespace SmartDormitory.Services
 
             await this.Context.SaveChangesAsync();
         }
+
+        public async Task DeleteAllHistory()
+        {
+            await this.Context
+                      .Notifications
+                      .Where(n => n.Seen)
+                      .ForEachAsync(n => n.IsDeleted = true);
+
+            await this.Context.SaveChangesAsync();
+        }
     }
 }

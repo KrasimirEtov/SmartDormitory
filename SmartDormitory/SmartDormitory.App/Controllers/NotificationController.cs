@@ -46,14 +46,21 @@ namespace SmartDormitory.App.Controllers
             return Ok();
         }
 
-        
+        [HttpPost]
         public async Task<IActionResult> ReadAll()
         {
             string userId = this.User.GetId();
-
             await this.notificationService.ReadAll(userId);
 
-            return RedirectToAction(nameof(Inbox));
+            return RedirectToAction(nameof(Inbox), new { seen = 1 });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAllHistory()
+        {
+            await this.notificationService.DeleteAllHistory();
+
+            return RedirectToAction(nameof(Inbox), new { seen = 0 });
         }
     }
 }

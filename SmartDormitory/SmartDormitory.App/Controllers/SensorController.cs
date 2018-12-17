@@ -176,8 +176,9 @@ namespace SmartDormitory.App.Controllers
 				model.Longtitude, model.Latitude, model.SwitchOn);
 
 			this.TempData["Success-Message"] = $"You successfully registered a new sensor!";
-			return this.RedirectToAction("Details", "Sensor", new { sensorId = createdSensorId });
-		}
+			return this.RedirectToAction("MySensors", "Sensor");
+			//return this.RedirectToAction("Details", "Sensor", new { sensorId = createdSensorId });
+        }
 
 		[HttpGet]
 		public async Task<IActionResult> Details(string sensorId)

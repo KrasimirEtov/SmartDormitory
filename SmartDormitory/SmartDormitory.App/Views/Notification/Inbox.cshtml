@@ -18,7 +18,14 @@
     <div class="col-md-3">
         @if (seen == "0")
         {
-            <a asp-controller="Notification" asp-action="ReadAll" class="btn btn-indigo float-right">Read all</a>
+            <form sp-controller="Notification" asp-action="ReadAll" method="post">
+                <button type="submit" class="btn btn-indigo float-right">Read all</button>
+            </form>
+        }
+        else if (seen == "1")
+        { <form sp-controller="Notification" asp-action="DeleteAllHistory" method="post">
+              <button type="submit" class="btn btn-indigo float-right">Delete all</button>
+            </form>
         }
     </div>
 </div>

@@ -20,5 +20,7 @@ namespace SmartDormitory.Services.Contracts
         Task Delete(string id);
 
         Task ReadAll(string userId);
+
+        Task DeleteAllHistory();
     }
 }

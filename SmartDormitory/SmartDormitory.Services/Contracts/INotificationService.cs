@@ -13,6 +13,12 @@ namespace SmartDormitory.Services.Contracts
 
         Task<int> GetUnseenCount(string userId);
 
-        Task<IEnumerable<Notification>> GetAllByUserId(string userId);
+        Task<IEnumerable<InboxServiceModel>> GetAllByUserId(string userId, int seen = 0, int page = 1, int pageSize = 10);
+
+        Task<int> TotalCountByCriteria(string userId, int seen = 0, int page = 1, int pageSize = 10);
+
+        Task Delete(string id);
+
+        Task ReadAll(string userId);
     }
 }

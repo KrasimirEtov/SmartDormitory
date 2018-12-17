@@ -16,6 +16,5 @@ namespace SmartDormitory.App.Infrastructure.Extensions
 
             return userId?.Value;
         }
-
     }
 }

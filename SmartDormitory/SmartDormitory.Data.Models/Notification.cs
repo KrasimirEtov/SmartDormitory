@@ -16,6 +16,8 @@ namespace SmartDormitory.Data.Models
 
         public string SensorId { get; set; }
 
+        public Sensor Sensor { get; set; }
+
         public float AlarmValue { get; set; }
     }
 }

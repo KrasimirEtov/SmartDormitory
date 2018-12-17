@@ -3,7 +3,7 @@
 <li class="nav-item dropdown no-arrow">
     <a class="nav-link dropdown-toggle waves-effect" id="userDropdown"
        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="far fa-envelope"></i> Notifications
+        <span class="h5 text-warning"><i class="far fa-bell"></i></span> Notifications
         <span id="unseen" class="badge badge-pill badge-primary">@Model.UnseenCount</span>
     </a>
     <ul class="dropdown-menu dropdown-menu-right dropdown-navbar">
@@ -15,7 +15,7 @@
         {
             <li class="nav-link">
                 <nav-item dropdown-item>
-                    <a asp-area="" asp-controller="Notification" asp-action="Inbox" @*asp-route-type="received" *@>
+                    <a asp-area="" asp-controller="Notification" asp-action="Inbox"asp-route-seen="0">
                         <span>@notification.Title</span>
                         <small class="text-danger">@notification.CreatedOn.ToShortDateString()</small>
                     </a>
@@ -24,7 +24,7 @@
             </li>
         }
         <li class="nav-link">
-            <a asp-area="" asp-controller="Notification" asp-action="Inbox" @*asp-route-type="received" *@>
+            <a asp-area="" asp-controller="Notification" asp-action="Inbox" asp-route-seen="0">
                 <span class="badge badge-warning badge-pill"> ...View all</span>
             </a>
         </li>

@@ -220,7 +220,7 @@
                     if (val <= -100) {
                         return 'Api is down';
                     } else if (val === -99) {
-                        return 'cached! ' + val;
+                        return 'offline';
                     } else if (val == -50 || val == null) {
                         return 'fetching';
                     } else if (val < @Model.MinRangeValue) {

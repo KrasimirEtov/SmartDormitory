@@ -53,7 +53,7 @@ body {
 }
 
 #mapModal {
-    height: 500px; /* The height is 400 pixels */
+    height: 500px; /* The height is 500 pixels */
     width: 100%; /* The width is the width of the web page */
 }
 
@@ -115,6 +115,11 @@ body {
 
 #homeIndexMap {
     height: 43em;
+    width: 100%;
+}
+
+#mySensorsMap {
+    height: 35em;
     width: 100%;
 }
 

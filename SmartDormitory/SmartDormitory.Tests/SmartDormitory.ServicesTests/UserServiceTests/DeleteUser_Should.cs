@@ -46,42 +46,6 @@ namespace SmartDormitory.Tests.SmartDormitory.AppTests.UserServiceTests
 			}
 		}
 
-		[TestMethod]
-		public async Task Throw_EntityDoesntExistException_When_User_Is_Deleted()
-		{
-			// Arrange
-			contextOptions = new DbContextOptionsBuilder<SmartDormitoryContext>()
-			.UseInMemoryDatabase(databaseName: "Throw_EntityDoesntExistException_When_User_Is_Deleted")
-				.Options;
-
-			string userId = Guid.NewGuid().ToString();
-
-			user = new User()
-			{
-				Id = userId,
-				UserName = "testUserName",
-				IsDeleted = true
-			};
-
-			userManagerMock = MockUserManager<User>();
-
-			roleManagerMock = MockRoleManager();
-
-			using (var actContext = new SmartDormitoryContext(contextOptions))
-			{
-				await actContext.Users.AddAsync(user);
-				await actContext.SaveChangesAsync();
-			}
-
-			// Act && Assert
-			using (var assertContext = new SmartDormitoryContext(contextOptions))
-			{
-				var userService = new UserService(assertContext, userManagerMock.Object, roleManagerMock.Object);
-
-				await Assert.ThrowsExceptionAsync<EntityDoesntExistException>(
-					() => userService.DeleteUser(userId));
-			}
-		}
 
 		[TestMethod]
 		public async Task Remove_User_When_Exists_And_Is_Not_Deleted()

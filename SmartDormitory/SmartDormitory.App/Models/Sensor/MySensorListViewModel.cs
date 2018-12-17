@@ -24,6 +24,7 @@ namespace SmartDormitory.App.Models.Sensor
             this.PollingInterval = model.PollingInterval;
 			this.Value = model.Value;
 			this.LastUpdateOn = model.LastUpdateOn;
+
         }
 
         public string Id { get; set; }

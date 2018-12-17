@@ -33,5 +33,7 @@ namespace SmartDormitory.Services.Contracts
             float maxRange, double longtitude, double latitude, bool switchOn);
 
         Task<IEnumerable<Sensor>> GetAllForUpdate();
-    }
+		Task<IEnumerable<MapSensorServiceModel>> GetAllUserCoordinates(string userId);
+
+	}
 }

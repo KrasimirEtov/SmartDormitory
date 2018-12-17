@@ -114,7 +114,7 @@ namespace SmartDormitory.Services
 		public async Task DeleteUser(string userId)
 		{
 			var user = await GetUser(userId);
-			if (user == null || user.IsDeleted)
+			if (user == null)
 			{
 				throw new EntityDoesntExistException($"\nUser doesn't exists!");
 			}

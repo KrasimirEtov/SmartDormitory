@@ -13,8 +13,8 @@
             <th class="h5 text-center">Sensor type</th>
             <th class="h5 text-center">Privacy</th>
             <th class="h5 text-center">Alarm</th>
-            <th class="h5 text-center">State</th>
-            <th class="h5 text-center">Details</th>
+            <th class="h5 text-center">Delete/Restore</th>
+            <th class="h5 text-center">Edit</th>
         </tr>
     </thead>
     <tbody class="bg-white">
@@ -33,7 +33,7 @@
                         <span >@sensor.Name</span>
                     </a>
                 </td>
-                <td>
+                <td class="text-center">
                     <a asp-area="Identity" asp-route-userId="@(sensor.OwnerId)" asp-page="/Account/Manage/Index">
                         @sensor.OwnerUsername
                     </a>

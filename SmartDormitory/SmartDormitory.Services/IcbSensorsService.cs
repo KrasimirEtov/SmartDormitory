@@ -112,7 +112,8 @@ namespace SmartDormitory.Services
                     MinRangeValue = s.MinRangeValue,
                     MaxRangeValue = s.MaxRangeValue,
                     PollingInterval = s.PollingInterval,
-                    MeasureType = s.MeasureType
+                    MeasureType = s.MeasureType,
+                    Tag = s.Tag
                 })
                 .FirstOrDefaultAsync();
         }

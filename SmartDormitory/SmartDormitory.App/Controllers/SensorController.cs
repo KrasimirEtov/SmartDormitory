@@ -125,7 +125,8 @@ namespace SmartDormitory.App.Controllers
 				IcbSensorId = icbSensorId,
 				PollingInterval = icbSensor.PollingInterval,
 				ApiPollingInterval = icbSensor.PollingInterval,
-				UserId = userId
+				UserId = userId,
+                ChoosenSensorModel = icbSensor.Tag.SplitTag()
 			};
 
 			if (icbSensor.MeasureType.MeasureUnit == "(true/false)")
@@ -147,7 +148,7 @@ namespace SmartDormitory.App.Controllers
 		{
 			if (!this.ModelState.IsValid)
 			{
-				TempData["Error-Message"] = "Error while trying to create a new sensor";
+				TempData["Error-Message"] = "Please enter valid alarm preferences!";
 				return this.RedirectToAction("Create", "Sensor", new
 				{
 					icbSensorId = model.IcbSensorId,
@@ -257,8 +258,10 @@ namespace SmartDormitory.App.Controllers
 					SensorId = sensor.Id,
 					UserId = sensor.UserId,
 					ApiPollingInterval = sensor.IcbSensor.PollingInterval,
-					SwitchOn = sensor.SwitchOn
-				};
+					SwitchOn = sensor.SwitchOn,
+                    ChoosenSensorModel = sensor.IcbSensor.Tag.SplitTag()
+
+                };
 
 				if (sensor.IcbSensor.MeasureType.MeasureUnit == "(true/false)")
 				{

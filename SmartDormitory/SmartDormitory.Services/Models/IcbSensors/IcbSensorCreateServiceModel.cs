@@ -12,5 +12,6 @@ namespace SmartDormitory.Services.Models.IcbSensors
 		public float MaxRangeValue { get; set; }
 		public int PollingInterval { get; set; }
 		public MeasureType MeasureType { get; set; }
-	}
+        public string Tag { get; set; }
+    }
 }

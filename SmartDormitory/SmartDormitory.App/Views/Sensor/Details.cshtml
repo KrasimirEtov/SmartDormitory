@@ -18,8 +18,8 @@
                     <div class="col-6">
                         <div class="col">
                             @if (User.IsInRole("Administrator"))
-                                    {
-                                        string areaName = User.GetId() == Model.UserId ? "" : "Administration";
+                            {
+                                string areaName = User.GetId() == Model.UserId ? "" : "Administration";
                                 <a asp-area="@areaName" asp-controller="Sensor" asp-action="Update" asp-route-sensorId="@Model.SensorId"
                                    class="btn btn-block waves-effect btn-outline-primary"><b>Edit</b></a>
                             }
@@ -58,12 +58,14 @@
                 <br />
                 <div class="card">
                     <div class="card-body text text-center">
-                        <h2 class="card-title">Sensor state:</h2>
                         <div class="form-row">
-                            <h4><i class="fas @sensorPrivacyIcon col-4"></i> @sensorPrivacyText</h4>
-                            <h4><i class="fas @sensorAlarmIcon col-3"></i> @sensorAlarmText</h4>
+                            <div class="col-6">
+                                <h4><i class="fas @sensorPrivacyIcon "></i> @sensorPrivacyText</h4>
+                            </div>
+                            <div class="col-6">
+                                <h4><i class="fas @sensorAlarmIcon"></i> @sensorAlarmText</h4>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>

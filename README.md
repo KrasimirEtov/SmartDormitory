@@ -5,11 +5,12 @@
 - Иван Китуков - https://github.com/imkitukov
 
 ## Presents
-![alt text](HomeIndex)
+![alt text](https://raw.githubusercontent.com/imkitukov/SmartDormitory/master/DemoImages/IndexDemo.jpg)
 
 ## Features
 Smart Dormitory has some of the following functionalities:
 * Authentication
+    * User can delete his own profile
 * Sensor operations:
     * Register
     * Edit
@@ -27,16 +28,22 @@ Smart Dormitory has some of the following functionalities:
     * Hangfire Dashboard access
     * Manipulate all user sensors
 
-![alt text](SensorMapDemo)
+![alt text](https://raw.githubusercontent.com/imkitukov/SmartDormitory/master/DemoImages/MapsDemo.jpg)
 
 ## Tech Stack
-* ASP.NET Core0 - v2.2
-* Razor Pages
+* ASP.NET Core - v2.2
 * Entity Framework Core - v2.2
-* SignalR
 * Material Design for Boostrap 4 - v4.5.14
 * Hangfire - v1.6.21
+* jQuery 3.3.1
 * JustGage - v1.29
 * Toastr - v2.1.4
 * Moq - v4.10.1
 * MS Test Framework - v1.4.0
+* SignalR
+* Razor Pages
+* JavaScript
+* AJAX
+* HTML
+* CSS
+* Google Maps API

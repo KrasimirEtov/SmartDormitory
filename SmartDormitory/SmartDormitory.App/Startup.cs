@@ -122,19 +122,18 @@ namespace SmartDormitory.App
         {
             services.AddMemoryCache();
 
-            services
-              .AddMvc(options =>
-              {
-                  options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
-              })
-              .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-              .AddRazorPagesOptions(options =>
-              {
-                  options.AllowAreas = true;
-                  options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
-                  options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
-              })
-              .AddNToastNotifyToastr();
+			services
+			  .AddMvc(options =>
+			  {
+				  options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+			  })
+			  .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+			  .AddRazorPagesOptions(options =>
+			  {
+				  options.AllowAreas = true;
+				  options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+				  options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+			  });
 
             services.AddSignalR();
         }
@@ -199,7 +198,6 @@ namespace SmartDormitory.App
             RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(x => x.ReviseIcbSensors(), Cron.Hourly());
             RecurringJob.AddOrUpdate<IHangfireJobsScheduler>(x => x.HardTenSecondsRecurringJob(), Cron.Minutely());
 
-            app.UseNToastNotify();
             app.UseSignalR(routes =>
             {
                 routes.MapHub<NotificationsHub>("/notificationHub");

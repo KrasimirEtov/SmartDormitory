@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using NToastNotify;
 using SmartDormitory.App.Infrastructure.Common;
 using System.Threading.Tasks;
 

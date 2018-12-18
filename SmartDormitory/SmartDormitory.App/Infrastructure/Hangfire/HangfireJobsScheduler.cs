@@ -29,25 +29,20 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
             this.apiService = apiService;
         }
 
-        public void ActivateRecurringJobs()
-        {
-            //RecurringJob.AddOrUpdate(() => this.UpdateIcbSensors(), Cron.Hourly());         
-        }
-
         // seed icb sensors and check for new ones
         public async Task ReviseIcbSensors()
         {
             try
             {
-                var upToDateApiSensors = await apiService.GetAllIcbSensors();
-                var dbExistingSensors = await icbSensorsService.GetAll();
+                var upToDateApiSensors = await this.apiService.GetAllIcbSensors();
+                var dbExistingSensors = await this.icbSensorsService.GetAll();
 
                 var sensorsToAdd = upToDateApiSensors
-                                .Where(s => !dbExistingSensors
-                                       .Any(dbSensor => dbSensor.Id != s.ApiSensorId))
-                                .ToList();
+                                        .Where(s => !dbExistingSensors
+                                                .Any(dbSensor => dbSensor.Id != s.ApiSensorId))
+                                        .ToList();
 
-                await icbSensorsService.AddSensors(sensorsToAdd);
+                await this.icbSensorsService.AddSensors(sensorsToAdd);
             }
             catch (HttpRequestException e)
             {
@@ -77,15 +72,11 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                 var notificationService = scope.ServiceProvider.GetService<INotificationService>();
                 var dbContext = scope.ServiceProvider.GetService<SmartDormitoryContext>();
 
-                var userSensorsForUpdate = await sensorsService.GetAllForUpdate();
-
-                bool isApiDown = false;
-                string apiExceptionMessage = string.Empty;
-
-                //                              icbSensorId   
                 var liveDataCache = new Dictionary<string, ApiSensorValueDTO>();
                 var sensorsToUpdate = new List<Sensor>();
                 var alarmsActivatedSensors = new List<Sensor>();
+
+                var userSensorsForUpdate = await sensorsService.GetAllForUpdate();
 
                 foreach (var userSensor in userSensorsForUpdate)
                 {
@@ -106,14 +97,13 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                         {
                             userSensor.CurrentValue = newValue;
                         }
-
                         userSensor.LastUpdateOn = liveSensorData.TimeStamp;
+
                         // populate list of sensors which data should be updated
                         sensorsToUpdate.Add(userSensor);
 
                         if (userSensor.AlarmOn &&
-                                (newValue <= userSensor.MinRangeValue ||
-                                 newValue >= userSensor.MaxRangeValue))
+                                (newValue <= userSensor.MinRangeValue || newValue >= userSensor.MaxRangeValue))
                         {
                             // populate list of sensors with activated alarms
                             alarmsActivatedSensors.Add(userSensor);
@@ -121,42 +111,21 @@ namespace SmartDormitory.App.Infrastructure.Hangfire
                     }
                     catch (HttpRequestException e)
                     {
-                        isApiDown = true;
-                        apiExceptionMessage = e.Message;
+                        await this.notificationManager.SendUIErrorAlerts(e.Message);
                     }
                 }
 
-                if (isApiDown)
+                //stage notifications
+                var notifications = await notificationService.CreateAlarmNotifications(alarmsActivatedSensors);
+
+                foreach (var notify in notifications)
                 {
-                    // no internet connection
-                    if (apiExceptionMessage.Equals("No such host is known"))
-                    {
-                        apiExceptionMessage = "Check your internet connection!";
-                        await this.notificationManager.SendRegularUsersAlert(apiExceptionMessage);
-                    }
-                    else
-                    {
-                        await this.notificationManager.SendRegularUsersAlert("Sorry for the inconvenience, our data provider is down. We’re working on it.");
-                    }
-                    await this.notificationManager.SendAdminsAlert(apiExceptionMessage);
+                    await this.notificationManager.SendNotification(notify.ReceiverId, notify.Title);
                 }
-                else
-                {
-                    //create and send alarm notifications
-                    var notifications = await notificationService.CreateAlarmNotifications(alarmsActivatedSensors);
 
-                    foreach (var notify in notifications)
-                    {
-                        await this.notificationManager.SendNotification(notify.ReceiverId, notify.Title);
-                    }
-
-                    //update all user sensors data at once
-                    //await sensorsService.UpdateRange(sensorsToUpdate);
-
-                    //--- save everything at once
-                    dbContext.UpdateRange(sensorsToUpdate);
-                    await dbContext.SaveChangesAsync();
-                }
+                //--- Save everything(sensors + notifies) with one transaction
+                dbContext.UpdateRange(sensorsToUpdate);
+                await dbContext.SaveChangesAsync();
             }
         }
     }

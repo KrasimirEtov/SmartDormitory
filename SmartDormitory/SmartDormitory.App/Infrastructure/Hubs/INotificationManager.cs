@@ -9,5 +9,7 @@ namespace SmartDormitory.App.Infrastructure.Hubs
         Task SendRegularUsersAlert(string message);
 
         Task SendAdminsAlert(string message);
+
+        Task SendUIErrorAlerts(string message);
     }
 }

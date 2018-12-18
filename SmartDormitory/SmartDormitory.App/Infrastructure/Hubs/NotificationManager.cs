@@ -27,5 +27,20 @@ namespace SmartDormitory.App.Infrastructure.Hubs
         {
             await this.hub.Clients.Groups(WebConstants.AdminsGroup).SendAsync("ReceiveAdminAlert", message);
         }
+
+        public async Task SendUIErrorAlerts(string errorMessage)
+        {
+            // no internet connection
+            if (errorMessage.Equals(WebConstants.NoInternetExceptionMessage))
+            {
+                errorMessage = WebConstants.NoInternetUserAlert;
+                await this.SendRegularUsersAlert(errorMessage);
+            }
+            else
+            {
+                await this.SendRegularUsersAlert(WebConstants.ApiDownUserAlert);
+            }
+            await this.SendAdminsAlert(errorMessage);
+        }
     }
 }

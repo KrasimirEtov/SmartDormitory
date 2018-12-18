@@ -20,8 +20,4 @@
     <ProjectReference Include="..\SmartDormitory.Services\SmartDormitory.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="SmartDormitory.ServicesTests\NotificationService.Tests\" />
-  </ItemGroup>
-
 </Project>

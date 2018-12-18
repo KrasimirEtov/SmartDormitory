@@ -35,7 +35,7 @@ Smart Dormitory has some of the following functionalities:
 * Entity Framework Core - v2.2
 * Material Design for Boostrap 4 - v4.5.14
 * Hangfire - v1.6.21
-* jQuery 3.3.1
+* jQuery - v3.3.1
 * JustGage - v1.29
 * Toastr - v2.1.4
 * Moq - v4.10.1
@@ -44,6 +44,9 @@ Smart Dormitory has some of the following functionalities:
 * Razor Pages
 * JavaScript
 * AJAX
-* HTML
+* HTML5
 * CSS
 * Google Maps API
+
+## Visual Studio 2017 Code Coverage Results
+![alt text](https://raw.githubusercontent.com/imkitukov/SmartDormitory/master/DemoImages/CodeCoverage.jpg)

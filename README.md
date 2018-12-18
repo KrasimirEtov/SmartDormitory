@@ -9,6 +9,8 @@
 
 ## Features
 Smart Dormitory has some of the following functionalities:
+* Continius integration:
+    * [![Build status](https://dev.azure.com/krasimiretov/smartdormitory/_apis/build/status/SmartDormitory-rg%20-%20CI)](https://dev.azure.com/krasimiretov/smartdormitory/_build/latest?definitionId=2)
 * Authentication
     * User can delete his own profile
 * Sensor operations:

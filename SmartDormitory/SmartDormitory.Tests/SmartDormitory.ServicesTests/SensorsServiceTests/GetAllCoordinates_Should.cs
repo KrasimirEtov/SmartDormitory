@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.NotificationService.Tests
+namespace SmartDormitory.Tests.SmartDormitory.ServicesTests.SensorsServiceTests
 {
 	[TestClass]
 	public class GetAllCoordinates_Should

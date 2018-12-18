@@ -47,3 +47,6 @@ Smart Dormitory has some of the following functionalities:
 * HTML5
 * CSS
 * Google Maps API
+
+## Visual Studio 2017 Code Coverage Results
+![alt text](https://raw.githubusercontent.com/imkitukov/SmartDormitory/master/DemoImages/CodeCoverage.jpg)

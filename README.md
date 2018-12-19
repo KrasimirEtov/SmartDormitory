@@ -5,7 +5,7 @@
 - Иван Китуков - https://github.com/imkitukov
 
 ## Presents
-![alt text](https://raw.githubusercontent.com/imkitukov/SmartDormitory/master/DemoImages/IndexDemo.jpg)
+![alt text](https://raw.githubusercontent.com/KrasimirEtov/SmartDormitory/master/DemoImages/IndexDemo.jpg)
 
 ## Features
 Smart Dormitory has some of the following functionalities:
@@ -30,7 +30,7 @@ Smart Dormitory has some of the following functionalities:
     * Hangfire Dashboard access
     * Manipulate all user sensors
 
-![alt text](https://raw.githubusercontent.com/imkitukov/SmartDormitory/master/DemoImages/MapsDemo.jpg)
+![alt text](https://raw.githubusercontent.com/KrasimirEtov/SmartDormitory/master/DemoImages/MapsDemo.jpg)
 
 ## Tech Stack
 * ASP.NET Core - v2.2
@@ -51,4 +51,4 @@ Smart Dormitory has some of the following functionalities:
 * Google Maps API
 
 ## Visual Studio 2017 Code Coverage Results
-![alt text](https://raw.githubusercontent.com/imkitukov/SmartDormitory/master/DemoImages/CodeCoverage.jpg)
+![alt text](https://raw.githubusercontent.com/KrasimirEtov/SmartDormitory/master/DemoImages/CodeCoverage.jpg)
